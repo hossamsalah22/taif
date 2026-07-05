@@ -4,38 +4,50 @@ namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ApiResponseTrait
 {
-    /**
-     * Return a success JSON response.
-     */
-    protected function successResponse(mixed $data = null, string $message = 'Success', int $code = 200): JsonResponse
+    public function successResponse($message = '', $data = [], $status = 200): JsonResponse
     {
-        $response = [
-            'success' => true,
-            'message' => $message,
-            'data'    => $data,
-        ];
+        $isDashboard = str_starts_with(request()->route()->getName(), 'dashboard');
+        if ($data instanceof ResourceCollection) {
+            $response = $data->additional([
+                'status' => true,
+                'message' => $message,
+            ])->response()->setStatusCode($status);
 
-        return response()->json($response, $code);
-    }
+            $originalData = $response->getData(true);
+            if (isset($originalData['links'])) {
+                if (! $isDashboard) {
+                    unset($originalData['links']);
+                }
+                $response->setData($originalData);
+            }
 
-    /**
-     * Return an error JSON response.
-     */
-    protected function errorResponse(string $message = 'Error', int $code = 400, mixed $errors = null): JsonResponse
-    {
-        $response = [
-            'success' => false,
-            'message' => $message,
-        ];
+            $originalData = $response->getData(true);
+            if (isset($originalData['meta']['links'])) {
+                if (! $isDashboard) {
+                    unset($originalData['meta']['links']);
+                }
+                $response->setData($originalData);
+            }
 
-        if (!empty($errors)) {
-            $response['errors'] = $errors;
+            return $response;
         }
 
-        return response()->json($response, $code);
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $data,
+        ], $status);
+    }
+
+    public function failedResponse($message = '', $errors = [], $status = 422): JsonResponse
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message,
+            'errors' => $errors,
+        ], $status);
     }
 }

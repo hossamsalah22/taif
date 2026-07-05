@@ -17,11 +17,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ShieldSeeder::class,
             RoleSeeder::class,
-            AdminSeeder::class,
             CountrySeeder::class,
             RegionSeeder::class,
             CitySeeder::class,
             DistrictSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }

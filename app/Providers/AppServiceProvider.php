@@ -6,6 +6,8 @@ use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Models\Admin;
 use App\Rules\PhoneNumberRule;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
+use Event;
+use Illuminate\Auth\Events\Login as LoginEvent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
@@ -34,6 +36,15 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::before(function (Admin $user, string $ability): ?bool {
             return $user->isSuperAdmin() ? true : null;
+        });
+
+        Event::listen(LoginEvent::class, function (LoginEvent $event) {
+            $user = $event->user;
+            if ($user instanceof Admin) {
+                $user->update([
+                    'last_login_at' => now(),
+                ]);
+            }
         });
 
         Validator::extend('phone_number', function ($attribute, $value, $parameters, $validator) {
