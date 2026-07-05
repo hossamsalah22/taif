@@ -1,0 +1,119 @@
+[
+    {
+        "capital_city_id": 3,
+        "code": "RD",
+        "region_id": 1,
+        "name": {
+            "ar": "منطقة الرياض",
+            "en": "Riyadh"
+        }
+    },
+    {
+        "capital_city_id": 6,
+        "code": "MQ",
+        "region_id": 2,
+        "name": {
+            "ar": "منطقة مكة المكرمة",
+            "en": "Makkah"
+        }
+    },
+    {
+        "capital_city_id": 14,
+        "code": "MN",
+        "region_id": 3,
+        "name": {
+            "ar": "منطقة المدينة المنورة",
+            "en": "Madinah"
+        }
+    },
+    {
+        "capital_city_id": 11,
+        "code": "QA",
+        "region_id": 4,
+        "name": {
+            "ar": "منطقة القصيم",
+            "en": "Qassim"
+        }
+    },
+    {
+        "capital_city_id": 13,
+        "code": "SQ",
+        "region_id": 5,
+        "name": {
+            "ar": "المنطقة الشرقية",
+            "en": "Eastern Province"
+        }
+    },
+    {
+        "capital_city_id": 15,
+        "code": "AS",
+        "region_id": 6,
+        "name": {
+            "ar": "منطقة عسير",
+            "en": "Asir"
+        }
+    },
+    {
+        "capital_city_id": 1,
+        "code": "TB",
+        "region_id": 7,
+        "name": {
+            "ar": "منطقة تبوك",
+            "en": "Tabuk"
+        }
+    },
+    {
+        "capital_city_id": 10,
+        "code": "HA",
+        "region_id": 8,
+        "name": {
+            "ar": "منطقة حائل",
+            "en": "Hail"
+        }
+    },
+    {
+        "capital_city_id": 2213,
+        "code": "SH",
+        "region_id": 9,
+        "name": {
+            "ar": "منطقة الحدود الشمالية",
+            "en": "Northern Borders"
+        }
+    },
+    {
+        "capital_city_id": 17,
+        "code": "GA",
+        "region_id": 10,
+        "name": {
+            "ar": "منطقة جازان",
+            "en": "Jazan"
+        }
+    },
+    {
+        "capital_city_id": 3417,
+        "code": "NG",
+        "region_id": 11,
+        "name": {
+            "ar": "منطقة نجران",
+            "en": "Najran"
+        }
+    },
+    {
+        "capital_city_id": 1542,
+        "code": "BA",
+        "region_id": 12,
+        "name": {
+            "ar": "منطقة الباحة",
+            "en": "Bahah"
+        }
+    },
+    {
+        "capital_city_id": 2237,
+        "code": "GO",
+        "region_id": 13,
+        "name": {
+            "ar": "منطقة ال",
+            "en": "Jawf"
+        }
+    }
+]
