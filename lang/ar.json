@@ -377,5 +377,16 @@
     "help_center_slogan_en": "شعار مركز المساعدة (بالإنجليزية)",
     "privacy_pillars": "أعمدة الخصوصية",
     "body_ar": "المحتوى (بالعربية)",
-    "body_en": "المحتوى (بالإنجليزية)"
+    "body_en": "المحتوى (بالإنجليزية)",
+    "question": "السؤال",
+    "answer": "الجواب",
+    "faq_order": "الترتيب",
+    "change_order": "تغيير الترتيب",
+    "select_new_order": "اختر الترتيب الجديد",
+    "order_updated_successfully": "تم تحديث الترتيب بنجاح",
+    "change_faq_order": "تغيير ترتيب الأسئلة",
+    "change_faq_order_description": "اختر الترتيب الجديد لهذا السؤال.",
+    "deactivate": "إلغاء التفعيل",
+    "faqs": "الأسئلة الشائعة",
+    "faq": "السؤال الشائع"
 }

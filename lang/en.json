@@ -361,5 +361,16 @@
     "help_center_slogan_en": "Help Center Slogan (English)",
     "privacy_pillars": "Privacy Pillars",
     "body_ar": "Body (Arabic)",
-    "body_en": "Body (English)"
+    "body_en": "Body (English)",
+    "question": "Question",
+    "answer": "Answer",
+    "faq_order": "Order",
+    "change_order": "Change Order",
+    "select_new_order": "Select New Order",
+    "order_updated_successfully": "Order Updated Successfully",
+    "change_faq_order": "Change FAQ Order",
+    "change_faq_order_description": "Select the new order for this FAQ.",
+    "deactivate": "Deactivate",
+    "faqs": "Faqs",
+    "faq": "Faq"
 }
