@@ -15,7 +15,7 @@ class Localization
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $authLocale = auth('user')->check() ? auth('user')->user()->locale : (auth('provider')->check() ? auth('provider')->user()->locale : null);
+        $authLocale = auth('user')->check() ? auth('user')->user()->locale : null;
         $acceptLanguage = $authLocale ?? $request->header('Accept-Language', 'ar');
 
         $locale = $this->parseLocale($acceptLanguage);

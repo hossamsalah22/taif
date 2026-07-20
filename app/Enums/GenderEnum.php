@@ -6,14 +6,28 @@ enum GenderEnum: string
 {
     case MALE = 'male';
     case FEMALE = 'female';
-    case OTHER = 'other';
 
-    public function label(): string
+    public static function label(self $status): string
     {
-        return match ($this) {
+        return match ($status) {
             self::MALE => __('male'),
-            self::FEMALE => __('female'),
-            self::OTHER => __('other'),
+            self::FEMALE => __('female')
         };
+    }
+
+    public static function color(self $status): string
+    {
+        return match ($status) {
+            self::MALE => 'primary',
+            self::FEMALE => 'success'
+        };
+    }
+
+    public static function options(): array
+    {
+        return [
+            self::MALE->value => __('male'),
+            self::FEMALE->value => __('female'),
+        ];
     }
 }

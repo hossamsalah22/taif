@@ -42,9 +42,9 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->favicon(Storage::url('clarity.svg'))
-            ->brandLogo(Storage::url('clarity_header.svg'))
-            ->brandLogoHeight('3.3rem')
+            ->favicon(Storage::url('tayf.svg'))
+            ->brandLogo(Storage::url('tayf.svg'))
+            ->brandLogoHeight('4rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

@@ -3,13 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\GenderEnum;
+use App\Enums\UserStatusEnum;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -22,7 +24,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, InteractsWithMedia, Notifiable;
+    use HasApiTokens, HasFactory, InteractsWithMedia, Notifiable, SoftDeletes;
 
     /**
      * Get the attributes that should be cast.
@@ -32,8 +34,7 @@ class User extends Authenticatable implements HasMedia
     protected function casts(): array
     {
         return [
-            'date_of_birth' => 'date',
-            'gender' => GenderEnum::class,
+            'status' => UserStatusEnum::class,
             'is_active' => 'boolean',
             'is_verified' => 'boolean',
             'receive_notifications' => 'boolean',
@@ -75,5 +76,10 @@ class User extends Authenticatable implements HasMedia
     public function country()
     {
         return $this->belongsTo(Country::class, 'country_code', 'iso');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Child::class, 'parent_id');
     }
 }

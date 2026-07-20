@@ -17,10 +17,9 @@ return new class extends Migration
             $table->string('phone')->nullable()->unique(); // nullable only for google and apple login
             $table->string('country_code', 2)->default('SA');
             $table->string('email')->nullable()->unique(); // nullable only for google and apple login
-            $table->date('date_of_birth')->nullable(); // nullable only for google and apple login
-            $table->string('gender')->nullable(); // nullable only for google and apple login
-            $table->boolean('is_active')->default(true);
             $table->boolean('is_verified')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->string('status');
             $table->boolean('receive_notifications')->default(true);
             $table->string('otp')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
@@ -28,6 +27,7 @@ return new class extends Migration
             $table->string('google_id')->nullable();
             $table->string('apple_id')->nullable();
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
 

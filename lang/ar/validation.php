@@ -222,6 +222,10 @@ return [
         'package_id' => 'الباقة',
         'payment_method' => 'طريقة الدفع',
         'purchasable_id' => 'القابل للشراء',
+        'age' => 'العمر',
+        'autism_level' => 'مستوى التوحد',
+        'speech_status' => 'حالة النطق',
+        'educational_status' => 'الحالة التعليمية',
     ],
 
     'country_codes' => [

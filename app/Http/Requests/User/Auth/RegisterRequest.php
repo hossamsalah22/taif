@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\User\Auth;
 
-use App\GenderEnum;
+use App\Enums\UserStatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Enum;
 
 class RegisterRequest extends FormRequest
 {
@@ -30,8 +29,6 @@ class RegisterRequest extends FormRequest
             'country_code' => ['required', 'string', 'max:10'],
             'phone' => ['required', 'string', 'phone_number', 'unique:users,phone'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'date_of_birth' => ['required', 'date', 'before:'.today()->subYears(18)->format('Y-m-d')],
-            'gender' => ['required', new Enum(GenderEnum::class)],
             'terms_and_conditions' => ['required', 'accepted'],
         ];
     }
@@ -56,5 +53,10 @@ class RegisterRequest extends FormRequest
         return [
             'phone.phone_number' => __('validation.phone_number', ['country_code' => __('validation.country_codes.'.($this->input('country_code') ?? 'SA'))]),
         ];
+    }
+
+    public function validated($key = null, $default = null)
+    {
+        return array_merge(parent::validated(), ['status' => UserStatusEnum::PENDING]);
     }
 }

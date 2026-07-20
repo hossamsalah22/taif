@@ -12,6 +12,7 @@
         "php": "^8.3",
         "abdulmajeed-jamaan/filament-translatable-tabs": "^4.0",
         "althinect/filament-spatie-roles-permissions": "^3.3",
+        "barryvdh/laravel-dompdf": "^3.1",
         "bezhansalleh/filament-language-switch": "^4.3",
         "bezhansalleh/filament-shield": "^4.2",
         "filament/filament": "~4.0",
