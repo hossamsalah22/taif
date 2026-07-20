@@ -20,11 +20,9 @@ class AssessmentController extends Controller
             return $this->failedResponse('Unauthorized access to this child profile.', 403);
         }
 
-        $severityLevel = $child->autism_level;
-
         $assessment = Assessment::with(['questions' => function ($query) {
             $query->orderBy('order');
-        }])->where('autism_level', $severityLevel->value)->first();
+        }])->where('autism_level', $child->autism_level->value)->first();
 
         if (! $assessment) {
             return $this->failedResponse('No assessment found for this severity level.', 404);

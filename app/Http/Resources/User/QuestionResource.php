@@ -20,6 +20,11 @@ class QuestionResource extends JsonResource
             'prompt' => $this->prompt,
             'exercise_type' => ExerciseTypeEnum::label($this->exercise_type),
             'video_url' => $this->video_url,
+            'audio' => $this->audio,
+            'image' => $this->image,
+            'distractors' => $this->distractors,
+            'shared_elements' => $this->shared_elements,
+            'options' => QuestionOptionResource::collection($this->options),
             'payload' => $this->payload,
             'order' => $this->order,
         ];

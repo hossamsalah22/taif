@@ -75,12 +75,35 @@ class AssessmentsTable
                             $newQuestion->assessment_id = $newAssessment->id;
                             $newQuestion->save();
 
-                            // Duplicate media (assuming we want to keep references or actually duplicate? Spatie Media Library allows copying)
+                            // Duplicate media on Question
                             $question->getMedia('question_audio')->each(function ($media) use ($newQuestion) {
                                 $media->copy($newQuestion, 'question_audio');
                             });
                             $question->getMedia('question_image')->each(function ($media) use ($newQuestion) {
                                 $media->copy($newQuestion, 'question_image');
+                            });
+                            $question->getMedia('distractors')->each(function ($media) use ($newQuestion) {
+                                $media->copy($newQuestion, 'distractors');
+                            });
+                            $question->getMedia('shared_elements')->each(function ($media) use ($newQuestion) {
+                                $media->copy($newQuestion, 'shared_elements');
+                            });
+
+                            // Clone Question Options
+                            $question->options->each(function (\App\Models\QuestionOption $option) use ($newQuestion) {
+                                $newOption = $option->replicate(['question_id']);
+                                $newOption->question_id = $newQuestion->id;
+                                $newOption->save();
+
+                                $option->getMedia('left_element')->each(function ($media) use ($newOption) {
+                                    $media->copy($newOption, 'left_element');
+                                });
+                                $option->getMedia('right_element')->each(function ($media) use ($newOption) {
+                                    $media->copy($newOption, 'right_element');
+                                });
+                                $option->getMedia('image')->each(function ($media) use ($newOption) {
+                                    $media->copy($newOption, 'image');
+                                });
                             });
                         });
 

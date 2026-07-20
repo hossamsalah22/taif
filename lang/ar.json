@@ -447,5 +447,6 @@
     "This will create a new draft version of this assessment. The current active version will remain active until you publish the new one.": "سيؤدي هذا إلى إنشاء مسودة جديدة لهذا التقييم. سيبقى الإصدار النشط حاليًا نشطًا حتى تقوم بنشر النسخة الجديدة.",
     "Publish Updated Package": "نشر الباقة المحدثة",
     "If there is an active assessment with this severity level, it will be automatically deprecated.": "إذا كان هناك تقييم نشط لهذا المستوى، فسيتم إهماله تلقائيًا.",
-    "Status": "الحالة"
+    "Status": "الحالة",
+    "No assessment found for this severity level.": "لم يتم العثور على تقييم لهذا المستوى"
 }

@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Assessments\Schemas;
 
 use App\Enums\AutismLevelEnum;
 use App\Enums\ExerciseTypeEnum;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -54,13 +53,16 @@ class AssessmentForm
                                 SpatieMediaLibraryFileUpload::make('question_image')
                                     ->label(__('Target Image (Correct Object)'))
                                     ->collection('question_image')
+                                    ->disk('public')
                                     ->image()
                                     ->maxSize(5120)
                                     ->visible(fn (Get $get) => in_array($get('exercise_type'), [ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::DISTINGUISHING->value]))
                                     ->required(fn (Get $get) => in_array($get('exercise_type'), [ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::DISTINGUISHING->value])),
 
-                                FileUpload::make('payload.distractors')
+                                SpatieMediaLibraryFileUpload::make('distractors')
                                     ->label(__('Distractor Objects Pool'))
+                                    ->collection('distractors')
+                                    ->disk('public')
                                     ->image()
                                     ->multiple()
                                     ->minFiles(2)
@@ -69,28 +71,50 @@ class AssessmentForm
                                     ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::IMAGE_SELECTION->value)
                                     ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::IMAGE_SELECTION->value),
 
-                                Repeater::make('payload.matching_pairs')
+                                Repeater::make('matchingPairs')
+                                    ->relationship()
                                     ->label(__('Matching Matrix Rows Manager'))
                                     ->schema([
-                                        FileUpload::make('left_element')->label(__('Left element'))->image()->maxSize(5120)->required(),
-                                        FileUpload::make('right_element')->label(__('Right element'))->image()->maxSize(5120)->required(),
+                                        SpatieMediaLibraryFileUpload::make('left_element')
+                                            ->disk('public')
+                                            ->collection('left_element')
+                                            ->label(__('Left element'))
+                                            ->image()
+                                            ->maxSize(5120)
+                                            ->required(),
+                                        SpatieMediaLibraryFileUpload::make('right_element')
+                                            ->disk('public')
+                                            ->collection('right_element')
+                                            ->label(__('Right element'))
+                                            ->image()
+                                            ->maxSize(5120)
+                                            ->required(),
                                     ])
                                     ->columns(2)
                                     ->minItems(3)
                                     ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::MATCHING->value)
                                     ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::MATCHING->value),
 
-                                Repeater::make('payload.ordering_steps')
+                                Repeater::make('orderingSteps')
+                                    ->relationship()
                                     ->label(__('Chronological Sequence Slider'))
                                     ->schema([
-                                        FileUpload::make('image')->label(__('Image'))->image()->maxSize(5120)->required(),
+                                        SpatieMediaLibraryFileUpload::make('image')
+                                            ->disk('public')
+                                            ->collection('image')
+                                            ->label(__('Image'))
+                                            ->image()
+                                            ->maxSize(5120)
+                                            ->required(),
                                     ])
                                     ->minItems(2)
                                     ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::ORDERING->value)
                                     ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::ORDERING->value),
 
-                                FileUpload::make('payload.shared_elements')
+                                SpatieMediaLibraryFileUpload::make('shared_elements')
                                     ->label(__('Shared Characteristic Elements'))
+                                    ->collection('shared_elements')
+                                    ->disk('public')
                                     ->image()
                                     ->multiple()
                                     ->maxSize(5120)
@@ -99,6 +123,7 @@ class AssessmentForm
 
                                 SpatieMediaLibraryFileUpload::make('question_audio')
                                     ->label(__('Audio File'))
+                                    ->disk('public')
                                     ->collection('question_audio')
                                     ->acceptedFileTypes(['audio/mpeg', 'audio/wav'])
                                     ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
