@@ -21,6 +21,8 @@ class Assessment extends Model
         'status' => AssessmentStatusEnum::class,
     ];
 
+    protected $with = ['questions'];
+
     public function questions()
     {
         return $this->hasMany(Question::class);

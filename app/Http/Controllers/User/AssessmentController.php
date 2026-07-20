@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubmitAssessmentRequest;
+use App\Http\Resources\User\AssessmentResource;
 use App\Models\Assessment;
 use App\Models\Child;
 use Illuminate\Http\Request;
@@ -15,23 +16,21 @@ class AssessmentController extends Controller
      */
     public function registrationTest(Request $request, Child $child)
     {
-        if ($child->parent_id !== $request->user()->id) {
-            abort(403, 'Unauthorized access to this child profile.');
+        if ($child->parent_id !== auth('user')->id()) {
+            return $this->failedResponse('Unauthorized access to this child profile.', 403);
         }
 
-        $severityLevel = $child->autism_spectrum_level ?? 'low'; // Default to low if not specified
+        $severityLevel = $child->autism_level;
 
         $assessment = Assessment::with(['questions' => function ($query) {
             $query->orderBy('order');
-        }])->where('severity_level', strtolower($severityLevel))->first();
+        }])->where('autism_level', $severityLevel->value)->first();
 
         if (! $assessment) {
-            return response()->json(['message' => 'No assessment found for this severity level.'], 404);
+            return $this->failedResponse('No assessment found for this severity level.', 404);
         }
 
-        return response()->json([
-            'assessment' => $assessment,
-        ]);
+        return $this->successResponse(__('Retrieved Successfully'), new AssessmentResource($assessment));
     }
 
     /**

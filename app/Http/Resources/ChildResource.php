@@ -25,6 +25,7 @@ class ChildResource extends JsonResource
             'autism_level' => AutismLevelEnum::label($this->autism_level),
             'speech_status' => SpeechStatusEnum::label($this->speech_status),
             'educational_status' => $this->educational_status,
+            'number_of_assessment_submissions' => $this->assessmentSubmissions()->count(),
         ];
     }
 }

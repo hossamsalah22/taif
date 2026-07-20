@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Guarded(['id'])]
 class Child extends Model
@@ -21,11 +22,18 @@ class Child extends Model
         'speech_status' => SpeechStatusEnum::class,
     ];
 
+    protected $with = ['assessmentSubmissions'];
+
     /**
      * Get the parent that owns the child.
      */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(User::class, 'parent_id');
+    }
+
+    public function assessmentSubmissions(): HasMany
+    {
+        return $this->hasMany(AssessmentSubmission::class);
     }
 }

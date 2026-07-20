@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssessmentReportController;
 use App\Http\Controllers\Global\AutismLevelController;
 use App\Http\Controllers\Global\GenderController;
 use App\Http\Controllers\Global\SpeechStatusesController;
+use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\OtpController;
 use App\Http\Controllers\User\Auth\RegisterController;
