@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Assessment;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SubmitAssessmentRequest extends FormRequest
@@ -11,14 +13,13 @@ class SubmitAssessmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $child = $this->route('child');
-        return $child && $child->parent_id === $this->user()->id;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -28,5 +29,26 @@ class SubmitAssessmentRequest extends FormRequest
             'answers.*.question_id' => ['required', 'exists:questions,id'],
             'answers.*.answer_data' => ['required'], // can be string, array, etc depending on exercise type
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $assessmentId = $this->input('assessment_id');
+            $answers = $this->input('answers', []);
+
+            if ($assessmentId && is_array($answers)) {
+                $assessment = Assessment::find($assessmentId);
+
+                if ($assessment) {
+                    $assessmentQuestionIds = $assessment->questions()->pluck('id');
+                    $submittedQuestionIds = collect($answers)->pluck('question_id');
+
+                    if ($assessmentQuestionIds->diff($submittedQuestionIds)->isNotEmpty()) {
+                        $validator->errors()->add('answers', __('All questions must be answered before submission.'));
+                    }
+                }
+            }
+        });
     }
 }

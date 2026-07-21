@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions;
 
-use App\Filament\Resources\AssessmentSubmissions\Pages\CreateAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Pages\EditAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ListAssessmentSubmissions;
+use App\Filament\Resources\AssessmentSubmissions\Pages\ViewAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Schemas\AssessmentSubmissionForm;
+use App\Filament\Resources\AssessmentSubmissions\Schemas\AssessmentSubmissionInfolist;
 use App\Filament\Resources\AssessmentSubmissions\Tables\AssessmentSubmissionsTable;
 use App\Filament\Resources\MainResource;
 use App\Models\AssessmentSubmission;
@@ -13,6 +14,7 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AssessmentSubmissionResource extends MainResource
 {
@@ -23,6 +25,11 @@ class AssessmentSubmissionResource extends MainResource
     public static function form(Schema $schema): Schema
     {
         return AssessmentSubmissionForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return AssessmentSubmissionInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table
@@ -37,12 +44,27 @@ class AssessmentSubmissionResource extends MainResource
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListAssessmentSubmissions::route('/'),
-            'create' => CreateAssessmentSubmission::route('/create'),
+            'view' => ViewAssessmentSubmission::route('/{record}'),
             'edit' => EditAssessmentSubmission::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with([
+                'answers.question.options.media',
+                'answers.question.matchingPairs.media',
+                'answers.question.orderingSteps.media',
+            ]);
     }
 }

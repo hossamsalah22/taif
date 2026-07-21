@@ -12,7 +12,18 @@ class AssessmentSubmission extends Model
     protected $fillable = [
         'child_id',
         'assessment_id',
+        'assessment_version',
         'status',
+        'notes',
+        'strengths',
+        'improvements',
+        'recommendations',
+        'diagnosed_severity_level',
+        'report_published_at'
+    ];
+
+    protected $casts = [
+        'report_published_at' => 'datetime'
     ];
 
     public function child()

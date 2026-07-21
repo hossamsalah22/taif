@@ -20,18 +20,18 @@ class AssessmentReportResource extends JsonResource
             'assessment' => [
                 'id' => $this->assessment->id,
                 'title' => $this->assessment->title,
-                'severity_level' => $this->assessment->severity_level,
+                'version' => $this->assessment_version,
             ],
             'status' => $this->status,
             'submitted_at' => $this->created_at,
-            'report_details' => $this->answers->map(function ($answer) {
-                return [
-                    'question_id' => $answer->question->id,
-                    'prompt' => $answer->question->prompt,
-                    'exercise_type' => $answer->question->exercise_type,
-                    'provided_answer' => $answer->answer_data,
-                ];
-            }),
+            'report_published_at' => $this->report_published_at,
+            'baseline_severity_level' => $this->child->autism_level->value ?? null,
+            'diagnosed_severity_level' => $this->diagnosed_severity_level,
+            'strengths' => $this->strengths,
+            'improvements' => $this->improvements,
+            'recommendations' => $this->recommendations,
+            'download_url' => route('api.reports.download', ['submission' => $this->id]),
+            // Removing full answers payload since report details screen is mostly specialist analysis
         ];
     }
 }

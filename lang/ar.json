@@ -456,5 +456,22 @@
     "Card Image": "صورة البطاقة",
     "Card Audio File": "الملف الصوتي للبطاقة",
     "Is Correct Answer": "إجابة صحيحة",
-    "Options": "الخيارات"
+    "Options": "الخيارات",
+    "All questions must be answered before submission.": "يجب الإجابة على جميع الأسئلة قبل الإرسال",
+    "Assessment version mismatch with child severity level.": "يجب أن يتطابق مستوى التقييم مع مستوى التوحد لدى الطفل.",
+    "Assessment submitted successfully.": "تم إرسال التقييم بنجاح.",
+    "Specialist Report": "تقرير الأخصائي",
+    "Diagnosed Severity Level": "مستوى الشدة المشخص",
+    "Strengths": "نقاط القوة",
+    "Areas for Improvement": "مجالات التحسين",
+    "Specialist Recommendations": "توصيات الأخصائي",
+    "Assessment Answers": "إجابات التقييم",
+    "Answers": "الإجابات",
+    "Question Prompt": "السؤال",
+    "Exercise Type": "نوع التمرين",
+    "Answer Data / Selected Options": "الإجابة / الخيارات المحددة",
+    "Publish Report": "نشر التقرير",
+    "Report Published Successfully": "تم نشر التقرير بنجاح",
+    "Watched": "تمت المشاهدة",
+    "Question": "السؤال"
 }

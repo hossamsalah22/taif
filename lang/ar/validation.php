@@ -226,6 +226,8 @@ return [
         'autism_level' => 'مستوى التوحد',
         'speech_status' => 'حالة النطق',
         'educational_status' => 'الحالة التعليمية',
+        'assessment_id' => 'التقييم',
+        'answers' => 'الإجابات',
     ],
 
     'country_codes' => [
