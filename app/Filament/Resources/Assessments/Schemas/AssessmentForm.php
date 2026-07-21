@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Assessments\Schemas;
 
+use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Enums\AutismLevelEnum;
 use App\Enums\ExerciseTypeEnum;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -32,7 +34,13 @@ class AssessmentForm
                             ->label(__('Title'))
                             ->required()
                             ->translatableTabs(),
-                    ]),
+                        TextInput::make('max_attempts')
+                            ->label(__('Max Allowed Attempts'))
+                            ->numeric()
+                            ->default(3)
+                            ->minValue(1)
+                            ->required(),
+                    ])->columnSpanFull(),
                 Section::make(__('Section 2: Question Nodes'))
                     ->schema([
                         Repeater::make('questions')
@@ -49,27 +57,6 @@ class AssessmentForm
                                     ->inline()
                                     ->live()
                                     ->required(),
-
-                                SpatieMediaLibraryFileUpload::make('question_image')
-                                    ->label(__('Target Image (Correct Object)'))
-                                    ->collection('question_image')
-                                    ->disk('public')
-                                    ->image()
-                                    ->maxSize(5120)
-                                    ->visible(fn (Get $get) => in_array($get('exercise_type'), [ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::DISTINGUISHING->value]))
-                                    ->required(fn (Get $get) => in_array($get('exercise_type'), [ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::DISTINGUISHING->value])),
-
-                                SpatieMediaLibraryFileUpload::make('distractors')
-                                    ->label(__('Distractor Objects Pool'))
-                                    ->collection('distractors')
-                                    ->disk('public')
-                                    ->image()
-                                    ->multiple()
-                                    ->minFiles(2)
-                                    ->maxFiles(5)
-                                    ->maxSize(5120)
-                                    ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::IMAGE_SELECTION->value)
-                                    ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::IMAGE_SELECTION->value),
 
                                 Repeater::make('matchingPairs')
                                     ->relationship()
@@ -111,23 +98,40 @@ class AssessmentForm
                                     ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::ORDERING->value)
                                     ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::ORDERING->value),
 
-                                SpatieMediaLibraryFileUpload::make('shared_elements')
-                                    ->label(__('Shared Characteristic Elements'))
-                                    ->collection('shared_elements')
-                                    ->disk('public')
-                                    ->image()
-                                    ->multiple()
-                                    ->maxSize(5120)
-                                    ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::DISTINGUISHING->value)
-                                    ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::DISTINGUISHING->value),
-
-                                SpatieMediaLibraryFileUpload::make('question_audio')
-                                    ->label(__('Audio File'))
-                                    ->disk('public')
-                                    ->collection('question_audio')
-                                    ->acceptedFileTypes(['audio/mpeg', 'audio/wav'])
-                                    ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
-                                    ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value),
+                                Repeater::make('options')
+                                    ->relationship()
+                                    ->label(__('Options'))
+                                    ->schema([
+                                        TranslatableTabs::make()
+                                            ->schema([
+                                                TextInput::make('title')
+                                                    ->label(__('Card Title'))
+                                                    ->required(),
+                                            ])
+                                            ->visible(fn (Get $get) => $get('../../exercise_type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value
+                                            ),
+                                        SpatieMediaLibraryFileUpload::make('image')
+                                            ->disk('public')
+                                            ->collection('image')
+                                            ->label(__('Card Image'))
+                                            ->image()
+                                            ->maxSize(5120)
+                                            ->required(),
+                                        SpatieMediaLibraryFileUpload::make('audio')
+                                            ->disk('public')
+                                            ->collection('audio')
+                                            ->label(__('Card Audio File'))
+                                            ->acceptedFileTypes(['audio/mpeg', 'audio/wav'])
+                                            ->visible(fn (Get $get) => $get('../../exercise_type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
+                                            ->required(fn (Get $get) => $get('../../exercise_type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value),
+                                        Toggle::make('is_correct')
+                                            ->label(__('Is Correct Answer'))
+                                            ->default(false),
+                                    ])
+                                    ->minItems(2)
+                                    ->columns(2)
+                                    ->visible(fn (Get $get) => in_array($get('exercise_type'), [ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value]))
+                                    ->required(fn (Get $get) => in_array($get('exercise_type'), [ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value])),
 
                                 TextInput::make('video_url')
                                     ->label(__('Video URL'))
@@ -139,7 +143,7 @@ class AssessmentForm
                             ->orderColumn('order')
                             ->defaultItems(1)
                             ->collapsed(false),
-                    ]),
+                    ])->columnSpanFull(),
             ]);
     }
 }

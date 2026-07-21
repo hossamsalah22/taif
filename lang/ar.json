@@ -448,5 +448,13 @@
     "Publish Updated Package": "نشر الباقة المحدثة",
     "If there is an active assessment with this severity level, it will be automatically deprecated.": "إذا كان هناك تقييم نشط لهذا المستوى، فسيتم إهماله تلقائيًا.",
     "Status": "الحالة",
-    "No assessment found for this severity level.": "لم يتم العثور على تقييم لهذا المستوى"
+    "No assessment found for this severity level.": "لم يتم العثور على تقييم لهذا المستوى",
+    "Max Allowed Attempts": "الحد الأقصى لعدد المحاولات",
+    "Max Allowed Attempts Description": "الحد الأقصى لعدد المحاولات المسموح بها لهذا التقييم.",
+    "Audio Cards Options": "خيارات البطاقات الصوتية",
+    "Card Title": "عنوان البطاقة",
+    "Card Image": "صورة البطاقة",
+    "Card Audio File": "الملف الصوتي للبطاقة",
+    "Is Correct Answer": "إجابة صحيحة",
+    "Options": "الخيارات"
 }

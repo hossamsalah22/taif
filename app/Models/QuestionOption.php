@@ -7,10 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 
 class QuestionOption extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, HasTranslations, InteractsWithMedia;
+
+    public array $translatable = ['title'];
+
+    protected $casts = [
+        'is_correct' => 'boolean',
+    ];
 
     protected $guarded = ['id'];
 
@@ -18,7 +25,7 @@ class QuestionOption extends Model implements HasMedia
 
     protected $hidden = ['media'];
 
-    protected $appends = ['left_element', 'right_element', 'image'];
+    protected $appends = ['left_element', 'right_element', 'image', 'audio'];
 
     public function question(): BelongsTo
     {
@@ -38,23 +45,37 @@ class QuestionOption extends Model implements HasMedia
         $this->addMediaCollection('image')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
             ->singleFile();
+
+        $this->addMediaCollection('audio')
+            ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
+            ->singleFile();
     }
 
     public function getLeftElementAttribute(): ?string
     {
         $media = $this->getFirstMedia('left_element');
+
         return $media ? $media->getFullUrl() : null;
     }
 
     public function getRightElementAttribute(): ?string
     {
         $media = $this->getFirstMedia('right_element');
+
         return $media ? $media->getFullUrl() : null;
     }
 
     public function getImageAttribute(): ?string
     {
         $media = $this->getFirstMedia('image');
+
+        return $media ? $media->getFullUrl() : null;
+    }
+
+    public function getAudioAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('audio');
+
         return $media ? $media->getFullUrl() : null;
     }
 }

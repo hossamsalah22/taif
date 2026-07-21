@@ -23,6 +23,7 @@ class SubmitAssessmentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'assessment_id' => ['required', 'exists:assessments,id'],
             'answers' => ['required', 'array'],
             'answers.*.question_id' => ['required', 'exists:questions,id'],
             'answers.*.answer_data' => ['required'], // can be string, array, etc depending on exercise type

@@ -22,10 +22,16 @@ class AssessmentController extends Controller
 
         $assessment = Assessment::with(['questions' => function ($query) {
             $query->orderBy('order');
-        }])->where('autism_level', $child->autism_level->value)->first();
+        }])->where('autism_level', strtolower($child->autism_level->value))->where('status', 'active')->first();
 
         if (! $assessment) {
             return $this->failedResponse('No assessment found for this severity level.', 404);
+        }
+
+        $submissionsCount = $child->assessmentSubmissions()->where('assessment_id', $assessment->id)->count();
+
+        if ($submissionsCount >= $assessment->max_attempts && !$child->override_assessment_lock) {
+            return $this->failedResponse('You have reached the maximum number of attempts allowed for this assessment. Please await specialist feedback.', 403);
         }
 
         return $this->successResponse(__('Retrieved Successfully'), new AssessmentResource($assessment));
@@ -38,9 +44,11 @@ class AssessmentController extends Controller
     {
         $data = $request->validated();
 
-        // Find the assessment based on child's severity level (assuming they submit the one they fetched)
-        $severityLevel = $child->autism_spectrum_level ?? 'low';
-        $assessment = Assessment::where('severity_level', strtolower($severityLevel))->firstOrFail();
+        $assessment = Assessment::findOrFail($data['assessment_id']);
+
+        if ($assessment->autism_level !== strtolower($child->autism_level->value ?? 'low')) {
+             return $this->failedResponse('Assessment version mismatch with child severity level.', 400);
+        }
 
         // Create submission
         $submission = $assessment->submissions()->create([
@@ -54,6 +62,10 @@ class AssessmentController extends Controller
                 'question_id' => $answer['question_id'],
                 'answer_data' => $answer['answer_data'],
             ]);
+        }
+
+        if ($child->override_assessment_lock) {
+            $child->update(['override_assessment_lock' => false]);
         }
 
         return response()->json([

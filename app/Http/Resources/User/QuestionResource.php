@@ -15,18 +15,26 @@ class QuestionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $type = $this->exercise_type;
+
         return [
             'id' => $this->id,
             'prompt' => $this->prompt,
-            'exercise_type' => ExerciseTypeEnum::label($this->exercise_type),
-            'video_url' => $this->video_url,
-            'audio' => $this->audio,
-            'image' => $this->image,
-            'distractors' => $this->distractors,
-            'shared_elements' => $this->shared_elements,
-            'options' => QuestionOptionResource::collection($this->options),
-            'payload' => $this->payload,
+            'exercise_type' => ExerciseTypeEnum::label($type),
             'order' => $this->order,
+            'payload' => $this->payload,
+
+            $this->mergeWhen($type === ExerciseTypeEnum::DISTINGUISHING, [
+                'image' => $this->image,
+            ]),
+
+            $this->mergeWhen($type === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO, [
+                'video_url' => $this->video_url,
+            ]),
+
+            $this->mergeWhen(in_array($type, [ExerciseTypeEnum::MATCHING, ExerciseTypeEnum::ORDERING, ExerciseTypeEnum::AUDIO_FLASHCARDS, ExerciseTypeEnum::IMAGE_SELECTION, ExerciseTypeEnum::DISTINGUISHING]), [
+                'options' => QuestionOptionResource::collection($this->options),
+            ]),
         ];
     }
 }

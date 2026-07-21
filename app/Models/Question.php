@@ -50,6 +50,11 @@ class Question extends Model implements HasMedia
         return $this->hasMany(QuestionOption::class)->orderBy('order');
     }
 
+    public function audioCards(): HasMany
+    {
+        return $this->hasMany(QuestionOption::class)->orderBy('order');
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('question_audio')

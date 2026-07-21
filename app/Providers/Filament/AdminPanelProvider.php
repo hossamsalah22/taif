@@ -42,9 +42,9 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->favicon(Storage::url('tayf.svg'))
-            ->brandLogo(Storage::url('tayf.svg'))
-            ->brandLogoHeight('4rem')
+            ->favicon(Storage::url('tayf.png'))
+            ->brandLogo(Storage::url('tayf.png'))
+            ->brandLogoHeight('4.5rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

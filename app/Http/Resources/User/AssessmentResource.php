@@ -22,7 +22,8 @@ class AssessmentResource extends JsonResource
             'autism_level' => AutismLevelEnum::label($this->autism_level),
             'status' => AssessmentStatusEnum::label($this->status),
             'version' => $this->version,
-            'questions' => QuestionResource::collection($this->questions),
+            'max_attempts' => $this->max_attempts,
+            'questions' => QuestionResource::collection($this->whenLoaded('questions')),
         ];
     }
 }
