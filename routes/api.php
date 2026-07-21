@@ -12,6 +12,7 @@ use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\OtpController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\ChildController;
+use App\Http\Controllers\User\LogoutController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('user')->group(function () {
@@ -21,6 +22,7 @@ Route::prefix('user')->group(function () {
     Route::post('login', LoginController::class);
 
     Route::middleware('auth:user')->group(function () {
+        Route::delete('logout', LogoutController::class);
         Route::apiResource('children', ChildController::class);
 
         Route::prefix('children/{child}/assessments')->group(function () {
