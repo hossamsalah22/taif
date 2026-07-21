@@ -473,5 +473,17 @@
     "Publish Report": "نشر التقرير",
     "Report Published Successfully": "تم نشر التقرير بنجاح",
     "Watched": "تمت المشاهدة",
-    "Question": "السؤال"
+    "Question": "السؤال",
+    "Submission ID": "معرف التقييم",
+    "Child Profile": "ملف الطفل",
+    "Assigned Severity": "مستوى الشدة المحدد",
+    "Performance Accuracy": "دقة الأداء",
+    "Attempt Number": "رقم المحاولة",
+    "Submission Time": "وقت التقديم",
+    "Export PDF": "تصدير PDF",
+    "Request Re-evaluation": "طلب إعادة التقييم",
+    "Re-evaluation token injected.": "تم حقن الرمز لإعادة التقييم.",
+    "Header Telemetry": "معلومات التقديم",
+    "Attempt Badge": "شارة المحاولة",
+    "Submission Timestamp": "تاريخ التقييم"
 }

@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('gender');
             $table->string('autism_level');
             $table->string('speech_status');
+            $table->boolean('override_assessment_lock')->default(false);
             $table->string('educational_status')->nullable();
+            $table->boolean('force_re_test')->default(false);
             $table->timestamps();
         });
     }

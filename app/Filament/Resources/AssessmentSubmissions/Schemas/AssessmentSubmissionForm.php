@@ -4,6 +4,7 @@ namespace App\Filament\Resources\AssessmentSubmissions\Schemas;
 
 use App\Enums\AutismLevelEnum;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -29,6 +30,12 @@ class AssessmentSubmissionForm
                         Textarea::make('recommendations')
                             ->label(__('Specialist Recommendations'))
                             ->rows(3),
+                        SpatieMediaLibraryFileUpload::make('report')
+                            ->label(__('Clinical Report Document'))
+                            ->collection('reports')
+                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                            ->maxSize(10240)
+                            ->columnSpanFull(),
                     ]),
             ]);
     }

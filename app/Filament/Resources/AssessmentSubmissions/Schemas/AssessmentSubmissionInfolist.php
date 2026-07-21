@@ -15,6 +15,19 @@ class AssessmentSubmissionInfolist
     {
         return $schema
             ->components([
+                Section::make(__('Header Telemetry'))
+                    ->schema([
+                        TextEntry::make('child.user.name')
+                            ->label(__('Child Profile'))
+                            ->weight('bold'),
+                        TextEntry::make('attempt_number')
+                            ->label(__('Attempt Badge'))
+                            ->prefix('#'),
+                        TextEntry::make('created_at')
+                            ->label(__('Submission Timestamp'))
+                            ->dateTime(),
+                    ])->columns(3),
+
                 Section::make(__('Specialist Report'))
                     ->schema([
                         TextEntry::make('diagnosed_severity_level')

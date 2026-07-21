@@ -20,6 +20,11 @@ class AssessmentSubmissionResource extends MainResource
 {
     protected static ?string $model = AssessmentSubmission::class;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Assessments Management');
+    }
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema

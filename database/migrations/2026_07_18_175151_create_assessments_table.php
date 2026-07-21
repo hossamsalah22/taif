@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('autism_level');
             $table->json('title');
+            $table->integer('max_attempts')->default(1);
             $table->integer('version')->default(1);
             $table->string('status')->default(AssessmentStatusEnum::ACTIVE->value);
             $table->timestamps();

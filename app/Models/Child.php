@@ -20,6 +20,7 @@ class Child extends Model
         'gender' => GenderEnum::class,
         'autism_level' => AutismLevelEnum::class,
         'speech_status' => SpeechStatusEnum::class,
+        'force_re_test' => 'boolean',
     ];
 
     protected $with = ['assessmentSubmissions'];

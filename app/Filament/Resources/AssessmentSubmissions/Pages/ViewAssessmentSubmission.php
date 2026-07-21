@@ -3,6 +3,11 @@
 namespace App\Filament\Resources\AssessmentSubmissions\Pages;
 
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
+use App\Models\AssessmentSubmission;
+use App\Notifications\ReportPublishedNotification;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewAssessmentSubmission extends ViewRecord
@@ -12,20 +17,20 @@ class ViewAssessmentSubmission extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\EditAction::make(),
-            \Filament\Actions\Action::make('publish')
+            EditAction::make(),
+            Action::make('publish')
                 ->label(__('Publish Report'))
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->requiresConfirmation()
-                ->visible(fn (\App\Models\AssessmentSubmission $record) => $record->status !== 'published')
-                ->action(function (\App\Models\AssessmentSubmission $record) {
+                ->visible(fn (AssessmentSubmission $record) => $record->status !== 'published')
+                ->action(function (AssessmentSubmission $record) {
                     $record->update([
                         'status' => 'published',
                         'report_published_at' => now(),
                     ]);
-                    $record->child->parent->notify(new \App\Notifications\ReportPublishedNotification($record));
-                    \Filament\Notifications\Notification::make()->title(__('Report Published Successfully'))->success()->send();
+                    $record->child->parent->notify(new ReportPublishedNotification($record));
+                    Notification::make()->title(__('Report Published Successfully'))->success()->send();
                 }),
         ];
     }

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class AssessmentSubmission extends Model
+class AssessmentSubmission extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'child_id',
@@ -19,7 +21,9 @@ class AssessmentSubmission extends Model
         'improvements',
         'recommendations',
         'diagnosed_severity_level',
-        'report_published_at'
+        'report_published_at',
+        'attempt_number',
+        'performance_accuracy'
     ];
 
     protected $casts = [
