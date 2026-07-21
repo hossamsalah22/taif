@@ -18,8 +18,7 @@ class SettingController extends Controller
 
         return $this->successResponse(__('retrieved_successfully'), [
             'settings' => [
-                'cancellation_policy' => $locale === 'ar' ? $settings->cancellation_policy_ar : $settings->cancellation_policy_en,
-                'refund_policy' => $locale === 'ar' ? $settings->refund_policy_ar : $settings->refund_policy_en,
+                'plan_grace_period_days' => $settings->plan_grace_period_days,
                 'phone' => $settings->phone,
                 'whatsapp' => $settings->whatsapp,
                 'email' => $settings->email,

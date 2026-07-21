@@ -26,7 +26,6 @@ class PageResource extends JsonResource
         $terms_and_conditions_html = Str::markdown($terms_and_conditions ?? '');
 
         return [
-            'about_us_image' => $this->about_us_image ? asset('storage/'.$this->about_us_image) : null,
             'about_us' => $about_us_html,
             'privacy_policy' => $privacy_policy_html,
             'terms_and_conditions' => $terms_and_conditions_html,

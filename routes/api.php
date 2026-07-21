@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\AssessmentReportController;
+use App\Http\Controllers\Global\AboutAppController;
 use App\Http\Controllers\Global\AutismLevelController;
 use App\Http\Controllers\Global\GenderController;
+use App\Http\Controllers\Global\PagesController;
+use App\Http\Controllers\Global\SettingController;
 use App\Http\Controllers\Global\SpeechStatusesController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\Auth\LoginController;
@@ -34,4 +37,7 @@ Route::prefix('global')->group(function () {
     Route::get('autism-levels', AutismLevelController::class);
     Route::get('genders', GenderController::class);
     Route::get('speech-statuses', SpeechStatusesController::class);
+    Route::get('pages', PagesController::class);
+    Route::get('settings', SettingController::class);
+    Route::get('about-app', AboutAppController::class);
 });
