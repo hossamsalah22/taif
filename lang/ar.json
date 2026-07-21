@@ -485,5 +485,6 @@
     "Re-evaluation token injected.": "تم حقن الرمز لإعادة التقييم.",
     "Header Telemetry": "معلومات التقديم",
     "Attempt Badge": "شارة المحاولة",
-    "Submission Timestamp": "تاريخ التقييم"
+    "Submission Timestamp": "تاريخ التقييم",
+    "Clinical Report Document": "ملف التقرير"
 }

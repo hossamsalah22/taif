@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions\Schemas;
 
-use App\Enums\AutismLevelEnum;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
@@ -17,10 +15,6 @@ class AssessmentSubmissionForm
             ->components([
                 Section::make(__('Specialist Report'))
                     ->schema([
-                        Select::make('diagnosed_severity_level')
-                            ->label(__('Diagnosed Severity Level'))
-                            ->options(AutismLevelEnum::options())
-                            ->required(),
                         Textarea::make('strengths')
                             ->label(__('Strengths'))
                             ->rows(3),

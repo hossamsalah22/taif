@@ -30,7 +30,7 @@ class AssessmentSubmissionsTable
                     ->label(__('Child Profile'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('diagnosed_severity_level')
+                TextColumn::make('assessment.autism_level')
                     ->label(__('Assigned Severity'))
                     ->badge()
                     ->formatStateUsing(fn ($state) => AutismLevelEnum::label($state) ?? $state),

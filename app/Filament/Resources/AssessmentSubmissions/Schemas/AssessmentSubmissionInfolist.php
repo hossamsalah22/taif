@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions\Schemas;
 
+use App\Enums\AutismLevelEnum;
 use App\Enums\ExerciseTypeEnum;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -30,8 +31,9 @@ class AssessmentSubmissionInfolist
 
                 Section::make(__('Specialist Report'))
                     ->schema([
-                        TextEntry::make('diagnosed_severity_level')
+                        TextEntry::make('assessment.autism_level')
                             ->label(__('Diagnosed Severity Level'))
+                            ->formatStateUsing(fn ($state) => AutismLevelEnum::label($state))
                             ->badge(),
                         TextEntry::make('strengths')
                             ->label(__('Strengths')),
