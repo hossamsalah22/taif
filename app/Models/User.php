@@ -82,4 +82,10 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Child::class, 'parent_id');
     }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class, 'user_id');
+    }
 }
+

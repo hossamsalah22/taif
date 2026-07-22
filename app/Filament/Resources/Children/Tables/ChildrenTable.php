@@ -21,6 +21,7 @@ class ChildrenTable
                 //
             ])
             ->recordActions([
+                \Filament\Actions\ViewAction::make(),
                 Action::make('force_retest')
                     ->label(__('Force Re-test'))
                     ->icon('heroicon-o-arrow-path')

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('subscription_packages', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->enum('billing_cycle', ['monthly', 'quarterly', 'semi-annually', 'annually']);
+            $table->json('name');
+            $table->string('billing_cycle');
             $table->integer('duration_value');
             $table->decimal('price', 8, 2);
             $table->json('features')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

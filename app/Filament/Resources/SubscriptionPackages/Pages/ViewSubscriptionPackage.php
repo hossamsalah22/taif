@@ -3,22 +3,17 @@
 namespace App\Filament\Resources\SubscriptionPackages\Pages;
 
 use App\Filament\Resources\SubscriptionPackages\SubscriptionPackageResource;
-use Filament\Actions\DeleteAction;
-use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
 
-class EditSubscriptionPackage extends EditRecord
+class ViewSubscriptionPackage extends ViewRecord
 {
     protected static string $resource = SubscriptionPackageResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            // DeleteAction::make(),
+            // Actions\EditAction::make(),
         ];
-    }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
     }
 }
