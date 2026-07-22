@@ -13,6 +13,7 @@ use App\Http\Controllers\User\Auth\OtpController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\ChildController;
 use App\Http\Controllers\User\LogoutController;
+use App\Http\Controllers\User\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('user')->group(function () {
@@ -23,6 +24,7 @@ Route::prefix('user')->group(function () {
 
     Route::middleware('auth:user')->group(function () {
         Route::delete('logout', LogoutController::class);
+        Route::get('profile', [ProfileController::class, 'index']);
         Route::apiResource('children', ChildController::class);
 
         Route::prefix('children/{child}/assessments')->group(function () {

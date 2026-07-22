@@ -20,7 +20,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[Guarded(['id'])]
 #[Hidden(['remember_token', 'otp', 'media'])]
-#[Appends(['image'])]
+#[Appends(['image', 'hasChildren'])]
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
@@ -87,5 +87,9 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Subscription::class, 'user_id');
     }
-}
 
+    public function getHasChildrenAttribute(): bool
+    {
+        return $this->children()->exists();
+    }
+}

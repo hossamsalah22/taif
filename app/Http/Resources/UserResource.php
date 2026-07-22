@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'is_active' => $this->is_active,
             'is_verified' => $this->is_verified,
             'receive_notifications' => $this->receive_notifications,
+            'has_children' => (bool) $this->hasChildren,
         ];
     }
 }
