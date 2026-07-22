@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('amount_paid', 8, 2)->default(0);
             $table->enum('status', ['active', 'expired', 'cancelled'])->default('active');
             $table->timestamp('start_date');
-            $table->timestamp('expiry_date');
+            $table->timestamp('expiry_date')->nullable();
             $table->boolean('is_free')->default(false);
             $table->timestamps();
         });
