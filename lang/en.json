@@ -372,5 +372,9 @@
     "change_faq_order_description": "Select the new order for this FAQ.",
     "deactivate": "Deactivate",
     "faqs": "Faqs",
-    "faq": "Faq"
+    "faq": "Faq",
+    "subscription_package": "Subscription Package",
+    "subscription_packages": "Subscription Packages",
+    "Duration Value": "Duration Value",
+    "Note: Modifying duration or price will only apply to new subscriptions. Active users are unaffected.": "Note: Modifying duration or price will only apply to new subscriptions. Active users are unaffected."
 }

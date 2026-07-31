@@ -572,5 +572,13 @@
     "Remaining Days": "الأيام المتبقية",
     "Expiry Date": "تاريخ الانتهاء",
     "Created At": "تاريخ الإنشاء",
-    "View Details": "عرض التفاصيل"
+    "View Details": "عرض التفاصيل",
+    "Force Re-test": "إعادة التقييم الإجباري",
+    "Override Assessment Lock": "تجاوز قفل التقييم",
+    "Are you sure you want to allow this child to take the assessment again? This will bypass the maximum attempts limit.": "هل أنت متأكد من رغبتك في السماح لهذا الطفل بإجراء التقييم مرة أخرى؟ سيؤدي هذا إلى تجاوز الحد الأقصى لعدد المحاولات.",
+    "Evaluate": "تقييم",
+    "subscription_package": "باقة اشتراك",
+    "subscription_packages": "باقات الاشتراك",
+    "Duration Value": "قيمة المدة",
+    "Note: Modifying duration or price will only apply to new subscriptions. Active users are unaffected.": "ملاحظة: سيتم تطبيق تعديل المدة أو السعر على الاشتراكات الجديدة فقط. لن يتأثر المستخدمون النشطون."
 }

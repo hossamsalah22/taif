@@ -79,7 +79,8 @@ class SubscriptionPackagesTable
 
                             $action->halt();
                         }
-                    }),
+                    })
+                    ->hidden(fn (SubscriptionPackage $record) => $record->subscriptions()->where('status', 'active')->count() > 0),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
