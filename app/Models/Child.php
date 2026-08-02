@@ -37,4 +37,9 @@ class Child extends Model
     {
         return $this->hasMany(AssessmentSubmission::class);
     }
+
+    public function childLearningPlans(): HasMany
+    {
+        return $this->hasMany(ChildLearningPlan::class);
+    }
 }

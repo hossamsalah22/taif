@@ -13,9 +13,14 @@ return new class extends Migration
     {
         Schema::create('learning_plans', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->enum('target_severity_level', ['low', 'medium', 'high']);
-            $table->enum('status', ['active', 'archived'])->default('active');
+            $table->json('name');
+            $table->string('autism_level');
+            $table->integer('weekly_sessions_count')->default(3);
+            $table->string('phase_duration')->nullable();
+            $table->integer('max_daily_goals')->nullable();
+            $table->integer('max_daily_lessons')->nullable();
+            $table->integer('max_daily_exercises')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

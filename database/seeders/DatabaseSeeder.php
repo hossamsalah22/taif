@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             DistrictSeeder::class,
             AdminSeeder::class,
             UserSeeder::class,
+            LearningPlanSeeder::class,
         ]);
     }
 }
