@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('child_id')->constrained('children')->cascadeOnDelete();
             $table->foreignId('learning_plan_id')->constrained('learning_plans')->cascadeOnDelete();
-            $table->enum('status', ['in_progress', 'completed', 'archived'])->default('in_progress');
+            $table->string('status');
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ChildLearningPlans\Tables;
 
 use App\Enums\AutismLevelEnum;
+use App\Enums\ChildLearningPlanStatusEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -35,6 +36,8 @@ class ChildLearningPlansTable
                     ->view('filament.tables.columns.progress-bar'),
                 TextColumn::make('status')
                     ->label(__('Status'))
+                    ->formatStateUsing(fn ($state) => ChildLearningPlanStatusEnum::label($state))
+                    ->color(fn ($state) => ChildLearningPlanStatusEnum::color($state))
                     ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()

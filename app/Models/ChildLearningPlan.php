@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\ChildLearningPlanStatusEnum;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Model;
 
+#[Guarded(['id'])]
 class ChildLearningPlan extends Model
 {
-    protected $fillable = ['child_id', 'learning_plan_id', 'status'];
+    protected $casts = [
+        'status' => ChildLearningPlanStatusEnum::class,
+    ];
 
     public function child()
     {

@@ -673,5 +673,12 @@
     "Description": "الوصف",
     "Type": "النوع",
     "Difficulty": "الصعوبة",
-    "Unlocked": "مفتوح"
+    "Unlocked": "مفتوح",
+    "Assigned Plan Title": "عنوان الخطة المعينة",
+    "Execution Progress": "تقدم التنفيذ",
+    "Completed": "تم الإنجاز",
+    "Pending": "قيد التنفيذ",
+    "Mastery Level": "مستوى الإتقان",
+    "In Progress": "قيد التنفيذ",
+    "Archived": "تم الأرشفة"
 }

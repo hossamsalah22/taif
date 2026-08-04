@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ChildLearningPlans\Schemas;
 
+use App\Enums\ChildLearningPlanStatusEnum;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class ChildLearningPlanForm
@@ -12,15 +12,17 @@ class ChildLearningPlanForm
     {
         return $schema
             ->components([
-                TextInput::make('child_id')
+                Select::make('child_id')
+                    ->label(__('Child'))
                     ->required()
-                    ->numeric(),
-                TextInput::make('learning_plan_id')
+                    ->relationship('child', 'name'),
+                Select::make('learning_plan_id')
+                    ->label(__('Learning Plan'))
                     ->required()
-                    ->numeric(),
+                    ->relationship('learningPlan', 'name'),
                 Select::make('status')
-                    ->options(['in_progress' => 'In progress', 'completed' => 'Completed', 'archived' => 'Archived'])
-                    ->default('in_progress')
+                    ->label(__('Status'))
+                    ->options(ChildLearningPlanStatusEnum::options())
                     ->required(),
             ]);
     }
