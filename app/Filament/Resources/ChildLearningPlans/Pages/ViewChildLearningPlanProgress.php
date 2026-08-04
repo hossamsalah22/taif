@@ -14,9 +14,48 @@ class ViewChildLearningPlanProgress extends Page
 
     protected string $view = 'filament.resources.child-learning-plans.pages.view-child-learning-plan-progress';
 
+    public array $exerciseLogs = [];
+
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
+        $this->exerciseLogs = \App\Models\ExerciseInteractionLog::where('child_id', $this->record->child_id)
+            ->get()
+            ->keyBy('learning_exercise_id')
+            ->toArray();
+    }
+
+    public function getExerciseStatus(int $exerciseId): string
+    {
+        if (isset($this->exerciseLogs[$exerciseId])) {
+            return $this->exerciseLogs[$exerciseId]['status'];
+        }
+        return 'locked';
+    }
+
+    public function getLessonStatus($lesson): string
+    {
+        $statuses = collect($lesson->exercises)->map(fn($ex) => $this->getExerciseStatus($ex->id));
+        if ($statuses->every(fn($s) => $s === 'completed')) return 'completed';
+        if ($statuses->contains('in_progress') || $statuses->contains('completed')) return 'in_progress';
+        return 'locked';
+    }
+
+    public function getGoalStatus($goal): string
+    {
+        $statuses = collect($goal->lessons)->map(fn($l) => $this->getLessonStatus($l));
+        if ($statuses->every(fn($s) => $s === 'completed')) return 'completed';
+        if ($statuses->contains('in_progress') || $statuses->contains('completed')) return 'in_progress';
+        return 'locked';
+    }
+
+    public function getStatusColorClass(string $status): string
+    {
+        return match ($status) {
+            'completed' => 'bg-green-100 border-green-500 text-green-800 dark:bg-green-900 dark:border-green-600 dark:text-green-300',
+            'in_progress' => 'bg-amber-100 border-amber-500 text-amber-800 dark:bg-amber-900 dark:border-amber-600 dark:text-amber-300',
+            default => 'bg-gray-100 border-gray-300 text-gray-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400',
+        };
     }
 
     public function reportAction(): \Filament\Actions\Action

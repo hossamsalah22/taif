@@ -27,6 +27,8 @@ class LearningGoalResource extends MainResource
         return __('Learning Plans Management');
     }
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema

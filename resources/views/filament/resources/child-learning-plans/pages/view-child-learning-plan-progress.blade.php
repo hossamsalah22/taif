@@ -32,23 +32,27 @@
                 </x-slot>
 
                 <div class="space-y-4">
-                    @foreach($record->learningPlan->goals as $goal)
-                        <div class="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700">
+                    @foreach ($record->learningPlan->goals as $goal)
+                        <div
+                            class="p-4 border rounded-lg {{ $this->getStatusColorClass($this->getGoalStatus($goal)) }}">
                             <div class="flex justify-between items-center mb-2">
                                 <h3 class="font-semibold text-lg">{{ $goal->name }}</h3>
                             </div>
-                            
+
                             <div class="pl-4 space-y-4 border-l-2 border-gray-200 dark:border-gray-700">
-                                @foreach($goal->lessons as $lesson)
-                                    <div class="p-3 border rounded bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
+                                @foreach ($goal->lessons as $lesson)
+                                    <div
+                                        class="p-3 border rounded {{ $this->getStatusColorClass($this->getLessonStatus($lesson)) }}">
                                         <div class="flex justify-between items-center mb-2">
                                             <h4 class="font-medium">{{ $lesson->name }}</h4>
                                         </div>
 
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                                            @foreach($lesson->exercises as $exercise)
-                                                <div class="p-2 border rounded bg-gray-50 dark:bg-gray-800 text-sm flex justify-between items-center">
-                                                    <span>{{ $exercise->type->value }} ({{ $exercise->difficulty_level->value }})</span>
+                                            @foreach ($lesson->exercises as $exercise)
+                                                <div
+                                                    class="p-2 border rounded text-sm flex justify-between items-center {{ $this->getStatusColorClass($this->getExerciseStatus($exercise->id)) }}">
+                                                    <span>{{ $exercise->type->value }}
+                                                        ({{ $exercise->difficulty_level->value }})</span>
                                                     {{ ($this->reportAction)(['type' => 'exercise', 'id' => $exercise->id]) }}
                                                 </div>
                                             @endforeach

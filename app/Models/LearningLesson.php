@@ -33,4 +33,9 @@ class LearningLesson extends Model
     {
         return $this->hasMany(LearningExercise::class);
     }
+
+    public function reward()
+    {
+        return $this->belongsTo(Reward::class);
+    }
 }
