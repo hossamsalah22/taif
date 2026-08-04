@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateLearningGoal extends CreateRecord
 {
     protected static string $resource = LearningGoalResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

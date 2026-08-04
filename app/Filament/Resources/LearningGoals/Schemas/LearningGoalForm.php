@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\LearningGoals\Schemas;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
+use App\Enums\PriorityEnum;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -18,6 +19,10 @@ class LearningGoalForm
                     ->label(__('Learning Plan'))
                     ->relationship('plan', 'name')
                     ->required(),
+                Select::make('display_priority')
+                    ->label(__('Display priority'))
+                    ->required()
+                    ->options(PriorityEnum::options()),
                 TextInput::make('name')
                     ->label(__('Goal Name'))
                     ->required()
@@ -30,10 +35,6 @@ class LearningGoalForm
                     ->translatableTabs(),
                 Toggle::make('is_locked')
                     ->label(__('Locked (Sequential)')),
-                TextInput::make('display_priority')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
             ]);
     }
 }
