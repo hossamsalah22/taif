@@ -657,5 +657,21 @@
     "Updated At": "تاريخ التحديث",
     "Learning Plan": "خطة التعلم",
     "Display priority": "أولوية العرض",
-    "Learning Goal": "الهدف التعليمي"
+    "Learning Goal": "الهدف التعليمي",
+    "Plan Details": "تفاصيل الخطة",
+    "Target severity level": "مستوى الشدة المستهدف",
+    "Weekly sessions count": "عدد الجلسات الأسبوعية",
+    "Phase duration": "مدة المرحلة",
+    "Created at": "تاريخ الإنشاء",
+    "Daily Limits": "الحدود اليومية",
+    "Max daily goals": "الحد الأقصى للأهداف اليومية",
+    "Max daily lessons": "الحد الأقصى للدروس اليومية",
+    "Max daily exercises": "الحد الأقصى للتمارين اليومية",
+    "Goals Hierarchy": "هيكل الأهداف",
+    "Priority": "الأولوية",
+    "Access Lock": "قفل الوصول",
+    "Description": "الوصف",
+    "Type": "النوع",
+    "Difficulty": "الصعوبة",
+    "Unlocked": "مفتوح"
 }

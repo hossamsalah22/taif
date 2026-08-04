@@ -19,6 +19,8 @@ class ViewChildLearningPlanProgress extends Page
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
+        $this->record->loadMissing('learningPlan.goals.lessons.exercises');
+        
         $this->exerciseLogs = \App\Models\ExerciseInteractionLog::where('child_id', $this->record->child_id)
             ->get()
             ->keyBy('learning_exercise_id')

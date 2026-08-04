@@ -23,4 +23,10 @@ class EditLearningPlan extends EditRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    public function mount(int | string $record): void
+    {
+        parent::mount($record);
+        $this->record->loadMissing('goals.lessons.exercises');
+    }
 }

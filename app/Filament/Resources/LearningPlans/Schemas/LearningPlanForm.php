@@ -5,6 +5,7 @@ namespace App\Filament\Resources\LearningPlans\Schemas;
 use App\Enums\AutismLevelEnum;
 use App\Enums\DifficultyLevel;
 use App\Enums\ExerciseTypeEnum;
+use App\Enums\PriorityEnum;
 use App\Models\LearningPlan;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -122,7 +123,7 @@ class LearningPlanForm
                                             ->maxValue(10),
                                         Select::make('display_priority')
                                             ->label(__('Display Priority'))
-                                            ->options(array_combine(range(1, 30), range(1, 30))),
+                                            ->options(PriorityEnum::options()),
                                         Select::make('type')
                                             ->label(__('Exercise Type'))
                                             ->options(ExerciseTypeEnum::options())
