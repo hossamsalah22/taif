@@ -28,8 +28,10 @@ class LearningLessonsTable
                     ->label(__('Reward'))
                     ->searchable(),
                 IconColumn::make('is_locked')
+                    ->label(__('Locked'))
                     ->boolean(),
                 TextColumn::make('display_priority')
+                    ->label(__('Display priority'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -45,7 +47,7 @@ class LearningLessonsTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
+                // ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([

@@ -25,6 +25,7 @@ class LearningGoalsTable
                     ->sortable()
                     ->searchable(),
                 IconColumn::make('is_locked')
+                    ->label(__('Locked'))
                     ->boolean(),
                 TextColumn::make('display_priority')
                     ->label(__('Display Priority'))

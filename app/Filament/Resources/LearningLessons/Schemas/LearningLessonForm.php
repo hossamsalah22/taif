@@ -2,8 +2,9 @@
 
 namespace App\Filament\Resources\LearningLessons\Schemas;
 
-use Filament\Forms\Components\TextInput;
+use App\Enums\PriorityEnum;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
@@ -26,10 +27,10 @@ class LearningLessonForm
                     ->relationship('reward', 'name'),
                 Toggle::make('is_locked')
                     ->label(__('Locked')),
-                TextInput::make('display_priority')
+                Select::make('display_priority')
+                    ->label(__('Display priority'))
                     ->required()
-                    ->numeric()
-                    ->default(1),
+                    ->options(PriorityEnum::options()),
             ]);
     }
 }
