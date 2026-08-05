@@ -7,6 +7,9 @@ use App\Models\Admin;
 use App\Rules\PhoneNumberRule;
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Event;
+use Filament\Navigation\NavigationGroup;
+use App\Models\ExerciseInteractionLog;
+use App\Observers\ExerciseInteractionLogObserver;
 use Illuminate\Auth\Events\Login as LoginEvent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -73,5 +76,6 @@ class AppServiceProvider extends ServiceProvider
                 ->locales(array_keys($locales));
         });
 
+        ExerciseInteractionLog::observe(ExerciseInteractionLogObserver::class);
     }
 }

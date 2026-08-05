@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ChildLearningPlans\Tables;
 
 use App\Enums\AutismLevelEnum;
 use App\Enums\ChildLearningPlanStatusEnum;
+use App\Filament\Resources\ChildLearningPlans\ChildLearningPlanResource;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -54,9 +55,9 @@ class ChildLearningPlansTable
             ->recordActions([
                 ViewAction::make(),
                 Action::make('view_progress')
-                    ->label(__('View Progress Details'))
+                    ->label(__('Progress Details'))
                     ->icon('heroicon-o-chart-bar')
-                    ->url(fn ($record) => route('filament.admin.resources.child-learning-plans.progress', ['record' => $record])),
+                    ->url(fn ($record) => ChildLearningPlanResource::getUrl('progress', ['record' => $record])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

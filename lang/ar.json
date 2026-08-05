@@ -687,5 +687,16 @@
     "Password": "كلمة المرور",
     "New Password": "كلمة المرور الجديدة",
     "Current Password": "كلمة المرور الحالية",
-    "Password Confirmation": "تأكيد كلمة المرور"
+    "Password Confirmation": "تأكيد كلمة المرور",
+    "View Child Learning Plan Progress": "عرض تقدم خطة التعلم",
+    "Export Logs": "تصدير السجلات",
+    "Logs exported successfully.": "تم تصدير السجلات بنجاح.",
+    "Report saved successfully": "تم حفظ التقرير بنجاح",
+    "Body": "النص",
+    "Smart Parental Advice": "نصائح ذكية للآباء",
+    "Skill Name": "اسم المهارة",
+    "Percentage": "النسبة",
+    "Target Area": "مجال التحسين",
+    "Is Visible to Parent": "هل يراه الوالد",
+    "Improvements": "مجالات التحسين"
 }
