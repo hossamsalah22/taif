@@ -681,5 +681,11 @@
     "Mastery Level": "مستوى الإتقان",
     "In Progress": "قيد التنفيذ",
     "Archived": "تم الأرشفة",
-    "Plan assigned successfully": "تم تعيين الخطة بنجاح"
+    "Plan assigned successfully": "تم تعيين الخطة بنجاح",
+    "Basic Information": "معلومات أساسية",
+    "Update your personal information and security settings.": "تحديث معلوماتك الشخصية وإعدادات الأمان",
+    "Password": "كلمة المرور",
+    "New Password": "كلمة المرور الجديدة",
+    "Current Password": "كلمة المرور الحالية",
+    "Password Confirmation": "تأكيد كلمة المرور"
 }

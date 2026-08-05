@@ -7,16 +7,19 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Guarded(['id'])]
-#[Hidden(['password', 'remember_token'])]
-class Admin extends Authenticatable implements FilamentUser
+#[Hidden(['password', 'remember_token', 'media'])]
+
+class Admin extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasRoles, HasSuperAdmin, Notifiable, SoftDeletes;
+    use HasRoles, HasSuperAdmin, InteractsWithMedia, Notifiable, SoftDeletes;
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -40,5 +43,10 @@ class Admin extends Authenticatable implements FilamentUser
     public function country()
     {
         return $this->belongsTo(Country::class, 'country_code', 'iso');
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->getFirstMediaUrl('avatar');
     }
 }
