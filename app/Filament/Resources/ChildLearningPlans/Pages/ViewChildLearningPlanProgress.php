@@ -14,6 +14,10 @@ class ViewChildLearningPlanProgress extends Page
 
     protected static string $resource = ChildLearningPlanResource::class;
 
+    public function getTitle(): string | \Illuminate\Contracts\Support\Htmlable
+    {
+        return __('View Child Learning Plan Progress');
+    }
     protected string $view = 'filament.resources.child-learning-plans.pages.view-child-learning-plan-progress';
 
     public function mount(int|string $record): void
