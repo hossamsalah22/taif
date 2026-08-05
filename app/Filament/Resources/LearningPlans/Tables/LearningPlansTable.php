@@ -13,6 +13,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ReplicateAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -106,7 +107,13 @@ class LearningPlansTable
                     })
                     ->requiresConfirmation()
                     ->modalHeading(__('Assign Plan to Children'))
-                    ->modalDescription(__('This will assign the plan to the selected children. Only children with matching severity level and no active plans are shown.')),
+                    ->modalDescription(__('This will assign the plan to the selected children. Only children with matching severity level and no active plans are shown.'))
+                    ->after(function () {
+                        Notification::make()
+                            ->title(__('Plan assigned successfully'))
+                            ->success()
+                            ->send();
+                    }),
                 ReplicateAction::make(),
             ])
             ->toolbarActions([
