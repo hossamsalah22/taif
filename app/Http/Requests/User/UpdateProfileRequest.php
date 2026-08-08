@@ -23,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-Z ]+$/'],
+            'name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-Z ]+$/'],
             'country_code' => ['required', 'string', 'max:10'],
             'phone' => ['required', 'string', 'phone_number', 'unique:users,phone,'.auth('user')->id()],
             'email' => ['required', 'email', 'unique:users,email,'.auth('user')->id()],

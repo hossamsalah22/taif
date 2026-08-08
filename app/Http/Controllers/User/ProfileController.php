@@ -23,7 +23,7 @@ class ProfileController extends Controller
     {
         $user = auth('user')->user();
         $data = $request->validated();
-
+        // dd(Arr::except($data, ['phone', 'country_code']));
         $user->update(Arr::except($data, ['phone', 'country_code']));
 
         if (isset($data['phone']) && $data['phone'] !== $user->phone) {
