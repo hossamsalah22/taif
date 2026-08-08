@@ -698,5 +698,8 @@
     "Percentage": "النسبة",
     "Target Area": "مجال التحسين",
     "Is Visible to Parent": "هل يراه الوالد",
-    "Improvements": "مجالات التحسين"
+    "Improvements": "مجالات التحسين",
+    "Subscription Gateway Data": "بيانات بوابة الاشتراك",
+    "Home data retrieved successfully": "تم جلب بيانات الصفحة الرئيسية بنجاح",
+    "No active learning plan found.": "لم يتم العثور على خطة تعلم نشطة."
 }

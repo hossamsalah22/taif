@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\AutismLevelEnum;
 use App\Enums\DifficultyLevel;
 use App\Enums\ExerciseType;
+use App\Enums\ExerciseTypeEnum;
 use App\Models\LearningPlan;
 use Illuminate\Database\Seeder;
 
@@ -20,7 +21,7 @@ class LearningPlanSeeder extends Seeder
                 'en' => 'Autism Early Intervention Plan',
                 'ar' => 'خطة التدخل المبكر للتوحد',
             ],
-            'severity_level' => AutismLevelEnum::MILD->value,
+            'autism_level' => AutismLevelEnum::MILD->value,
             'is_active' => true,
             'weekly_sessions_count' => 3,
             'phase_duration' => '3_months',
@@ -57,11 +58,11 @@ class LearningPlanSeeder extends Seeder
         ]);
 
         $lesson1->exercises()->create([
-            'difficulty_level' => DifficultyLevel::Low->value,
+            'difficulty_level' => DifficultyLevel::LOW->value,
             'is_locked' => false,
             'max_attempts' => 3,
             'display_priority' => 1,
-            'type' => ExerciseType::ImageSelection->value,
+            'type' => ExerciseTypeEnum::IMAGE_SELECTION->value,
             'configuration' => [
                 'correct_image' => 'red_circle.png',
                 'distractors' => ['blue_square.png', 'green_triangle.png'],
@@ -69,11 +70,11 @@ class LearningPlanSeeder extends Seeder
         ]);
 
         $lesson1->exercises()->create([
-            'difficulty_level' => DifficultyLevel::Medium->value,
+            'difficulty_level' => DifficultyLevel::MEDIUM->value,
             'is_locked' => true,
             'max_attempts' => 5,
             'display_priority' => 2,
-            'type' => ExerciseType::Matching->value,
+            'type' => ExerciseTypeEnum::MATCHING->value,
             'configuration' => [
                 'pairs' => [
                     ['source' => 'red.png', 'target' => 'red_apple.png'],

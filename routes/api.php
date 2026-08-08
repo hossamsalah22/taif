@@ -12,8 +12,11 @@ use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\OtpController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\ChildController;
+use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\LearningPlanController;
 use App\Http\Controllers\User\LogoutController;
 use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('user')->group(function () {
@@ -24,12 +27,12 @@ Route::prefix('user')->group(function () {
 
     Route::middleware('auth:user')->group(function () {
         Route::delete('logout', LogoutController::class);
-        Route::get('home', [\App\Http\Controllers\User\HomeController::class, 'index']);
-        Route::get('subscriptions/gateway', [\App\Http\Controllers\User\SubscriptionController::class, 'gateway']);
+        Route::get('home', [HomeController::class, 'index']);
+        Route::get('subscriptions/gateway', [SubscriptionController::class, 'gateway']);
         Route::get('profile', [ProfileController::class, 'index']);
         Route::put('profile', [ProfileController::class, 'update']);
         Route::put('settings', [\App\Http\Controllers\User\SettingsController::class, 'update']);
-        Route::get('children/{child}/learning-plan', [\App\Http\Controllers\User\LearningPlanController::class, 'showProgressTree']);
+        Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
         Route::post('exercises/interactions', [\App\Http\Controllers\User\ExerciseInteractionController::class, 'store']);
         Route::apiResource('children', ChildController::class);
 
