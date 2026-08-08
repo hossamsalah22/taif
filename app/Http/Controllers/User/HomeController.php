@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\ChildLearningPlanStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ChildResource;
 use App\Models\Child;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
@@ -10,43 +12,51 @@ use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    use ApiResponseTrait;
-
     public function index(Request $request)
     {
-        $user = auth('sanctum')->user();
+        $user = auth('user')->user();
 
-        // 1. Fetch children
-        $children = $user->children()->get(['id', 'name', 'age', 'gender', 'autism_level']);
+        $children = $user->children()->get();
 
-        // Active Child context - assume the first child if not explicitly provided, or passed via header
-        $activeChildId = $request->header('X-Active-Child-Id', $children->first()->id ?? null);
+        $activeChildId = $request->header(
+            'X-Active-Child-Id',
+            $children->first()?->id
+        );
 
-        // 2. Fetch Plan Progress for the active child
+        $activeChild = $activeChildId
+            ? $children->firstWhere('id', $activeChildId)
+            : null;
+
         $planProgress = null;
-        if ($activeChildId) {
+
+        if ($activeChild) {
             $planProgress = DB::table('child_learning_plans')
-                ->where('child_id', $activeChildId)
-                ->where('is_completed', false)
+                ->where('child_id', $activeChild->id)
+                ->where(
+                    'status',
+                    ChildLearningPlanStatusEnum::InProgress->value
+                )
                 ->orderBy('created_at', 'asc')
                 ->first();
         }
 
-        // 3. Fetch recent system notifications
-        // Fallback to checking settings if notifications table doesn't have what we need,
-        // but assuming there's a notifications table for actual alerts:
         $recentNotifications = DB::table('notifications')
             ->where('notifiable_id', $user->id)
-            ->where('notifiable_type', get_class($user))
+            ->where('notifiable_type', $user->getMorphClass())
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
-        return $this->successResponse(__('Home data retrieved successfully'), [
-            'children' => $children,
-            'active_child_id' => $activeChildId,
-            'current_plan_progress' => $planProgress,
-            'recent_notifications' => $recentNotifications,
-        ]);
+        return $this->successResponse(__('Home data retrieved successfully'),[
+                'children' => ChildResource::collection($children),
+                'active_child' => $activeChild
+                    ? ChildResource::make($activeChild)
+                    : null,
+
+                'current_plan_progress' => $planProgress,
+
+                'recent_notifications' => $recentNotifications,
+            ]
+        );
     }
 }
