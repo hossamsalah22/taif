@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('learning_exercises', function (Blueprint $table) {
             $table->id();
             $table->foreignId('learning_lesson_id')->constrained('learning_lessons')->cascadeOnDelete();
-            $table->string('difficulty_level')->default(\App\Enums\DifficultyLevel::Medium->value);
+            $table->string('difficulty_level')->default(\App\Enums\DifficultyLevel::MEDIUM->value);
             $table->boolean('is_locked')->default(true);
             $table->integer('max_attempts')->default(3);
             $table->integer('display_priority')->default(1);
