@@ -85,7 +85,7 @@ class User extends Authenticatable implements HasMedia
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(Subscription::class, 'user_id');
+        return $this->hasMany(Subscription::class, 'parent_id');
     }
 
     public function getHasChildrenAttribute(): bool

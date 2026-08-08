@@ -82,6 +82,7 @@ class UsersTable
                 ViewAction::make(),
                 // EditAction::make(),
                 Action::make('free_subscription')
+                    ->visible(fn($record) => $record->children()->exists() && !$record->subscriptions()->where('is_free', true)->exists())
                     ->label(__('Free Subscription'))
                     ->icon('heroicon-o-gift')
                     ->color('success')
@@ -93,8 +94,14 @@ class UsersTable
                             ->minValue(1),
                     ])
                     ->action(function (User $record, array $data) {
-                        // Logic for creating a free subscription for the user
-                        // This will be added when subscriptions logic is complete
+                        $record->subscriptions()->create([
+                            'status' => 'active',
+                            'start_date' => now(),
+                            'expiry_date' => now()->addDays($data['duration_days']),
+                            'is_free' => true,
+                            'amount_paid' => 0,
+                        ]);
+
                         Notification::make()
                             ->title(__('Free Subscription Granted'))
                             ->body(__("User granted free access for {$data['duration_days']} days."))
