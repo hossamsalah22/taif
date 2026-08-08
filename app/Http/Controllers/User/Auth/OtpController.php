@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\Auth\ConfirmOtpRequest;
 use App\Http\Requests\User\Auth\SendOtpRequest;
 use App\Http\Resources\UserResource;
+use App\Models\DeviceToken;
 use App\Models\User;
 use App\Models\UserVerification;
 use App\Notifications\SendUserOtpNotification;
@@ -60,12 +61,19 @@ class OtpController extends Controller
                 break;
         }
 
-        if (isset($request->device_token)) {
-            $user->firebaseTokens()->updateOrCreate(
-                ['token' => $request->device_token],
-                ['device_type' => $request->device_type ?? null]
+         if (isset($request->device_token)) {
+            DeviceToken::updateOrCreate(
+                [
+                    'token' => $request->device_token,
+                ],
+                [
+                    'tokenable_id' => $user->id,
+                    'tokenable_type' => $user->getMorphClass(),
+                    'device_type' => $request->device_type,
+                ]
             );
         }
+
 
         return $this->successResponse(
             __('auth.code_verified_successfully'),

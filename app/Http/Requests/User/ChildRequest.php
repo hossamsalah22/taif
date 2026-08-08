@@ -33,6 +33,7 @@ class ChildRequest extends FormRequest
             'autism_level' => ['required', 'string', new Enum(AutismLevelEnum::class)],
             'speech_status' => ['required', 'string', new Enum(SpeechStatusEnum::class)],
             'educational_status' => ['nullable', 'string', 'max:100'],
+            'confirm_recalibrate' => ['sometimes', 'boolean'],
         ];
     }
 

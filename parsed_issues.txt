@@ -1,0 +1,748 @@
+TAYF-89 - Manage Notifications 
+## **Manage Notifications**
+
+**TYF-SET-05**
+
+**Description**
+
+Allows the parent to customize and control their preferences for receiving system-generated push notifications and emails. The system manages granular preference states for therapeutic sessions, progress reports, child achievements, and learning plan updates, while strictly locking down mandatory billing and commercial expiration alerts to protect core transaction workflows.
+
+**Pre-conditions**
+
+* The parent is successfully logged in.
+* The parent profile session is verified and active.
+
+**Main Flow**
+
+1. The parent navigates to the **"Account Settings"** workspace dashboard.
+2. The parent selects the **"Manage Notifications"** interaction tab.
+3. The system queries the server data registry for the parent's unique account ID and renders the **Notification Categories Configuration Grid**.
+4. The system populates the grid with five distinct, controllable notification-type rows:
+
+    * **Daily Session Reminders:** Alerts for child educational tasks and daily gameplay slots.
+    * **Progress Reports:** Periodic automated diagnostic and developmental tracking summary updates.
+    * **Child Achievements:** Motivational badges, milestones, and high-score celebrations.
+    * **Plan Updates:** Updates pushed when the assigned specialist alters or expands goals (`UC-ADM-05`).
+    * **Subscription & Billing Alerts:** Pre-expiry 3-day countdown alerts, invoice generations, and Online Payment receipts.
+    
+5. The parent toggles the **Dynamic Switch Control Component** next to any category to mutate its operational state (`Enabled` / `Disabled`).
+6. The system evaluates the targeted category change:
+
+    * **Scenario A (Subscription Toggles):** If the parent attempts to toggle the _Subscription & Billing Alerts_ row, the system rejects the input event, locks the toggle to `Enabled`, and displays an inline system validation note. _(Skip to Step 8)_.
+    * **Scenario B (Standard Toggles):** The system updates the local toggle state view.
+    
+7. The parent clicks the primary **"Save Preferences Button"**.
+8. The system executes a security validation review check:
+
+    * **Pathway A (All Optional Toggles Disabled):** If all optional toggles are switched off, the system intercepts the execution and overlays the **Global Disable Confirmation Dialogue Modal**. Upon parent confirmation, it writes changes to the database.
+    * **Pathway B (Standard Save Payload):** The system packages the boolean array configuration tokens, executes an API post to update the cloud server repository, and applies the fresh notification constraints immediately to the parent's user profile record.
+    
+
+**Alternative Flows**
+
+* **A1 - Preference Save Aborted:** If the parent exits or navigates away from the configuration grid before clicking the save control component, the system discards the interface mutations and retains the previous database preferences.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Notification Categories Grid** | Contextual multi-row layout distributing active system message alerts | **Field Type:** Vertical Form Grid Element  **Validation:** Read/Write configuration mapping the parent profile's active messaging parameters. |
+| **Dynamic Switch Control** | Individual toggle switch changing specific notification states | **Field Type:** Binary Toggle Component (`True` / `False`)  **Validation:** Programmatically **Locked & Fixed** to `True` for the Subscription & Billing row; completely mutable for optional therapeutic parameters. |
+| **Save Preferences Button** | Confirms and commits the selected configuration layout states | **Field Type:** Primary Action Button  **Validation:** Programmatically **Disabled** until at least one Dynamic Switch Control state changes from its initial baseline value. |
+| **Disable Confirmation Modal** | Disruptive verification window overlaying the active view area | **Field Type:** Modal Dialogue Window  **Validation:** Intercepts routing only if all non-mandatory parameters are toggled to `False`. Requires explicit positive confirmation. |
+
+**Validation Message**
+
+* **\[Dynamic Switch Control - Subscription Row\]:** "Mandatory Alert: Subscription expiration notifications, 3-day grace period warnings, and Online Payment verification receipts cannot be deactivated to ensure service continuity."
+* **\[Disable Confirmation Modal\]:** "Are you sure you want to disable all therapeutic reminders, report updates, and achievement notifications? This may affect your ability to track your child's daily progress milestones."
+* **\[Save Preferences Button\]:** "Notification settings updated successfully and applied across your registered devices."
+
+**Constraints**
+
+* **Commercial Communication Lock:** The 3-day subscription pre-expiry tracking alert engine is structurally classified as a core system transaction framework. It is completely exempt from user deactivation rules, preventing parents from missing critical billing cycles.
+* **Database Isolation Principle:** Notification preference arrays must be written and checked against individual parent account master indexes; changing notification toggles under one parent account will never alter the communication rules of distinct sibling accounts.
+
+**Acceptance Criteria**
+
+* **Given** a parent alters optional switch parameters, **when** they click the save control component, **then** the system securely writes the updated configuration to the cloud database and applies the delivery updates immediately.
+* **Given** a parent attempts to turn off all optional alerts, **when** the save action triggers, **then** the interface stops processing and displays the global confirmation modal before executing database updates.
+* **Given** the Subscription & Billing notification category row, **when** the user interacts with its toggle switch, **then** the system completely blocks modification events, forces the state to remain active, and presents the inline reason notice.
+
+
+-----------------
+
+TAYF-88 - Update Sensory Settings 
+## **Update Sensory Settings**
+
+**TYF-SET-04**
+
+**Description**
+
+Allows the parent to customize and adjust the sensory application environment (audio volume levels and screen brightness intensity) from within the account settings. This configuration directly dictates the viewport emission properties and audio output levels to protect and accommodate children with specific sensory sensitivities during their interactive sessions.
+
+**Pre-conditions**
+
+* The parent is logged into the application.
+* The application has been granted system-level permissions to modify system brightness or audio channels (where applicable locally on the host operating system).
+
+**Main Flow**
+
+1. The parent navigates to the **"Settings"** or **"Child Profile Management"** workspace hub.
+2. The parent taps on the **"Sensory & Accessibility Settings"** option row.
+3. The system renders the sensory configuration control panel dashboard.
+4. The parent modifies the environmental sensory sliders:
+
+    * Adjusts the **Audio Volume Slider** to set the max decibel output percentage for app media and sound effects.
+    * Adjusts the **Screen Brightness Slider** to scale the illumination intensity of the mobile display screen.
+    
+5. The parent taps the **"Save Sensory Preferences"** button component.
+6. The system commits the adjustments to the local system cache profile database.
+7. The application core instantly adjusts the master audio layer mixer and shifts screen rendering gamma nodes to mirror the selected constraints immediately.
+
+**Alternative Flows**
+
+* **A1 - Missing System Permissions:** If the operating system restricts the application from programmatically altering hardware screen brightness, the system displays an overlay modal requesting permissions with a link to the device's native settings framework.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Audio Volume Slider** | Horizontal sliding bar component controlling multi-media sound emission | **Field Type:** Interactive Range Slider  **Validation:** Linear control mapping values between integer ranges of **0%** (Mute) to **100%** (Max Volume). |
+| **Screen Brightness Slider** | Horizontal sliding bar component adjusting screen lighting variables | **Field Type:** Interactive Range Slider  **Validation:** Linear control mapping values between integer ranges of **10%** (Min Operational Visibility) to **100%** (Max Illumination). |
+| **Save Sensory Preferences Button** | Commits structural sensory adjustments permanently | **Field Type:** Primary Action Button  **Validation:** Enabled upon tracking any positional changes on either range slider element compared to baseline values. |
+
+**Validation Message**
+
+* **\[Screen Brightness Slider\]:** "Application requires system write permissions to modify display brightness levels. Please enable it in your device settings."
+* **\[Save Sensory Preferences Button\]:** "Sensory data settings successfully written and applied to the active child profile environment."
+
+**Constraints**
+
+* **Session Persistence Rule:** Altering sensory environmental variables must run completely isolated in memory and must never drop, reset, or invalidate active user authorization tokens or game interaction lifecycles.
+* **Immediate Local Application:** Unlike remote configuration synchronizations, visual and audio slider modifications must enforce instant rendering updates on the device hardware layer to guarantee safe interactions.
+
+**Acceptance Criteria**
+
+* **Given** an authenticated parent interacts with the sensory adjustment workspace, **when** they shift the audio volume or brightness sliders, **then** the terminal device hardware output shifts operational variables dynamically to match the exact input values.
+* **Given** the user confirms the configuration, **when** they tap the save preferences button, **then** the data attributes are written to the profile config files, ensuring the system boots up with these exact sensory constraints during all subsequent launches.
+
+
+-----------------
+
+TAYF-87 - Change Application Language 
+## **Change Application Language**
+
+**TYF-SET-03**
+
+**Description**
+
+Allows the parent to change the localized display language of the application (e.g., Arabic / English) from within the account settings dashboard. Upon selection, the system dynamically re-renders the active interface layout to apply the correct text translations and structural orientation parameters.
+
+**Pre-conditions**
+
+* The parent is logged into the application.
+* An active internet connection is available (to sync localization preferences to the cloud ledger, though local caching applies immediately).
+
+**Main Flow**
+
+1. The parent navigates to the **"Settings"** or **"Account Management"** workspace hub.
+2. The parent taps on the **"Language Settings"** action row trigger.
+3. The system overlay displays the **Language Selection Modal** showing the supported system language options.
+4. The parent selects their preferred language (e.g., Arabic or English) via the selector framework.
+5. The parent taps the **"Apply Changes"** button component.
+6. The system commits the updated language preference key to the local device cache and writes the state update to the remote server database.
+7. The application core triggers a live layout lifecycle refresh, dynamically updating all text strings, asset configurations, and structural directions (RTL for Arabic / LTR for English) across the viewport.
+
+**Alternative Flows**
+
+* **A1 - Synchronization Network Failure:** If a network connection drop occurs during the save routine, the client application caches the preference locally to ensure immediate UI conversion and schedules a background worker to sync with the server database once connectivity is restored.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Language Row Trigger** | Navigation option inside the settings list menu | **Field Type:** Interactive List Row Template  **Validation:** Clickable state; initializes routing to the language layout overlay. |
+| **Language Selection Picker** | Selection interface container presenting the localized options | **Field Type:** Dropdown List / Single-Choice Radio Button Group  **Validation:** Mandatory selection. Choices must strictly map to system-defined language enum pairs: ar-SA (العربية) or en-US (English). |
+| **Apply Changes Button** | Confirms and triggers the layout overhaul pipeline | **Field Type:** Primary Action Button  **Validation:** Disabled if the chosen language token matches the currently active system display state. |
+
+**Validation Message**
+
+* **\[Language Selection Picker\]:** "Please pick a language option to continue."
+* **\[Apply Changes Button\]:** "Unable to sync language preferences with the server. Your settings will be saved locally until connection returns."
+
+**Constraints**
+
+* **Immediate Structural Inversion:** Switching between language codes must programmatically reverse layout alignment rules natively (forcing an absolute switch between android:supportsRtl="true" parameters or iOS semantic layouts) to maintain proper design symmetry.
+* **Session Persistence Rule:** Altering localization variables must never terminate, invalidate, or disrupt active user authorization sessions or child profile context locks.
+
+**Acceptance Criteria**
+
+* **Given** an authenticated user selects a new language code configuration, **when** they confirm the change via the primary action button, **then** the platform instantly updates all layout components, text elements, and navigation alignments without forcing an application restart.
+* **Given** a network interruption, **when** the user applies the language modification, **then** the layout context flips locally, and the synchronization task is queued cleanly for backend resolution.
+
+
+-----------------
+
+TAYF-85 - Edit Child Profile 
+### **Edit Child Profile**
+
+**TYF-SET-02-A**
+
+**Description**
+
+Allows the parent to modify any of the registered personal, structural, and developmental data of an existing child profile (Name, Age, Autism Level, Speech Status, and Educational Status). If the parent modifies critical diagnostic fields that dictate active tasks, the system surfaces a confirmation warning, allowing the parent to force-update the child's profile baseline while seamlessly preserving the active subscription shell.
+
+**Pre-conditions**
+
+* The parent is logged in successfully.
+* The target child profile exists and is actively linked to the parent’s account master ID.
+
+**Main Flow**
+
+1. The parent triggers the modification flow by tapping **"Edit Profile"** on the target child’s profile card.
+2. The system executes a database query to fetch the child’s current dataset.
+3. The system renders the modification form sheet, pre-populating **all existing data fields** (Name, Age, Autism Level, Speech Status, Educational Status).
+4. The parent modifies any of the child's metrics within the configuration form:
+
+    * Updates the **Name Field**.
+    * Updates the **Age Field**.
+    * Updates the **Gender.**
+    * Modifies selections in the **Autism Level List**.
+    * Modifies selections in the **Speech Status Selector** (Verbal / Non-Verbal).
+    * Updates text inputs in the **Educational Status Field**.
+    
+5. The parent taps the **"Save Changes"** button component.
+6. The system executes structural form validation.
+7. The system applies the **Dynamic Profile & Task Adaptation Logic**:
+
+    * **Scenario A (Non-Critical Update):** If only the Name or Educational Status was changed, the system overwrites the record instantly. _(Proceed to Step 8)_.
+    * **Scenario B (Critical Diagnostic Update):** If Age, Autism Level, or Speech Status was changed, the system intercepts the execution and triggers the **Systemic Recalibration Interlocking Alert**. The parent clicks **"Confirm & Recalibrate"**. The system retains the Child_ID (keeping the financial subscription 100% active) while programmatically resetting and rebuilding the upcoming task queue based on the new criteria. _(Proceed to Step 8)_.
+    
+8. The system commits all updates permanently to the database and routes the interface back to the Child Profiles Directory Screen (TYF-AUT-05).
+
+**Alternative Flows**
+
+* **A1 - Incomplete Data Input:** If mandatory fields are left blank or validation bounds are broken, the system halts database submission, rejects the updates, and highlights the faulty field inline.
+* **A2 - Recalibration Aborted:** If the parent cancels the Systemic Recalibration Alert, the update transaction is aborted, database writes are discarded, and the screen returns to the editable form state.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Name Field** | Input for updating the child's name | **Field Type:** Text String  **Validation:** Mandatory field. Must contain alphabetical text only (2 to 30 characters). |
+| **Age Field** | Input for updating the child's age | **Field Type:** Numeric Integer  **Validation:** Mandatory field. Must be a valid positive number within an accepted range (e.g., 2 to 18 years). |
+| **Gender Selector**  | Selection picker for updating the child's gender  | **Field Type:** Segmented Control / Radio Buttons. Validation: Mandatory selection. Must map to: Male (ذكر) or Female (أنثى).  |
+| **Autism Level List** | Selection picker for updating autism severity levels | **Field Type:** Dropdown / Single-Choice Radio Group  **Validation:** Mandatory selection. Must map to one of the system-defined values: Mild, Moderate, Severe. |
+| **Speech Status Selector** | Selection picker for updating the child's speaking ability | **Field Type:** Segmented Control / Radio Buttons  **Validation:** Mandatory selection. Must map to one of the system-defined values: Verbal (ناطق) or Non-Verbal (غير ناطق). |
+| **Educational Status Field** | Brief descriptive input of the school or development level | **Field Type:** Text String  **Validation:** Optional field. The maximum length allowed is 100 characters. |
+| **Recalibration Interlocking Alert** | System confirmation overlay blocking the save pipeline on diagnostic changes | **Field Type:** Modal Dialogue Overlay  **Validation:** Fires conditionally if Age, Autism Level, or Speech Status values deviate from the initial database fetch. |
+| **Save Changes Button** | Commits form configurations to the server | **Field Type:** Primary Action Button  **Validation:** Remains disabled until all mandatory input validation criteria are fulfilled. |
+
+**Validation Message**
+
+* **\[Name Field\]:** "Please enter a valid name for your child."
+* **\[Age Field\]:** "Please enter a valid age."
+* **\[Autism Level List\]:** "Please select the autism severity level."
+* **\[Speech Status Selector\]:** "Please select your child's speech status."
+* **\[Recalibration Interlocking Alert\]:** "Warning: Changing critical diagnostic data (Age, Autism Level, or Speech Status) will automatically update and replace the child's current task layout to match their new needs. Your active subscription will not be affected. Do you wish to proceed?"
+* **\[Save Changes Button\]:** "Required fields are missing. Please complete the form."
+
+**Constraints**
+
+* **Subscription Preservation Rule:** Profile parameter modifications must never delete, alter, or terminate running payment logs or active subscription tokens bound to the Child_ID.
+* **Domain Range Isolation:** The autism parameters must match strict system enum categories exclusively (Mild, Moderate, Severe).
+* **Speech Metrics Isolation:** The speech status parameter must strictly match system configuration constraints representing either Verbal (ناطق) or Non-Verbal (غير ناطق).
+
+**Acceptance Criteria**
+
+* **Given** valid updates to non-critical fields (Name/Educational Status), **when** the parent saves, the database record updates instantly without interrupting the user.
+* **Given** changes to critical metrics (such as changing Speech Status from Verbal to Non-Verbal), **when** the parent clicks save, the system triggers the Recalibration Interlocking Alert to warn the user before adjusting the task schema.
+* **Given** the parent confirms the dynamic recalibration alert, **when** the transaction commits, **then** the child’s dataset is updated, their active subscription is preserved, and the upcoming task baseline is programmatically recalculated.
+* **Given** missing mandatory inputs, **when** the parent attempts execution, **then** database writing is blocked, and field-level inline validation errors are displayed.
+
+
+-----------------
+
+TAYF-84 - View Children Directory via Settings 
+## **View Children Directory via Settings**
+
+**TYF-SET-02**
+
+**Description**
+
+Allows an authenticated parent to access and view a complete directory of all their registered children's profiles directly from the application's "Settings" or "Account Management" hub. This view provides summary metrics for each child and serves as the permanent management gateway to either add new child profiles or trigger updates to existing ones during regular application usage.
+
+**Pre-conditions**
+
+* The parent is logged in successfully.
+* The parent has navigated to the application's "Settings" or "Profile" dashboard.
+
+**Main Flow**
+
+1. The parent taps on the **"Manage Children Profiles"** option within the Settings menu list.
+2. The system executes a database query to fetch all active child profile records associated with the parent's master account ID.
+3. The system loads and renders the stable profiles directory layout view.
+4. The parent views the registered children's cards array, where each card item clearly displays summary metrics: **Child's Name**, **Child's Age**, **Child's Autism Level**, and **Speech Status**.
+5. The parent evaluates their profile management options from this view:
+
+    * **Option A (Register Another Child):** The parent clicks the **"Add New Child"** action button, which routes the interface to the child registration form (TYF-AUT-04).
+    * **Option B (Edit Existing Child Profile):** The parent clicks the **"Edit Profile"** icon button on a specific child's summary card, routing them directly to the child profile modification sheet.
+    
+
+**Alternative Flows**
+
+* **A1 - No Children Profiles Registered:** If the account contains zero child profiles (e.g., deleted or uncompleted onboarding), the system displays a clear empty-state layout panel prompting the parent to add their first child profile.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Settings Navigation Item** | Menu entry point inside the general settings list | **Field Type:** Interactive List Row Template  **Validation:** Clickable state; initializes navigation routing to the children directory layout. |
+| **Children Directory Grid** | Scrollable list layout rendering active profile summary cards | **Field Type:** Collection View / Vertical List Container  **Validation:** Read-Only dynamic elements; displays Name, Age, Autism level, and Speech Status parameters fetched from server records. |
+| **Edit Profile Button** | Action trigger attached to each child card index | **Field Type:** Icon Action Button  **Validation:** Active target link; maps the child's unique identifier and routes to the modification form loop (TYF-AUT-05-B). |
+| **Add New Child Button** | Floating or structural action link to append more profiles | **Field Type:** Primary Action Button / Outlined Link  **Validation:** Active trigger link; routes client layout state directly to the registration form layout (TYF-AUT-04). |
+
+**Validation Message**
+
+* **\[Children Directory Grid\]:** "No child profiles found linked to this account. Please add a child to customize your interactive platform experience."
+* **\[Edit Profile Button\]:** "Unable to retrieve profile metadata. Please check your network connection and try again."
+
+**Constraints**
+
+* **Context Isolation Rule:** The system must strictly filter and display only the child profile records that possess a direct foreign key relationship to the authenticated parent's account master ID.
+* **Onboarding Stack Isolation:** Unlike the post-registration flow (TYF-AUT-05), this settings layout component does not contain a "Proceed to App" stack-destroyer block; navigating backward safely returns the parent to the main Settings root menu.
+
+**Acceptance Criteria**
+
+* **Given** an authenticated parent with registered children's profiles, **when** they select "Manage Children Profiles" from Settings, **then** the system accurately queries the database and displays cards reflecting each child's Name, Age, Autism level, and Speech Status.
+* **Given** a parent clicks the "Edit Profile" icon component from the settings directory grid, **when** the request initializes, the interface transitions smoothly into the dedicated profile modification script for that specific child context.
+* **Given** a parent clicks the "Add New Child" button, **when** the transaction triggers, **then** the application opens a clean registration form instance without breaking or logging out the active parent session.
+
+
+-----------------
+
+TAYF-83 - Edit Profile 
+## **Edit Profile**
+
+**TYF-SET-01**
+
+**Description**
+
+Allows an authenticated parent to modify their personal profile details (such as Name or registered Email address) within the application. If the parent attempts to change their primary communication channel (**Mobile Number Field**), the system mandates a real-time OTP (One-Time Password) verification flow to ensure the newly provided number is active, valid, and functional before committing the modifications to the database.
+
+**Pre-conditions**
+
+* The parent is logged in successfully.
+* An active internet connection is available.
+
+**Main Flow**
+
+1. The parent navigates to the **"Profile Settings"** layout workspace.
+2. The system executes a secure fetch command, retrieving current database values, and populates the editable profile form.
+3. The parent modifies their desired personal attributes:
+
+    * Updates alphabetical character inputs in the **Name Field**.
+    * Updates data inputs within the **Email Field**.
+    * Alters data inputs within the **Mobile Number Field** to change their primary registered phone number.
+    
+4. The parent taps the **"Save Changes"** action button.
+5. The system checks the modified parameters:
+
+    * **Scenario A (Non-Sensitive Fields Only):** If only the Name or Email fields were altered, the system commits updates directly to the database. _(Proceed to Step 8)_.
+    * **Scenario B (Mobile Number Field Altered):** If the Mobile Number was changed, the system flags the profile state as "Pending Phone Verification" and locks the update pipeline until ownership is validated. _(Proceed to Step 6)_.
+    
+6. The system dispatches a 4-6 digit OTP validation token via SMS to the newly requested mobile number.
+7. The parent compiles the received verification token into the **OTP Field**.
+8. The system completes validations, commits all profile updates to the user ledger database, and displays a success toast component layout on the viewport.
+
+**Alternative Flows**
+
+* **A1 - Mobile Number Conflict:** If the new mobile number submitted by the parent matches an existing account record in the database, the system blocks execution and displays an explicit validation error.
+* **A2 - Invalid OTP entered:** The system flags a validation alert and holds screen layout state for code re-entry.
+* **A3 - OTP expired:** The interface highlights the "Resend Code" contextual link component once the countdown timer decays.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Name Field** | Input for updating the parent's full name | **Field Type:** Alphabetical Text String  **Validation:** Mandatory field. Text length restrictions must reside between 2 and 50 characters. |
+| **Email Field** | Input for updating the registered email address | **Field Type:** Email String  **Validation:** Must follow standard format syntax (`user@domain.com`). Checked for uniqueness across database user records. |
+| **Mobile Number Field** | Input for updating the primary registered mobile number | **Field Type:** Numeric String  **Validation:** Must follow standardized national phone format validation. Must be completely unique across database user records. |
+| **OTP Field** | Entry field for validating new mobile number updates | **Field Type:** Numeric Input (4-6 Digits)  **Validation:** Real-time match execution against database cache tokens. Bound to strict time decay constraints. |
+| **Save Changes Button** | Triggers database write pipeline evaluations | **Field Type:** Primary Action Button  **Validation:** Stays locked/disabled until fields fulfill minimum length or syntax validation criteria. |
+
+**Validation Message**
+
+* **\[Name Field\]:** "Please enter a valid name."
+* **\[Email Field\]:** "Please enter a valid email address."
+* **\[Mobile Number Field\]:** "Please enter a valid mobile number."
+* **\[Mobile Number Field\]:** "This mobile number is already linked to another account."
+* **\[OTP Field\]:** "Invalid verification code. Please check the code and try again."
+* **\[OTP Field\]:** "The verification code has expired. Please request a new code."
+
+**Constraints**
+
+* **Mandatory Mobile Verification Gating:** Mobile number modifications are programmatically prevented from being committed to the database without a verified, matching active OTP session token to guarantee the target number is live and correct.
+* **Token Expiration Decay:** All dispatched phone update verification tokens must self-destruct programmatically after a strict time window (e.g., 5 minutes).
+* **End-to-End Encryption:** All account update exchanges and profile status changes must route exclusively across secure SSL/HTTPS channels.
+
+**Acceptance Criteria**
+
+* **Given** an authenticated parent modifies non-sensitive metadata (such as their Name or Email), **when** they tap the save changes component, **then** the platform updates the database record instantly without triggering verification flags.
+* **Given** a parent enters a new, unregistered mobile number, **when** they submit changes, **then** the system initializes an onboarding verification loop and dispatches an OTP payload via SMS to confirm the channel is functional.
+* **Given** the input of a correct, active verification token matching the new phone number, **when** the user confirms, the new profile parameters are written to the database successfully.
+* **Given** an incorrect token entry, **when** the parent attempts confirmation, **then** database update routines abort, data writes are discarded, and an error message is printed instantly.
+
+
+-----------------
+
+TAYF-76 - Child Exercise Interaction & Execution 
+## **Child Exercise Interaction & Execution**
+
+**TYF-EXR-APP** 
+
+**Description:**
+
+This viewport represents the deep execution layer where the child engages directly with the individual cognitive **exercises** packed inside an active lesson node. The layout operates text-free, functioning as a polymorphic interaction template.
+
+Crucially, the rendering engine dynamically adapts to the **Exercise Access Lock** bit inherited from the master configuration:
+
+* **Asynchronous Mode (Is_Locked == False):** Renders all exercise nodes inside the active lesson as an open carousel or horizontal grid of interactive challenge cards. The child has full cognitive autonomy to select, play, and solve any exercise in their preferred order.
+* **Sequential Mode (Is_Locked == True):** Forces a rigid linear pipeline. The interface isolates exactly one exercise asset onto the active workspace container, completely blocking or blurring subsequent challenge cards until the active index sets its terminal success flags.
+
+**Pre-conditions:**
+
+* The child profile has successfully launched an active or unlocked lesson node via the **Primary Journey Canvas** (`TYF-LPN-APP`).
+* The local application cache (`SQLite / Room`) has pre-parsed and fully verified the integrity of the binary assets (high-contrast images, shapes, and localized audio snippets) tied to the selected exercise indices.
+
+**Main Flow:**
+
+1. The child enters the active lesson node context, prompting the application to initialize the workspace canvas.
+2. The runtime configuration script evaluates the specific **Exercise Access Lock** status for the parent lesson framework:
+3. **Branch 1 — Asynchronous Grid (Free Choice):**
+
+    * The screen renders an array of open, animated exercise node entry cards side-by-side.
+    * The child taps any available exercise card to launch its internal mini-game loop.
+    
+4. **Branch 2 — Sequential Workspace (Linear Progression):**
+
+    * The system evaluates the child's local ledger history to find the first incomplete index item (Indexn​).
+    * The screen initializes Indexn​ into full focus, while rendering future indices as locked or hiding them to maintain structured clinical focus.
+    
+5. The application detects the polymorphic **Exercise Type** (Image Selection, Matching, Ordering, or Distinguishing) and prepares the matching touch gesture listeners.
+6. The child interacts with the screen elements (Tapping, dragging, chronological sorting).
+7. Once the specific success metrics of the active exercise are achieved, the system fires a localized visual reward burst (e.g., star animation, object fade-out).
+8. The engine writes the execution trace data (Success, trials counter, total duration metrics) into the local sandbox database layer.
+9. **State Resolution Routing:**
+
+    * _In Asynchronous Mode:_ The child is brought back to the exercise grid canvas, showing a green checkmark or glowing badge over the completed exercise card.
+    * _In Sequential Mode:_ The interface automatically slides the completed index out of frame and executes a smooth physics transition to reveal the next unlocked exercise item (Index+1​).
+    
+10. Upon resolving the terminal completion validation rule for all exercises bound within the active lesson scope, the engine hands over runtime focus to the **Gamified Reward Unlock Loop** (`TYF-LPN-APP`).
+
+**Dynamic UI Component Layout States:**
+
+**Exercise Canvas Behavioral Manifest**
+
+| **Interface Layout Component** | **Mode Flag State** | **Client-Side Interaction & Visual Manifest Rules** |
+| --- | --- | --- |
+| **Exercise Matrix Grid Hub** | `Is_Locked == False` _(Asynchronous)_ | Renders all exercises as active, clickable, floating orbital card slots. The child can hop between items, exit a partially completed exercise without penalty, and choose their own exploratory pace. |
+| **Linear Progression Ribbon** | `Is_Locked == True` _(Sequential)_ | Displays a clean top horizontal progress point rail (e.g., 1→2→3). Only the current active point lights up. Future numbers are locked behind tiny subtle lock vectors, denying touch intent handlers entirely. |
+| **The In-App Evaluation Vault** | _Universal Over-ride Rule_ | Completely locks out the physical and software Android/iOS navigation bars, notification window drop-downs, and gesture edges to eliminate distraction or accidental exit. |
+| **Daily Limit Reached Overlay**  | _Universal — triggered when daily cap is met_  | Renders a full-screen, non-dismissible motivational overlay when the child's completed exercises, lessons, or goals for the current calendar day reaches the Max Daily cap configured in the plan template (TYF-LPN-02). Displays a celebratory animation and the message: "Great job today! You've reached your daily limit. Come back tomorrow for more!" All exercise node touch handlers are disabled until the next 00:00 calendar day reset, evaluated server-side. The overlay cannot be bypassed by back gestures or system navigation. |
+
+**Deep Core Gesture & Asset Interaction Logic:**
+
+1. **Image Selection (اختيار الصور)**
+
+* **Media Architecture:** Displays 1 locked success asset (`Correct_Object_Target`) randomized amongst a variable layer of distractors (`Distractor_Objects_Pool`), scaling from 2 to 5 items based on severity setup.
+* **Touch Event:** A clean single-tap boundary checker. Tapping the correct coordinate triggers immediate haptic feedback, while tapping a distractor launches a temporary passive wobble.
+
+2. **Matching (التوصيل والمطابقة)**
+
+* **Media Architecture:** Generates two vertical parallel streams (Column_A vs. Column_B).
+* **Touch Event:** Tracks a continuous `MotionEvent.ACTION_MOVE` line from an item origin bounding box to its matching recipient block. If a line is drawn incorrectly, the line canvas snaps back like a rubber band to invite a clean retry.
+
+3. **Ordering (التدريب التسلسلي ورسم الخطوات)**
+
+* **Media Architecture:** Spawns a scrambled row of high-contrast action frames above empty index slot boxes (1→2→3…).
+* **Touch Event:** Multi-axis drag-and-drop gesture loop. The app monitors spatial drop boundaries; placing an image card over its matching absolute sequence index triggers a gravity snap anchor, locking the card permanently into its correct position.
+
+4. **Distinguishing (استخراج العنصر المختلف)**
+
+* **Media Architecture:** Multi-item matrix mapping matching categories, with exactly one card featuring a broken semantic rule trait.
+* **Touch Event:** Immediate single-tap vector look-up. Selecting the anomaly breaks the card pattern with a satisfying popping sound stream.
+
+**Alternative Flows:**
+
+* **AF-1 — Mid-Exercise Session Disruption / Interruption:** If a child abandons an exercise halfway or turns off the screen before completing it:
+
+    * _If Unlocked (Asynchronous):_ The temporary interaction state is cached locally; returning to the hub keeps their choices preserved, allowing them to jump into a different task fluidly.
+    * _If Locked (Sequential):_ The app freezes layout context tracking. Upon app wake-up, it re-initializes on the exact same incomplete index Indexn​, preserving the structured clinical pathway.
+    
+
+**Post-conditions:**
+
+* Granular performance logs (Total attempts, coordinate accuracy, and completion duration timestamps) are committed directly to the sandboxed SQLite transaction layers.
+* Local database state changes trigger reactive pipeline updates (`Room LiveData / Flow`), notifying the master journey status bars to adjust progress bars instantaneously.
+* The system schedules a background workers synchronization pass to upload execution deltas to the Specialist Monitoring Center (`TYF-LPN-03`).
+
+
+-----------------
+
+TAYF-75 - Child Learning Plan Execution Interface 
+## **Child Learning Plan Execution Interface**
+
+**TYF-LPN-APP** 
+
+**Description:**
+
+This feature defines the core, gamified interactive mobile interface presented to the child profile on their client device. Rather than enforcing a universally linear path, the application dynamically reads the multi-tier **Progression Access Locks** (Locked/Sequential vs. Unlocked/Asynchronous) configured during blueprint creation.
+
+The application renders a highly visual, fluid, text-free interface tailored to the child's autism severity level. It selectively restricts or opens navigation components down to the individual goal, lesson, and exercise level, allowing the child free interactive traversal across unlocked nodes while holding strict structural gating only over nodes explicitly designated as sequential.
+
+**Pre-conditions:**
+
+* The child profile has an active plan successfully bound to their account via the backend junction table (`Child_Plan_Assignments`).
+* The mobile device is authenticated and initialized under the active child session context.
+* The system has localized and cached the multimedia asset bundles (Images, Audios, GIFs) required for the active or unlocked available nodes.
+
+**Main Flow:**
+
+1. The child opens or switches to their profile dashboard on the mobile application.
+2. The system queries the local data cache (`SQLite / Room DB`) to determine the full deployment state tree and the active progress ledger:  
+  Current Progress Tree=∑(Goali​→Lessonj​→Exercisek​)
+3. The application renders the **Primary Journey Canvas**, parsing the dynamic access matrix flags:
+
+    * **If a node has Is_Locked == True:** It checks for preceding chronological completion markers. If prerequisites are missing, it renders the node with an organic padlock asset graphic and blocks input events.
+    * **If a node has Is_Locked == False:** It renders the item as instantly open, interactive, and available for engagement, skipping chronological checks.
+    
+4. The child taps any available or active flashing **"Play Session"** gateway asset to launch the respective exercise layout.
+5. The interface morphs into the text-free **Polymorphic Activity Portal**, reading the specific exercise rules and its individual progression lock state (whether items within the exercise must be solved linearly or can be tapped out-of-order).
+6. The child interacts step-by-step with the screen objects through tactile gestures (Tapping, dragging-and-dropping, sorting).
+7. Upon passing the specific activity conditions, the system logs the session data. If a rewards package token is attached to this specific lesson index, the **Reward Asset Gateway Container** flips open dynamically on screen, discharging the asset (sound clip, token, or high-contrast GIF).
+8. The mobile application writes a completed row into the local transaction ledger. If adjacent elements are sequential, it updates their locked states to active. It synchronizes all state metrics asynchronously with cloud systems (`TYF-LPN-03`) and smoothly transitions back to the main journey roadmap.
+
+**Detailed Mobile Interaction Models per Activity Type:**
+
+1. **Image Selection (اختيار الصور)**
+
+* **On-Screen Execution Landscape:** The screen populates one targeted correct vector card mixed into a fluid layout containing randomized, sensory-appropriate distractor image objects.
+* **Child Interaction Mechanic:** The child identifies and taps the target object. Tapping the correct item triggers a high-frequency sparkle effect, freezes further multi-touch input, writes a success log, and transitions into the next available container.
+
+2. **Matching (التوصيل والمطابقة)**
+
+* **On-Screen Execution Landscape:** The interface splits symmetrically into two mismatched vertical item rows (animals vs. their respective home environments).
+* **Child Interaction Mechanic:** The child touches an object icon from Column A and performs a continuous drag-and-drop stroke to connect it with its partner item in Column B. When coordinates meet the correct bounding matrix, a colorful vector neon line links them permanently.
+
+3. **Ordering (التدريب التسلسلي ورسم الخطوات)**
+
+* **On-Screen Execution Landscape:** Presents a scrambled horizontal grid of behavioral narrative flashcards showing step-by-step routine timelines.
+* **Child Interaction Mechanic:** The child physically grips, slides, and drops the scrambled frames into empty slot placeholders ordered left-to-right. The interface applies gravitational snapping physics when a card is positioned in the correct placeholder coordinate slot.
+
+4. **Distinguishing (استخراج العنصر المختلف)**
+
+* **On-Screen Execution Landscape:** Displays a symmetrical dynamic matrix layout of items sharing identical semantic traits, with exactly one single anomaly object breaking the pattern rules.
+* **Child Interaction Mechanic:** The child inspects the pattern, scans the visual layout, and directly taps the non-conforming odd-one-out element. Correct selection breaks the anomaly card apart with a pleasant visual pop effect to signal completion.
+
+5. **Audio Flashcards (بطاقات النطق التفاعلية)**
+
+**Media Architecture:** Loads one target visual asset (Correct_Object_Target) paired with one audio source resolved from either a custom binary upload path or a system audio registry string identifier (System_Audio_Registry_ID). The audio source is resolved at runtime from the cloud asset bucket.
+
+**Touch Event:** Single-tap boundary checker on the flashcard image container. Tapping the graphic triggers the audio playback engine. The system fires the mapped audio stream and logs an Audio_Playback_Event record containing: Flashcard_ID, Timestamp, Playback_Duration, and Child_Profile_ID.
+
+* In Asynchronous Mode: The child may tap any available flashcard in the grid in any order. Each card independently logs its playback event and shows a completed badge upon trigger.
+* In Sequential Mode: Only the current active flashcard is tappable. The next card unlocks only after the audio playback event for the current card is written to the local SQLite transaction layer.
+
+6. **Instructional Video (الفيديو التعليمي)**
+
+**On-Screen Execution Landscape:**The interface displays an embedded instructional video player directly inside the exercise screen, accompanied by simple playback controls suitable for children. The video occupies the primary interaction area, allowing the child to focus on the demonstrated activity or behavior without leaving the application.
+
+**Child Interaction Mechanic:** The child watches the instructional video directly within the application. The video can be replayed whenever needed during the exercise. Once the required viewing criteria are satisfied, the system records the completion event, logs the viewing activity, and enables progression to the next exercise according to the configured workflow.
+
+**Dynamic Multi-Tier Progression Constraints:**
+
+* **Goal Level Logic:** If the active plan template has Goal 1 and Goal 2 flagged as Unlocked, the child can toggle tabs on their screen freely and engage with both developmental tracks simultaneously. If Goal 2 is marked as Locked, it remains visually frozen behind a gateway track until Goal 1 hits its 100% completion threshold.
+* **Lesson Level Logic:** Within any accessible goal, lessons marked as Unlocked display active icons immediately. If a sequential lock is enforced by the Admin, the mobile layout enforces a strict index roadmap (1→2→3), where Lesson 2 ignores user touch completely until Lesson 1 writes its terminal completion code.
+* **Exercise Level Logic:** Inside the activity portal, an Unlocked state allows the child to click and solve multiple displayed exercise cards in any preferred psychological pattern. A Locked state forces strict screen card pacing where the interface isolates cards into distinct, linear steps.
+
+**App Interface Components & Behavioral Constraints:**
+
+| **Interface Element** | **Screen Layout Mapping** | **Processing Constraints & Client-Side Behavioral Rules** |
+| --- | --- | --- |
+| **Primary Journey Canvas** | Main App Home Dashboard | Entirely text-free workspace; navigation relies on clear visual spatial mapping paths.  Only nodes with verified open active flags or `Is_Locked == False` state parameters respond to touch inputs. |
+| **Progress Tracking Meter** | Top Sticky Status Ribbon | Displays an organic filling element (e.g., a liquid bar, growing plant, or star track) that visually matches the overall plan execution progress ratio calculated locally. |
+| **Polymorphic Activity Portal** | Active Screen Layer Full View | Completely disables external phone system gestures, back navigation rails, and phone status bars to preserve concentration focus.  Dynamic layout adjusts immediately to process either rigid step-by-step screen iterations or open multi-card tapping arrays based on exercise lock bits. |
+
+**Mobile Business Rules & Runtime Sandboxing:**
+
+* **Asynchronous Offline Capabilities:** If connection links to the core cloud database drop while a child is interacting with a lesson node, the mobile app transitions seamlessly to local processing mode. All exercise logs, trial metrics, and reward unlock codes are committed straight to the local `SQLite / Room` transaction layer. No progress is lost, and metrics auto-sync with the administrative backend (`TYF-LPN-03`) immediately upon internet re-establishment.
+* **Dynamic Rule Hot-Swapping Adaptation:** In alignment with `TYF-LPN-04`, if an Admin logs into the portal and changes a future unexecuted milestone from Locked to Unlocked, the mobile client intercepts this data flag change during background sync cycles. The interface dynamically updates the target component shell—removing padlock graphics and unlocking user access instantly mid-phase without interrupting the child's local user profile session.
+* **Sandbox Data Protection Guarantee:** All completed milestones and earned rewards captured during mobile sessions are written as permanent, unchangeable database transaction records. If a global admin modifies a master template afterward, the child’s local device app ignores those mutations for completed segments, ensuring a completely stable, glitch-free clinical journey.
+
+**Alternative Flows:**
+
+* **AF-1 — Child Incorrect Selection / Fatigue Loop:** If a child inputs an incorrect selection coordinate or misplaces a matching line during an exercise:
+
+    * The interface plays a soft, non-punitive, neutral visual wobble effect (No aggressive alarm or buzzing sounds to prevent sensory overload).
+    * The item cards reset gently to their initial slots, prompting a calm retry tracking frame without locking the device workflow.
+    
+
+**Post-conditions:**
+
+* The system successfully tracks and saves granular cognitive interaction metrics with zero data regression.
+* Completed lesson timestamps are recorded locally, triggering a synchronization script that pipes live tracking metrics to the Specialist Progress Hub (`TYF-LPN-03`).
+* The client device unlocked asset wallet index updates to include the newly earned reward media tags.
+
+
+-----------------
+
+TAYF-74 - App Home 
+## **View App Home** 
+
+**Use Case ID:** TYF-HOM-01
+
+**Actor:** Authenticated App User (Parent / Guardian)
+
+**Description**
+
+This use case governs the structural presentation and dynamic layout of the primary "Home" dashboard interface immediately following a successful login or session restoration. It consolidates active child profiles, quick-access operational cards, personalized learning plan summaries, gamified progress rings, and system notifications into a centralized feed layout.
+
+**Pre-conditions:**
+
+1. The user has successfully authenticated and holds a valid session token (JWT).
+2. The client device is connected to the internet (or loads the last cached structural snapshot if offline navigation is active).
+3. At least one child profile is linked to the user’s account record.
+
+**Main Flow:**
+
+1. The user launches the application or successfully authenticates, triggering the routing engine to target the core structural interface stack.
+2. The application client issues secure HTTPS GET requests to fetch the user's active context dashboard payload (including linked child profiles, daily progress metrics, and recommended activities).
+3. The server validates the active authorization header, reads the backend data tables, and returns a `200 OK` JSON response containing payload attributes.
+4. The application renders the **Home View Layout**, displaying the Child Profile Switcher, Active Learning Plan Tracker, and Daily Recommendation Modules.
+5. The system initiates the background rendering of localized progress metrics, calculating visual vector fill metrics for circular percentage containers.
+6. The user views their personalized dashboard elements and interacts with individual content nodes to launch specific child intervention components.
+
+**Alternative Flows:**
+
+**Alternative Flow A: No Active Child Profile Linked**
+
+1. At Step 3 of the Main Flow, the system identifies that the user profile database entry contains zero active child profile mappings.
+2. The system redirects the user's layout wrapper away from the core Dashboard view.
+3. The system mounts the **"Child Profile Creation Wizard"** interface overlay.
+4. The user is forced to complete the basic registration of at least one child profile before the core Home View is unlocked.
+
+**Alternative Flow B: Network Offline State**
+
+1. At Step 2 of the Main Flow, the client application fails to establish a secure handshake with the remote application gateway due to a lack of network connectivity.
+2. The client interceptor catches the timeout exception.
+3. The application reads local storage indexes to retrieve the last securely persisted data state snapshot.
+4. The system renders the Home layout using historical cache data and overlays a non-intrusive banner reading: _"You are viewing offline data. Some metrics might not be up to date."_
+
+**Alternative Flow C: Learning Plan Grace Period Expired (Subscription Paywall Trigger)**
+
+1. At Step 2 of the Main Flow, the server evaluates the timestamp delta (Δt) of the generated learning plan against the server-fetched config rule (`System_Config.plan_grace_period_days`).
+2. If Δt exceeds the defined limit, the server flag flags the plan as restricted.
+3. The client application triggers the **Plan Expiration Blackout Screen** overlay across the Home layout, masking content blocks with a primary CTA button prompting subscription renewal.
+
+**Components Type (Table):**
+
+| **Component Name** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Child Profile Switcher** | Horizontal avatar carousel allowing quick switching between linked child profiles. | **Field Type:** Interactive Scrollable List. Validation: Must display at least one profile avatar. Clicking updates active context. |
+| **Learning Plan Progress Ring** | Circular vector graphic representing the percentage of completed daily activities. | **Field Type:** Visual Data Canvas. Validation: Dynamically scales from 0% to 100% based on numerical calculation of completed tasks. |
+| **Quick Launch Activity Cards** | Dynamic content feed items linking directly to recommended therapeutic games or assessment tasks. | **Field Type:** Actionable Grid Cards. Validation: Hidden if child assessment is incomplete; dynamically loads fallback diagnostic elements instead. |
+| **Global Navigation Bar** | Persistent bottom routing layout anchor containing links to Home, Analytics, Library, and Profile. | **Field Type:** Sticky Structural Tab Bar. Validation: Highlights active icon context state; blocks multiple rapid click triggers. |
+
+**Validation Messages:**
+
+* **\[Offline Data Banner\]:** _"Network connection lost. Displaying offline data cache updated \[X\] minutes ago."_
+* **\[Subscription Intercept\]:** _"Your free learning plan access period has concluded. Upgrade to Premium to keep exploring personalized milestones."_
+* **\[Data Load Failure\]:** _"Unable to compile your personalized home feed dashboard. Pull down to refresh or try again later."_
+
+**Constraints:**
+
+* **Secure Client Cache Isolation:** Any structural or user dashboard metrics cached locally for offline fallback display must be stored using sandboxed application storage and immediately wiped upon an explicit logout command execution.
+* **Non-Blocking Dynamic Lazy Loading:** Structural frame containers must mount instantly with placeholder skeleton loaders. Image elements and detailed progress calculations must populate asynchronously so as not to block view scroll operations.
+* **Token Validity Checks:** Prior to rendering any data nodes on the Home interface layout, the underlying client routine must verify the current lifespan of the stored JWT token context.
+
+**Acceptance Criteria:**
+
+* **Given** an authenticated parent user lands on the primary dashboard interface route, **when** the system parses the database payload successfully, **then** the Home layout should fully render all dynamic child dashboard component nodes within a sub-2-second transaction window.
+* **Given** a child has achieved their designated target progress thresholds for the day, **when** the user switches view state context to that specific child, **then** the Progress Ring component must dynamically update to display a 100% vector state alongside a localized celebratory visual checkmark layout modifier.
+* **Given** an invalid or expired authentication payload signature state when the client attempts to pull home elements, **then** the view routine must disrupt the layout render, tear down active navigation frames, and instantly bounce the viewport routing context to the root App Login wrapper screen layout.
+
+
+-----------------
+
+TAYF-73 - View Learning Plan & Subscription Gateway 
+## **View Learning Plan & Subscription Gateway**
+
+**TYF-AUT-09**
+
+**Description**
+
+Forces the parent to review the child's tailored read-only learning plan generated from the baseline assessment. The plan remains accessible for a restricted grace period (System Configuration: **Defined by admin in settings**). Once this retention period expires, the system automatically triggers a hard cryptographic block, obscuring the plan data parameters from the parent interface and making full subscription activation a mandatory prerequisite to regain application access and view any plan structures.
+
+**Pre-conditions**
+
+* The parent is successfully logged in.
+* A structured learning plan has been officially committed by the specialist (`UC-ADM-05`).
+* The system has stamped a `Plan_Creation_Timestamp` upon plan finalization.
+
+**Main Flow**
+
+1. The parent navigates to the **"Learning Plan"** workspace hub or is automatically redirected here post-assessment.
+2. The system checks the active child context via the **Child Context Selector Modal**.
+3. The system executes an operational validation, tracking the delta time:  
+  Δt=Current_Timestamp−Plan_Creation_Timestamp
+4. The system evaluates the age of the learning plan ledger:
+
+    * **Scenario A (Within Grace Period - Δt≤Defined by admin in settings):** The system grants read-only clearance. It displays the plan layout grid along with a dynamic **Grace Period Countdown Timer** and the **Action Decision Panel** (Subscribe vs. Skip). _(Proceed to Step 5)_.
+    * **Scenario B (Expired Grace Period - Δt>Defined by admin in settings):** The system blocks data drawing, activates the **Plan Expiration Blackout Screen Layout**, obscuring all goals and exercises, and renders an absolute subscription block interface. _(Route directly to Step 9)_.
+    
+5. Below the open plan presentation layout, the parent evaluates their commercial preferences:
+
+    * **Pathway A (Subscribe to Plan):** The parent clicks **"Subscribe to Unlock Full Plan"**. The system routes the layout directly into the checkout/online payment gateway framework (`TYF-PAY-01`). _(End of Flow)_.
+    * **Pathway B (Skip Integration):** The parent clicks the secondary skip trigger link. _(Proceed to Step 6)_.
+    
+6. The system intercepts the skip command and overlays the mandatory **Limited Access Warning Pop-Up** on top of the viewport.
+7. The parent acknowledges the restrictions by tapping **"Proceed with Limited Mode"**.
+8. The system sets the active user session status to "Freemium/Limited" and routes the parent directly to the primary **Application Home Screen Layout**. _(End of Flow)_.
+9. **\[Expired Block Execution\]:** The parent views the locked state interface, displaying the **Expired Plan Action Button**. The parent must tap **"Subscribe Now to View Plan"** to instantiate the Online Payment workflow; all alternative "Skip" functionalities are permanently removed.
+
+**Alternative Flows**
+
+* **A1 - No Active Learning Plan Found:** If the specialist hasn't finalized the plan template yet, the system blocks the execution and surfaces a pending state dashboard workspace.
+
+**Components Type (Table)**
+
+| **Component** | **Description** | **Constraints / Validation** |
+| --- | --- | --- |
+| **Child Context Selector** | Interactive selector locking down the targeted profile master key | **Field Type:** Single-Selection List View  **Validation:** Mandatory prerequisite step before querying plan details from the server database. |
+| **Grace Period Countdown Timer** | Visual alert tracking remaining free-tier viewing allocation | **Field Type:** Localized Inline Countdown Label  **Validation:** Displayed conditionally only if Δt≤7 Days. Dynamic string format. |
+| **Plan Architecture View** | Multi-tiered container drawing goals, sequential lessons, and exercise counts | **Field Type:** Non-Editable Hierarchical Grid View **Validation:** Absolute **Read-Only** rendering layout; completely hidden and scrubbed from view if Δt>**Defined by admin in settings**. |
+| **Plan Expiration Blackout Screen** | Security layout masking child plan data post-expiration | **Field Type:** Overlaid Blur / Blank State Screen Wrapper **Validation:** Triggered instantly on the server side if expiry evaluation holds; absolute block to UI inspection tools. |
+| **Expired Plan Action Button** | Direct payment trigger on the blocked profile view | **Field Type:** Primary High-Emphasis Action Button  **Validation:** Replaces all action configurations on the expired block screen. Routes directly to Online Payment checkout nodes. |
+| **Limited Access Warning Pop-Up** | Business gate overlay warning user of restricted capabilities | **Field Type:** Modal Dialogue Pop-Up Window  **Validation:** Disables background environment interaction; forces choice between upgrading or accepting a degraded app state. |
+
+**Validation Message**
+
+* **\[Grace Period Countdown Timer\]:** "Notice: Your child's tailored learning plan is available for free preview for \[X Days / X Hours\]. Subscribe now to prevent plan blackout and unlock full exercise interactions."
+* **\[Plan Expiration Blackout Screen\]:** "Access Expired: The free preview window for this learning plan has ended. To view your child's personalized goals, exercises, and specialist recommendations, please activate a platform subscription package."
+* **\[Limited Access Warning Pop-Up\]:** "Notice: Skipping subscription means your child's access to games, exercises, and developmental tracking reports will be strictly limited. You can upgrade at any time from your dashboard profile. Do you want to continue with limited access?"
+
+**Constraints**
+
+* **Server-Side Expiration Enforcement:** The expiration verification framework (Δt>**Defined by admin in settings**) must be executed on the cloud backend architecture during the initial data pull API handshake. The client application must never rely on device local clocks to dictate plan locking, preventing manipulation.
+* **Cryptographic Asset Protection:** Upon expiration, the API payload must return a nullified or tokenized content object rather than just relying on styling attributes (like a CSS blur filter) to guarantee parent users cannot extract diagnostic metrics illegally via front-end debugging tools.
+
+**Acceptance Criteria**
+
+* **Given** that an approved learning plan is fetched within its grace period, **when** the parent views the screen, **then** the system accurately maps the goals, reveals a live countdown clock, and offers both subscription and limited skip pathways.
+* **Given** that the plan age exceeds the period threshold, **when** the parent attempts to open the learning plan hub, the system drops data drawing, replaces the grid with the Plan Expiration Blackout Screen, and strips away all "Skip" routing shortcuts.
+* **Given** that the parent triggers the subscription flow from either the active countdown panel or the expired blackout interface, **when** verified, the application transfers full context variables directly to the secure Online Payment setup engine.
+
+
+-----------------
+

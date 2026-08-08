@@ -53,7 +53,34 @@ class ChildController extends Controller
             return $this->failedResponse(__('Data Not Found'), [], 404);
         }
 
-        $child->update($request->validated());
+        $validated = $request->validated();
+        
+        // TAYF-85: Check for critical diagnostic changes
+        $criticalChanged = false;
+        if (
+            $child->age != $validated['age'] || 
+            $child->autism_level !== $validated['autism_level'] || 
+            $child->speech_status !== $validated['speech_status']
+        ) {
+            $criticalChanged = true;
+        }
+
+        if ($criticalChanged && empty($validated['confirm_recalibrate'])) {
+            return $this->failedResponse(__('Warning: Changing critical diagnostic data will update the task layout. Please confirm to proceed.'), [
+                'requires_recalibration' => true
+            ], 409);
+        }
+
+        $child->update($validated);
+
+        if ($criticalChanged) {
+            // Recalibrate logic: wipe uncompleted tasks / trigger re-test
+            $child->update(['force_re_test' => true]);
+            \Illuminate\Support\Facades\DB::table('child_learning_plans')
+                ->where('child_id', $child->id)
+                ->where('is_completed', false)
+                ->delete();
+        }
 
         return $this->successResponse(__('Updated Successfully'), ChildResource::make($child));
     }
