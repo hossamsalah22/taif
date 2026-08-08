@@ -19,7 +19,7 @@ class AssessmentResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'autism_level' => AutismLevelEnum::label($this->autism_level),
+            'autism_level' => $this->autism_level,
             'status' => AssessmentStatusEnum::label($this->status),
             'version' => $this->version,
             'max_attempts' => $this->max_attempts,
