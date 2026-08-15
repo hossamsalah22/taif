@@ -30,7 +30,9 @@ class AssessmentReportResource extends JsonResource
             'strengths' => $this->strengths,
             'improvements' => $this->improvements,
             'recommendations' => $this->recommendations,
+            'specialist_notes' => $this->specialist_notes,
             'download_url' => route('api.reports.download', ['child' => $this->child_id, 'submission' => $this->id]),
+            'attached_file_url' => $this->getFirstMediaUrl('reports') ?: null,
             // Removing full answers payload since report details screen is mostly specialist analysis
         ];
     }

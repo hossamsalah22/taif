@@ -49,12 +49,14 @@ class RewardForm
                     ->required()
                     ->live(),
                 SpatieMediaLibraryFileUpload::make('sound')
+                    ->disk('public')
                     ->collection('rewards')
                     ->acceptedFileTypes(['audio/*'])
                     ->visible(fn (Get $get) => $get('type') === RewardTypeEnum::SOUND->value)
                     ->required(fn (Get $get) => $get('type') === RewardTypeEnum::SOUND->value),
 
                 SpatieMediaLibraryFileUpload::make('image')
+                    ->disk('public')
                     ->collection('rewards')
                     ->acceptedFileTypes(['image/*', 'application/json'])
                     ->visible(fn (Get $get) => $get('type') !== RewardTypeEnum::SOUND->value)

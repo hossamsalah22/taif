@@ -37,6 +37,7 @@ class AssessmentSubmissionForm
                             ->label(__('Specialist Recommendations'))
                             ->rows(3),
                         SpatieMediaLibraryFileUpload::make('report')
+                            ->disk('public')
                             ->label(__('Clinical Report Document'))
                             ->collection('reports')
                             ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])

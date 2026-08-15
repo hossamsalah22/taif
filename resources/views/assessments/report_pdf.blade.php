@@ -121,5 +121,15 @@
     </div>
     @endif
 
+    @if($record->getFirstMediaUrl('reports'))
+    <div class="section" style="text-align: center; background-color: #eef2ff;">
+        <h3>{{ __('Clinical Report Document') }}</h3>
+        <p>{{ __('An official clinical document was attached to this evaluation.') }}</p>
+        <a href="{{ $record->getFirstMediaUrl('reports') }}" style="display: inline-block; padding: 10px 20px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+            {{ __('Download Document') }}
+        </a>
+    </div>
+    @endif
+
 </body>
 </html>

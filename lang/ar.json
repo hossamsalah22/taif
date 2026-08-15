@@ -701,5 +701,9 @@
     "Improvements": "مجالات التحسين",
     "Subscription Gateway Data": "بيانات بوابة الاشتراك",
     "Home data retrieved successfully": "تم جلب بيانات الصفحة الرئيسية بنجاح",
-    "No active learning plan found.": "لم يتم العثور على خطة تعلم نشطة."
+    "No active learning plan found.": "لم يتم العثور على خطة تعلم نشطة.",
+    "Specialist Notes & Diagnostic Summary": "ملاحظات الأخصائي وملخص التشخيص",
+    "Answers Audit Tree": "شجرة مراجعة الإجابات",
+    "An official clinical document was attached to this evaluation.": "تم إرفاق ملف تقرير سريري رسمي بهذا التقييم.",
+    "Download Document": "تحميل الملف"
 }

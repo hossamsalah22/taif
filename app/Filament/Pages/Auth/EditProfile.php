@@ -30,6 +30,7 @@ class EditProfile extends BaseEditProfile
                         Group::make([
                             SpatieMediaLibraryFileUpload::make('avatar')
                                 ->label(__('Avatar'))
+                                ->disk('public')
                                 ->collection('avatar')
                                 ->hiddenLabel()
                                 ->avatar()

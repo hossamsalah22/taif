@@ -6,6 +6,7 @@ use App\Http\Resources\AssessmentReportResource;
 use App\Models\AssessmentSubmission;
 use App\Models\Child;
 use Illuminate\Http\Request;
+use Spatie\Browsershot\Browsershot;
 
 class AssessmentReportController extends Controller
 {
@@ -18,10 +19,14 @@ class AssessmentReportController extends Controller
             abort(403, 'Unauthorized access to this report.');
         }
 
+        if ($submission->status !== 'published') {
+            abort(400, 'Report is not published yet.');
+        }
+
         $submission->load(['assessment', 'answers.question']);
 
         return response()->json([
-            'report' => new AssessmentReportResource($submission)
+            'report' => new AssessmentReportResource($submission),
         ]);
     }
 
@@ -36,8 +41,8 @@ class AssessmentReportController extends Controller
         }
 
         $html = view('reports.assessment', ['submission' => $submission])->render();
-        
-        $pdf = \Spatie\Browsershot\Browsershot::html($html)
+
+        $pdf = Browsershot::html($html)
             ->format('A4')
             ->margins(10, 10, 10, 10)
             ->pdf();

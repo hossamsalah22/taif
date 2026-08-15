@@ -31,6 +31,10 @@ class AssessmentSubmissionInfolist
 
                 Section::make(__('Specialist Report'))
                     ->schema([
+                        TextEntry::make('specialist_notes')
+                            ->label(__('Specialist Notes & Diagnostic Summary'))
+                            ->html()
+                            ->columnSpanFull(),
                         TextEntry::make('assessment.autism_level')
                             ->label(__('Diagnosed Severity Level'))
                             ->formatStateUsing(fn ($state) => AutismLevelEnum::label($state))
@@ -41,6 +45,17 @@ class AssessmentSubmissionInfolist
                             ->label(__('Areas for Improvement')),
                         TextEntry::make('recommendations')
                             ->label(__('Specialist Recommendations')),
+                        TextEntry::make('report_document')
+                            ->label(__('Clinical Report Document'))
+                            ->state(function ($record) {
+                                return $record->hasMedia('reports') ? __('Download Document') : null;
+                            })
+                            ->url(fn ($record) => $record->getFirstMediaUrl('reports') ?: null)
+                            ->openUrlInNewTab()
+                            ->icon('heroicon-o-document-arrow-down')
+                            ->color('primary')
+                            ->visible(fn ($record) => $record->hasMedia('reports'))
+                            ->columnSpanFull(),
                     ])->columns(2),
 
                 Section::make(__('Assessment Answers'))
