@@ -52,11 +52,62 @@ class AssessmentController extends Controller
         }
 
         $submission = DB::transaction(function () use ($assessment, $child, $data) {
+            $attemptNumber = $child->assessmentSubmissions()->where('assessment_id', $assessment->id)->count() + 1;
+
+            $correctAnswersCount = 0;
+            $totalGradableQuestions = 0;
+
+            foreach ($data['answers'] as $answerData) {
+                $question = \App\Models\Question::with('options')->find($answerData['question_id']);
+                if (!$question) continue;
+
+                $type = $question->exercise_type;
+                $isCorrect = false;
+
+                if (in_array($type, [\App\Enums\ExerciseTypeEnum::IMAGE_SELECTION, \App\Enums\ExerciseTypeEnum::DISTINGUISHING, \App\Enums\ExerciseTypeEnum::AUDIO_FLASHCARDS])) {
+                    $totalGradableQuestions++;
+                    $correctOptionIds = $question->options->where('is_correct', true)->pluck('id')->toArray();
+                    $submittedOptionIds = (array) $answerData['answer_data'];
+                    
+                    if (count($correctOptionIds) === count($submittedOptionIds) && empty(array_diff($correctOptionIds, $submittedOptionIds))) {
+                        $isCorrect = true;
+                    }
+                } elseif ($type === \App\Enums\ExerciseTypeEnum::MATCHING) {
+                    $totalGradableQuestions++;
+                    $submittedPairs = (array) $answerData['answer_data'];
+                    $allMatched = true;
+                    foreach ($submittedPairs as $pair) {
+                        if (($pair['left_option_id'] ?? null) !== ($pair['right_option_id'] ?? null)) {
+                            $allMatched = false;
+                            break;
+                        }
+                    }
+                    if ($allMatched && count($submittedPairs) === $question->options->count()) {
+                        $isCorrect = true;
+                    }
+                } elseif ($type === \App\Enums\ExerciseTypeEnum::ORDERING) {
+                    $totalGradableQuestions++;
+                    $correctOrderIds = $question->options->sortBy('order')->pluck('id')->toArray();
+                    $submittedOrderIds = (array) $answerData['answer_data'];
+                    if ($correctOrderIds === $submittedOrderIds) {
+                        $isCorrect = true;
+                    }
+                }
+
+                if ($isCorrect) {
+                    $correctAnswersCount++;
+                }
+            }
+
+            $performanceAccuracy = $totalGradableQuestions > 0 ? ($correctAnswersCount / $totalGradableQuestions) * 100 : 0;
+
             // Create submission
             $submission = $assessment->submissions()->create([
                 'child_id' => $child->id,
                 'assessment_version' => $assessment->version,
-                'status' => 'completed', // Or 'pending_review' depending on your frontend logic
+                'status' => 'pending_review',
+                'attempt_number' => $attemptNumber,
+                'performance_accuracy' => $performanceAccuracy,
             ]);
 
             // Create answers

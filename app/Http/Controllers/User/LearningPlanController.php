@@ -17,14 +17,42 @@ class LearningPlanController extends Controller
         }
 
         $progressTree = ChildLearningPlan::where('child_id', $child->id)
-            ->where('status', 'active')
+            ->whereIn('status', [\App\Enums\ChildLearningPlanStatusEnum::InProgress, \App\Enums\ChildLearningPlanStatusEnum::Completed])
             ->with([
-                'learningPlan.learningGoals.learningLessons.learningExercises'
+                'learningPlan.goals.lessons.exercises'
             ])
             ->first();
 
         if (!$progressTree) {
             return $this->successResponse(__('No active learning plan found.'), null);
+        }
+
+        // Get completed IDs for quick lookup
+        $completedGoalIds = $child->completedGoals()->pluck('learning_goals.id')->toArray();
+        $completedLessonIds = $child->completedLessons()->pluck('learning_lessons.id')->toArray();
+        $completedExerciseIds = $child->completedExercises()->pluck('learning_exercises.id')->toArray();
+
+        // Transform the tree to inject statuses
+        $plan = $progressTree->learningPlan;
+        if ($plan && $plan->goals) {
+            $plan->goals->transform(function ($goal) use ($completedGoalIds, $completedLessonIds, $completedExerciseIds) {
+                $goal->is_completed = in_array($goal->id, $completedGoalIds);
+                
+                if ($goal->lessons) {
+                    $goal->lessons->transform(function ($lesson) use ($completedLessonIds, $completedExerciseIds) {
+                        $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
+                        
+                        if ($lesson->exercises) {
+                            $lesson->exercises->transform(function ($exercise) use ($completedExerciseIds) {
+                                $exercise->is_completed = in_array($exercise->id, $completedExerciseIds);
+                                return $exercise;
+                            });
+                        }
+                        return $lesson;
+                    });
+                }
+                return $goal;
+            });
         }
 
         return $this->successResponse(__('Learning plan progress tree retrieved successfully.'), [

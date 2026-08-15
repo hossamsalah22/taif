@@ -16,7 +16,7 @@ class AssessmentSubmission extends Model implements HasMedia
         'assessment_id',
         'assessment_version',
         'status',
-        'notes',
+        'specialist_notes',
         'strengths',
         'improvements',
         'recommendations',

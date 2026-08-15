@@ -55,13 +55,23 @@ class AssessmentSubmissionsTable
                 EditAction::make()
                     ->label(__('Evaluate'))
                     ->icon('heroicon-o-clipboard-document-check')
-                    ->slideOver(),
+                    ->slideOver()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['status'] = 'reviewed_with_report';
+                        return $data;
+                    }),
                 Action::make('export_pdf')
                     ->label(__('Export PDF'))
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('info')
                     ->action(function (AssessmentSubmission $record) {
-                        $pdf = Browsershot::html("<h1>Report for {$record->id}</h1>")->pdf();
+                        $html = view('assessments.report_pdf', ['record' => $record])->render();
+                        $pdf = Browsershot::html($html)
+                            ->format('A4')
+                            ->margins(10, 10, 10, 10)
+                            ->showBackground()
+                            ->noSandbox()
+                            ->pdf();
 
                         return response()->streamDownload(fn () => print ($pdf), "report-{$record->id}.pdf");
                     }),

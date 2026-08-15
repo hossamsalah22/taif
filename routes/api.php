@@ -12,10 +12,12 @@ use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\OtpController;
 use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\ChildController;
+use App\Http\Controllers\User\ExerciseInteractionController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\LearningPlanController;
 use App\Http\Controllers\User\LogoutController;
 use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\User\SettingsController;
 use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,16 +33,16 @@ Route::prefix('user')->group(function () {
         Route::get('subscriptions/gateway', [SubscriptionController::class, 'gateway']);
         Route::get('profile', [ProfileController::class, 'index']);
         Route::put('profile', [ProfileController::class, 'update']);
-        Route::put('settings', [\App\Http\Controllers\User\SettingsController::class, 'update']);
+        Route::put('settings', [SettingsController::class, 'update']);
         Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
-        Route::post('exercises/interactions', [\App\Http\Controllers\User\ExerciseInteractionController::class, 'store']);
+        Route::post('exercises/interactions', [ExerciseInteractionController::class, 'store']);
         Route::apiResource('children', ChildController::class);
 
         Route::prefix('children/{child}/assessments')->group(function () {
             Route::get('registration', [AssessmentController::class, 'registrationTest']);
             Route::post('submit', [AssessmentController::class, 'submitTest']);
-            Route::get('{submission}/report', [AssessmentReportController::class, 'show']);
             Route::get('{submission}/report/download', [AssessmentReportController::class, 'download'])->name('api.reports.download');
+            Route::get('{submission}/report', [AssessmentReportController::class, 'show']);
         });
 
     });

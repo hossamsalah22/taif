@@ -35,15 +35,15 @@ class QuestionOption extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('left_element')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
             ->singleFile();
 
         $this->addMediaCollection('right_element')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
             ->singleFile();
 
         $this->addMediaCollection('image')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
             ->singleFile();
 
         $this->addMediaCollection('audio')

@@ -42,4 +42,19 @@ class Child extends Model
     {
         return $this->hasMany(ChildLearningPlan::class);
     }
+
+    public function completedGoals()
+    {
+        return $this->belongsToMany(LearningGoal::class, 'child_completed_goals')->withTimestamps();
+    }
+
+    public function completedLessons()
+    {
+        return $this->belongsToMany(LearningLesson::class, 'child_completed_lessons')->withTimestamps();
+    }
+
+    public function completedExercises()
+    {
+        return $this->belongsToMany(LearningExercise::class, 'child_completed_exercises')->withTimestamps();
+    }
 }
