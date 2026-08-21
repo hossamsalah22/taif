@@ -57,4 +57,9 @@ class Child extends Model
     {
         return $this->belongsToMany(LearningExercise::class, 'child_completed_exercises')->withTimestamps();
     }
+
+    public function rewards()
+    {
+        return $this->hasMany(ChildReward::class);
+    }
 }

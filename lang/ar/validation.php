@@ -228,6 +228,13 @@ return [
         'educational_status' => 'الحالة التعليمية',
         'assessment_id' => 'التقييم',
         'answers' => 'الإجابات',
+        'child_id' => 'الطفل',
+        'learning_exercise_id' => 'تمرين التعلم',
+        'is_successful' => 'هل تم بنجاح',
+        'duration_seconds' => 'مدة التمرين',
+        'trials_count' => 'عدد المحاولات',
+        'interaction_type' => 'نوع التفاعل',
+        'metadata' => 'البيانات الوصفية',
     ],
 
     'country_codes' => [

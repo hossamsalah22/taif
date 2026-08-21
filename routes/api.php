@@ -35,6 +35,7 @@ Route::prefix('user')->group(function () {
         Route::put('profile', [ProfileController::class, 'update']);
         Route::put('settings', [SettingsController::class, 'update']);
         Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
+        Route::post('exercises/interactions/sync', [ExerciseInteractionController::class, 'sync']);
         Route::post('exercises/interactions', [ExerciseInteractionController::class, 'store']);
         Route::apiResource('children', ChildController::class);
 

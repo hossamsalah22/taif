@@ -83,9 +83,12 @@ class LearningPlanController extends Controller
             });
         }
 
+        $unlockedRewards = $child->rewards()->pluck('reward_id')->toArray();
+
         return $this->successResponse(__('Learning plan progress tree retrieved successfully.'), [
             'progress_tree' => $progressTree,
             'access_status' => $accessStatus,
+            'unlocked_rewards' => $unlockedRewards,
         ]);
     }
 }
