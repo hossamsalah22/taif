@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\ChildLearningPlanStatusEnum;
 use App\Http\Controllers\Controller;
-use App\Models\SubscriptionPackage;
+use App\Models\ChildLearningPlan;
 use App\Models\Subscription;
-use App\Traits\ApiResponseTrait;
+use App\Models\SubscriptionPackage;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -27,8 +28,8 @@ class SubscriptionController extends Controller
 
         $pendingPlanSummary = null;
         if ($activeChild) {
-            $childLearningPlan = \App\Models\ChildLearningPlan::where('child_id', $activeChild->id)
-                ->whereIn('status', [\App\Enums\ChildLearningPlanStatusEnum::Pending, \App\Enums\ChildLearningPlanStatusEnum::InProgress])
+            $childLearningPlan = ChildLearningPlan::where('child_id', $activeChild->id)
+                ->whereIn('status', [ChildLearningPlanStatusEnum::InProgress, ChildLearningPlanStatusEnum::Completed])
                 ->with('learningPlan.goals')
                 ->latest()
                 ->first();

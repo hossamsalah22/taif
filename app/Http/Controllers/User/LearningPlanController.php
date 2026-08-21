@@ -27,6 +27,34 @@ class LearningPlanController extends Controller
             return $this->successResponse(__('No active learning plan found.'), null);
         }
 
+        $user = auth('sanctum')->user();
+        
+        $isSubscribed = \App\Models\Subscription::where('parent_id', $user->id)
+            ->where('status', \App\Enums\SubscriptionStatusEnum::ACTIVE)
+            ->where('expiry_date', '>', now())
+            ->exists();
+
+        $gracePeriodDays = app(\App\Settings\GeneralSettings::class)->plan_grace_period_days;
+        $planCreationTimestamp = $progressTree->created_at;
+        $gracePeriodEndsAt = $planCreationTimestamp->copy()->addDays($gracePeriodDays);
+        
+        $isExpired = now()->greaterThan($gracePeriodEndsAt);
+        $isBlocked = !$isSubscribed && $isExpired;
+
+        $accessStatus = [
+            'is_subscribed' => $isSubscribed,
+            'is_blocked' => $isBlocked,
+            'grace_period_ends_at' => !$isSubscribed && !$isExpired ? $gracePeriodEndsAt->toIso8601String() : null,
+            'remaining_seconds' => !$isSubscribed && !$isExpired ? max(0, $gracePeriodEndsAt->diffInSeconds(now())) : 0,
+        ];
+
+        if ($isBlocked) {
+            return $this->successResponse(__('Learning plan progress tree retrieved successfully.'), [
+                'progress_tree' => null,
+                'access_status' => $accessStatus,
+            ]);
+        }
+
         // Get completed IDs for quick lookup
         $completedGoalIds = $child->completedGoals()->pluck('learning_goals.id')->toArray();
         $completedLessonIds = $child->completedLessons()->pluck('learning_lessons.id')->toArray();
@@ -57,6 +85,7 @@ class LearningPlanController extends Controller
 
         return $this->successResponse(__('Learning plan progress tree retrieved successfully.'), [
             'progress_tree' => $progressTree,
+            'access_status' => $accessStatus,
         ]);
     }
 }
