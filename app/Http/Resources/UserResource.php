@@ -29,6 +29,10 @@ class UserResource extends JsonResource
             'apple_id' => $this->apple_id,
             'google_id' => $this->google_id,
             'has_children' => (bool) $this->hasChildren,
+            'has_active_subscription' => $this->subscriptions()
+                ->where('status', \App\Enums\SubscriptionStatusEnum::ACTIVE->value)
+                ->where('expiry_date', '>', now())
+                ->exists(),
         ];
     }
 }
