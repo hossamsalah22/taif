@@ -14,6 +14,7 @@ use App\Http\Controllers\User\Auth\RegisterController;
 use App\Http\Controllers\User\ChildController;
 use App\Http\Controllers\User\ExerciseInteractionController;
 use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\LearningLessonController;
 use App\Http\Controllers\User\LearningPlanController;
 use App\Http\Controllers\User\LogoutController;
 use App\Http\Controllers\User\ProfileController;
@@ -38,6 +39,7 @@ Route::prefix('user')->group(function () {
         Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
         Route::post('exercises/interactions/sync', [ExerciseInteractionController::class, 'sync']);
         Route::post('exercises/interactions', [ExerciseInteractionController::class, 'store']);
+        Route::get('lessons/{lesson}', [LearningLessonController::class, 'show']);
         Route::apiResource('children', ChildController::class);
 
         Route::prefix('children/{child}/assessments')->group(function () {
