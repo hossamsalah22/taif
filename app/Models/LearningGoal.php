@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
 class LearningGoal extends Model
@@ -16,14 +16,14 @@ class LearningGoal extends Model
         'description',
         'acquired_skills',
         'is_locked',
-        'display_priority'
+        'display_priority',
     ];
 
     public $translatable = ['name', 'description', 'acquired_skills'];
 
     protected $casts = [
         'acquired_skills' => 'array',
-        'is_locked' => 'boolean'
+        'is_locked' => 'boolean',
     ];
 
     public function plan()

@@ -61,7 +61,7 @@ class OtpController extends Controller
                 break;
         }
 
-         if (isset($request->device_token)) {
+        if (isset($request->device_token)) {
             DeviceToken::updateOrCreate(
                 [
                     'token' => $request->device_token,
@@ -73,7 +73,6 @@ class OtpController extends Controller
                 ]
             );
         }
-
 
         return $this->successResponse(
             __('auth.code_verified_successfully'),

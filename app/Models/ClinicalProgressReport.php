@@ -19,13 +19,13 @@ class ClinicalProgressReport extends Model
         'smart_parental_advice',
         'strengths',
         'improvements',
-        'is_visible_to_parent'
+        'is_visible_to_parent',
     ];
 
     protected $casts = [
         'strengths' => 'array',
         'improvements' => 'array',
-        'is_visible_to_parent' => 'boolean'
+        'is_visible_to_parent' => 'boolean',
     ];
 
     public function reportable()

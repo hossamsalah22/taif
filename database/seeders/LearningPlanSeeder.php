@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\AutismLevelEnum;
 use App\Enums\DifficultyLevel;
-use App\Enums\ExerciseType;
 use App\Enums\ExerciseTypeEnum;
 use App\Models\LearningPlan;
 use Illuminate\Database\Seeder;

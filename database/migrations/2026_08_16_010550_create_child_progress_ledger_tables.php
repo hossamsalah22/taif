@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('child_id')->constrained()->cascadeOnDelete();
             $table->foreignId('learning_goal_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            
+
             $table->unique(['child_id', 'learning_goal_id']);
         });
 
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreignId('child_id')->constrained()->cascadeOnDelete();
             $table->foreignId('learning_lesson_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            
+
             $table->unique(['child_id', 'learning_lesson_id']);
         });
 
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->foreignId('child_id')->constrained()->cascadeOnDelete();
             $table->foreignId('learning_exercise_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            
+
             $table->unique(['child_id', 'learning_exercise_id']);
         });
     }

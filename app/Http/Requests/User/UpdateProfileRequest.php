@@ -51,5 +51,4 @@ class UpdateProfileRequest extends FormRequest
             'phone.phone_number' => __('validation.phone_number', ['country_code' => __('validation.country_codes.'.($this->input('country_code') ?? 'SA'))]),
         ];
     }
-
 }

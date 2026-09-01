@@ -20,7 +20,7 @@ class QuestionResource extends JsonResource
         return [
             'id' => $this->id,
             'prompt' => $this->prompt,
-            'exercise_type' =>$type,
+            'exercise_type' => $type,
             'exercise_type_label' => ExerciseTypeEnum::label($type),
             'order' => $this->order,
             'payload' => $this->payload,

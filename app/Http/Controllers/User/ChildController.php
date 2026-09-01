@@ -7,6 +7,7 @@ use App\Http\Requests\User\ChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Models\Child;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ChildController extends Controller
 {
@@ -54,12 +55,12 @@ class ChildController extends Controller
         }
 
         $validated = $request->validated();
-        
+
         // TAYF-85: Check for critical diagnostic changes
         $criticalChanged = false;
         if (
-            $child->age != $validated['age'] || 
-            $child->autism_level !== $validated['autism_level'] || 
+            $child->age != $validated['age'] ||
+            $child->autism_level !== $validated['autism_level'] ||
             $child->speech_status !== $validated['speech_status']
         ) {
             $criticalChanged = true;
@@ -67,7 +68,7 @@ class ChildController extends Controller
 
         if ($criticalChanged && empty($validated['confirm_recalibrate'])) {
             return $this->failedResponse(__('Warning: Changing critical diagnostic data will update the task layout. Please confirm to proceed.'), [
-                'requires_recalibration' => true
+                'requires_recalibration' => true,
             ], 409);
         }
 
@@ -76,7 +77,7 @@ class ChildController extends Controller
         if ($criticalChanged) {
             // Recalibrate logic: wipe uncompleted tasks / trigger re-test
             $child->update(['force_re_test' => true]);
-            \Illuminate\Support\Facades\DB::table('child_learning_plans')
+            DB::table('child_learning_plans')
                 ->where('child_id', $child->id)
                 ->where('is_completed', false)
                 ->delete();

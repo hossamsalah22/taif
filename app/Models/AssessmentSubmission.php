@@ -23,11 +23,11 @@ class AssessmentSubmission extends Model implements HasMedia
         'diagnosed_severity_level',
         'report_published_at',
         'attempt_number',
-        'performance_accuracy'
+        'performance_accuracy',
     ];
 
     protected $casts = [
-        'report_published_at' => 'datetime'
+        'report_published_at' => 'datetime',
     ];
 
     public function child()

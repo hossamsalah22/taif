@@ -40,7 +40,7 @@ class ChildDirectoryTest extends TestCase
         $response = $this->actingAs($parentA, 'user')->getJson('/api/user/children');
 
         $response->assertStatus(200);
-        
+
         // Assert we only get Parent A's 2 children
         $response->assertJsonCount(2, 'data');
     }
@@ -73,8 +73,8 @@ class ChildDirectoryTest extends TestCase
                     'autism_level_label',
                     'speech_status',
                     'speech_status_label',
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertJsonFragment([
@@ -93,7 +93,7 @@ class ChildDirectoryTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson([
-            'data' => []
+            'data' => [],
         ]);
     }
 }

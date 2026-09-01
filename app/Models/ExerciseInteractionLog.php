@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class ExerciseInteractionLog extends Model
 {
     protected $fillable = [
-        'child_id', 
-        'learning_exercise_id', 
-        'is_successful', 
-        'duration_seconds', 
-        'trials_count', 
-        'interaction_type', 
-        'metadata'
+        'child_id',
+        'learning_exercise_id',
+        'is_successful',
+        'duration_seconds',
+        'trials_count',
+        'interaction_type',
+        'metadata',
     ];
 
     protected $casts = [

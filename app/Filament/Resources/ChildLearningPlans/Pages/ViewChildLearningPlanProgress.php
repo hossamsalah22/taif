@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ViewChildLearningPlanProgress extends Page
 {
@@ -14,10 +15,11 @@ class ViewChildLearningPlanProgress extends Page
 
     protected static string $resource = ChildLearningPlanResource::class;
 
-    public function getTitle(): string | \Illuminate\Contracts\Support\Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('View Child Learning Plan Progress');
     }
+
     protected string $view = 'filament.resources.child-learning-plans.pages.view-child-learning-plan-progress';
 
     public function mount(int|string $record): void

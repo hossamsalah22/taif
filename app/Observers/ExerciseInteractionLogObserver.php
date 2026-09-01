@@ -2,9 +2,10 @@
 
 namespace App\Observers;
 
+use App\Enums\ExerciseTypeEnum;
+use App\Models\Admin;
 use App\Models\ExerciseInteractionLog;
 use Filament\Notifications\Notification;
-use App\Models\Admin;
 
 class ExerciseInteractionLogObserver
 {
@@ -21,15 +22,15 @@ class ExerciseInteractionLogObserver
     protected function checkMilestones(ExerciseInteractionLog $log): void
     {
         // Milestone check logic to notify admins when an exercise is marked 'completed'
-        if ($log->status === 'completed' && (!$log->getOriginal('status') || $log->getOriginal('status') !== 'completed')) {
+        if ($log->status === 'completed' && (! $log->getOriginal('status') || $log->getOriginal('status') !== 'completed')) {
             $log->loadMissing(['child', 'exercise.lesson.goal.plan']);
-            
+
             $childName = $log->child->name ?? 'A child';
-            $exerciseName = \App\Enums\ExerciseTypeEnum::label($log->exercise->type);
+            $exerciseName = ExerciseTypeEnum::label($log->exercise->type);
             $planName = $log->exercise->lesson->goal->plan->name ?? 'a learning plan';
-            
+
             $admins = Admin::all();
-            
+
             foreach ($admins as $admin) {
                 Notification::make()
                     ->title(__('Milestone Reached!'))

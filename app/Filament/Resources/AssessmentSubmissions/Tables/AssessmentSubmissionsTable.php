@@ -58,6 +58,7 @@ class AssessmentSubmissionsTable
                     ->slideOver()
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['status'] = 'reviewed_with_report';
+
                         return $data;
                     }),
                 Action::make('export_pdf')

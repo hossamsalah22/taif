@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Assessments\Pages;
 use App\Enums\AssessmentStatusEnum;
 use App\Filament\Resources\Assessments\AssessmentResource;
 use App\Models\Assessment;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +21,7 @@ class EditAssessment extends EditRecord
         ];
     }
 
-    protected function getSaveFormAction(): \Filament\Actions\Action
+    protected function getSaveFormAction(): Action
     {
         return parent::getSaveFormAction()
             ->label(__('Publish Updated Package'));

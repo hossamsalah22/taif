@@ -82,7 +82,7 @@ class UsersTable
                 ViewAction::make(),
                 // EditAction::make(),
                 Action::make('free_subscription')
-                    ->visible(fn($record) => $record->children()->exists() && !$record->subscriptions()->where('is_free', true)->exists())
+                    ->visible(fn ($record) => $record->children()->exists() && ! $record->subscriptions()->where('is_free', true)->exists())
                     ->label(__('Free Subscription'))
                     ->icon('heroicon-o-gift')
                     ->color('success')

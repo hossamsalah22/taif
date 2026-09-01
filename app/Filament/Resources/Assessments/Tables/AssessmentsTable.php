@@ -6,6 +6,7 @@ use App\Enums\AssessmentStatusEnum;
 use App\Enums\AutismLevelEnum;
 use App\Models\Assessment;
 use App\Models\Question;
+use App\Models\QuestionOption;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
@@ -90,7 +91,7 @@ class AssessmentsTable
                             });
 
                             // Clone Question Options
-                            $question->options->each(function (\App\Models\QuestionOption $option) use ($newQuestion) {
+                            $question->options->each(function (QuestionOption $option) use ($newQuestion) {
                                 $newOption = $option->replicate(['question_id']);
                                 $newOption->question_id = $newQuestion->id;
                                 $newOption->save();

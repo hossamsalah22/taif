@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
-use App\Http\Requests\User\UpdateProfileRequest;
-use App\Models\UserVerification;
 use App\Enums\VerificationTypeEnum;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\User\UpdateProfileRequest;
+use App\Http\Resources\UserResource;
+use App\Models\UserVerification;
 use App\Notifications\SendUserOtpNotification;
-use App\Traits\ApiResponseTrait;
 use Arr;
 use Illuminate\Support\Facades\Hash;
 

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
 class LearningLesson extends Model
@@ -15,13 +15,13 @@ class LearningLesson extends Model
         'name',
         'reward_id',
         'is_locked',
-        'display_priority'
+        'display_priority',
     ];
 
     public $translatable = ['name'];
 
     protected $casts = [
-        'is_locked' => 'boolean'
+        'is_locked' => 'boolean',
     ];
 
     public function goal()

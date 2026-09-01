@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\ExerciseTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubmitAssessmentRequest;
 use App\Http\Resources\User\AssessmentResource;
 use App\Models\Assessment;
 use App\Models\Child;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -58,21 +60,23 @@ class AssessmentController extends Controller
             $totalGradableQuestions = 0;
 
             foreach ($data['answers'] as $answerData) {
-                $question = \App\Models\Question::with('options')->find($answerData['question_id']);
-                if (!$question) continue;
+                $question = Question::with('options')->find($answerData['question_id']);
+                if (! $question) {
+                    continue;
+                }
 
                 $type = $question->exercise_type;
                 $isCorrect = false;
 
-                if (in_array($type, [\App\Enums\ExerciseTypeEnum::IMAGE_SELECTION, \App\Enums\ExerciseTypeEnum::DISTINGUISHING, \App\Enums\ExerciseTypeEnum::AUDIO_FLASHCARDS])) {
+                if (in_array($type, [ExerciseTypeEnum::IMAGE_SELECTION, ExerciseTypeEnum::DISTINGUISHING, ExerciseTypeEnum::AUDIO_FLASHCARDS])) {
                     $totalGradableQuestions++;
                     $correctOptionIds = $question->options->where('is_correct', true)->pluck('id')->toArray();
                     $submittedOptionIds = (array) $answerData['answer_data'];
-                    
+
                     if (count($correctOptionIds) === count($submittedOptionIds) && empty(array_diff($correctOptionIds, $submittedOptionIds))) {
                         $isCorrect = true;
                     }
-                } elseif ($type === \App\Enums\ExerciseTypeEnum::MATCHING) {
+                } elseif ($type === ExerciseTypeEnum::MATCHING) {
                     $totalGradableQuestions++;
                     $submittedPairs = (array) $answerData['answer_data'];
                     $allMatched = true;
@@ -85,7 +89,7 @@ class AssessmentController extends Controller
                     if ($allMatched && count($submittedPairs) === $question->options->count()) {
                         $isCorrect = true;
                     }
-                } elseif ($type === \App\Enums\ExerciseTypeEnum::ORDERING) {
+                } elseif ($type === ExerciseTypeEnum::ORDERING) {
                     $totalGradableQuestions++;
                     $correctOrderIds = $question->options->sortBy('order')->pluck('id')->toArray();
                     $submittedOrderIds = (array) $answerData['answer_data'];

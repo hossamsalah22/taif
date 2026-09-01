@@ -28,10 +28,10 @@ class SettingsController extends Controller
             // Verify child belongs to user
             if ($user->children()->where('id', $childId)->exists()) {
                 DB::table(config('settings.repositories.database.table') ?? 'settings')->updateOrInsert(
-                    ['group' => 'sensory', 'name' => 'child_' . $childId],
+                    ['group' => 'sensory', 'name' => 'child_'.$childId],
                     ['payload' => json_encode([
                         'audio_volume' => $data['sensory']['audio_volume'],
-                        'screen_brightness' => $data['sensory']['screen_brightness']
+                        'screen_brightness' => $data['sensory']['screen_brightness'],
                     ]), 'updated_at' => now(), 'created_at' => now()]
                 );
             }
@@ -44,7 +44,7 @@ class SettingsController extends Controller
             $payload['subscription_billing'] = true; // Hardcoded true per requirements
 
             DB::table(config('settings.repositories.database.table') ?? 'settings')->updateOrInsert(
-                ['group' => 'notifications', 'name' => 'user_' . $user->id],
+                ['group' => 'notifications', 'name' => 'user_'.$user->id],
                 ['payload' => json_encode($payload), 'updated_at' => now(), 'created_at' => now()]
             );
         }

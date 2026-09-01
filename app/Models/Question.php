@@ -75,12 +75,14 @@ class Question extends Model implements HasMedia
     public function getAudioAttribute(): ?string
     {
         $media = $this->getFirstMedia('question_audio');
+
         return $media ? $media->getFullUrl() : null;
     }
 
     public function getImageAttribute(): ?string
     {
         $media = $this->getFirstMedia('question_image');
+
         return $media ? $media->getFullUrl() : null;
     }
 

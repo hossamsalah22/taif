@@ -2,7 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Enums\AutismLevelEnum;
+use App\Enums\GenderEnum;
+use App\Enums\SpeechStatusEnum;
 use App\Models\Child;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,12 +22,12 @@ class ChildFactory extends Factory
     public function definition(): array
     {
         return [
-            'parent_id' => \App\Models\User::factory(),
+            'parent_id' => User::factory(),
             'name' => fake()->name(),
             'age' => fake()->numberBetween(3, 12),
-            'gender' => \App\Enums\GenderEnum::MALE->value,
-            'autism_level' => \App\Enums\AutismLevelEnum::MILD->value,
-            'speech_status' => \App\Enums\SpeechStatusEnum::VERBAL->value,
+            'gender' => GenderEnum::MALE->value,
+            'autism_level' => AutismLevelEnum::MILD->value,
+            'speech_status' => SpeechStatusEnum::VERBAL->value,
         ];
     }
 }

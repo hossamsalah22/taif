@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\ChildLearningPlanStatusEnum;
+use App\Enums\SubscriptionStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Child;
 use App\Models\ChildLearningPlan;
-use App\Traits\ApiResponseTrait;
+use App\Models\Subscription;
+use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
 
 class LearningPlanController extends Controller
@@ -17,35 +20,35 @@ class LearningPlanController extends Controller
         }
 
         $progressTree = ChildLearningPlan::where('child_id', $child->id)
-            ->whereIn('status', [\App\Enums\ChildLearningPlanStatusEnum::InProgress, \App\Enums\ChildLearningPlanStatusEnum::Completed])
+            ->whereIn('status', [ChildLearningPlanStatusEnum::InProgress, ChildLearningPlanStatusEnum::Completed])
             ->with([
-                'learningPlan.goals.lessons.exercises'
+                'learningPlan.goals.lessons.exercises',
             ])
             ->first();
 
-        if (!$progressTree) {
+        if (! $progressTree) {
             return $this->successResponse(__('No active learning plan found.'), null);
         }
 
         $user = auth('sanctum')->user();
-        
-        $isSubscribed = \App\Models\Subscription::where('parent_id', $user->id)
-            ->where('status', \App\Enums\SubscriptionStatusEnum::ACTIVE)
+
+        $isSubscribed = Subscription::where('parent_id', $user->id)
+            ->where('status', SubscriptionStatusEnum::ACTIVE)
             ->where('expiry_date', '>', now())
             ->exists();
 
-        $gracePeriodDays = app(\App\Settings\GeneralSettings::class)->plan_grace_period_days;
+        $gracePeriodDays = app(GeneralSettings::class)->plan_grace_period_days;
         $planCreationTimestamp = $progressTree->created_at;
         $gracePeriodEndsAt = $planCreationTimestamp->copy()->addDays($gracePeriodDays);
-        
+
         $isExpired = now()->greaterThan($gracePeriodEndsAt);
-        $isBlocked = !$isSubscribed && $isExpired;
+        $isBlocked = ! $isSubscribed && $isExpired;
 
         $accessStatus = [
             'is_subscribed' => $isSubscribed,
             'is_blocked' => $isBlocked,
-            'grace_period_ends_at' => !$isSubscribed && !$isExpired ? $gracePeriodEndsAt->toIso8601String() : null,
-            'remaining_seconds' => !$isSubscribed && !$isExpired ? max(0, $gracePeriodEndsAt->diffInSeconds(now())) : 0,
+            'grace_period_ends_at' => ! $isSubscribed && ! $isExpired ? $gracePeriodEndsAt->toIso8601String() : null,
+            'remaining_seconds' => ! $isSubscribed && ! $isExpired ? max(0, $gracePeriodEndsAt->diffInSeconds(now())) : 0,
         ];
 
         if ($isBlocked) {
@@ -65,20 +68,23 @@ class LearningPlanController extends Controller
         if ($plan && $plan->goals) {
             $plan->goals->transform(function ($goal) use ($completedGoalIds, $completedLessonIds, $completedExerciseIds) {
                 $goal->is_completed = in_array($goal->id, $completedGoalIds);
-                
+
                 if ($goal->lessons) {
                     $goal->lessons->transform(function ($lesson) use ($completedLessonIds, $completedExerciseIds) {
                         $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
-                        
+
                         if ($lesson->exercises) {
                             $lesson->exercises->transform(function ($exercise) use ($completedExerciseIds) {
                                 $exercise->is_completed = in_array($exercise->id, $completedExerciseIds);
+
                                 return $exercise;
                             });
                         }
+
                         return $lesson;
                     });
                 }
+
                 return $goal;
             });
         }
