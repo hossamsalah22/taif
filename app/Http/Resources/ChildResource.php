@@ -28,7 +28,8 @@ class ChildResource extends JsonResource
             'speech_status' => $this->speech_status,
             'speech_status_label' => SpeechStatusEnum::label($this->speech_status),
             'educational_status' => $this->educational_status,
-            'number_of_assessment_submissions' => $this->assessmentSubmissions()->count(),
+            'number_of_assessment_submissions' => $this->assessmentSubmissions->count(),
+            'submission_id' => $this->assessmentSubmissions->max('id'),
         ];
     }
 }
