@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\SubscriptionStatusEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,12 +26,12 @@ class UserResource extends JsonResource
             'is_active' => $this->is_active,
             'is_verified' => $this->is_verified,
             'receive_notifications' => $this->receive_notifications,
-            'language'  => $this->locale,
+            'language' => $this->locale,
             'apple_id' => $this->apple_id,
             'google_id' => $this->google_id,
             'has_children' => (bool) $this->hasChildren,
             'has_active_subscription' => $this->subscriptions()
-                ->where('status', \App\Enums\SubscriptionStatusEnum::ACTIVE->value)
+                ->where('status', SubscriptionStatusEnum::ACTIVE->value)
                 ->where('expiry_date', '>', now())
                 ->exists(),
         ];
