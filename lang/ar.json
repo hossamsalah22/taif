@@ -707,5 +707,7 @@
     "An official clinical document was attached to this evaluation.": "تم إرفاق ملف تقرير سريري رسمي بهذا التقييم.",
     "Download Document": "تحميل الملف",
     "Exercise interaction logged successfully.": "تم تسجيل التفاعل بنجاح.",
-    "Exercise interactions synced successfully.": "تم مزامنة التفاعلات بنجاح."
+    "Exercise interactions synced successfully.": "تم مزامنة التفاعلات بنجاح.",
+    "Subscribed successfully": "تم الاشتراك بنجاح",
+    "You already have an active subscription.": "لديك اشتراك نشط بالفعل."
 }
