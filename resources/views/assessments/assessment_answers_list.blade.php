@@ -1,4 +1,13 @@
 <div>
+    @php
+        if ($getRecord()) {
+            $getRecord()->loadMissing([
+                'answers.question.options.media',
+                'answers.question.matchingPairs.media',
+                'answers.question.orderingSteps.media',
+            ]);
+        }
+    @endphp
     @if($getRecord() && $getRecord()->answers)
         @foreach($getRecord()->answers as $answer)
             <div class="mb-6 p-4 border rounded-lg">
