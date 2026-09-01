@@ -42,15 +42,10 @@ class AssessmentReportController extends Controller
 
         $html = view('reports.assessment', ['submission' => $submission])->render();
 
-        $pdf = app()->environment('local') ? Browsershot::html($html)
+        $pdf = Browsershot::html($html)
             ->format('A4')
             ->margins(10, 10, 10, 10)
-            ->pdf() :
-            Browsershot::html($html)
-                ->setNodeModulePath('/home/techorgmobile/public_html/taifapp.com.app/node_modules')
-                ->format('A4')
-                ->margins(10, 10, 10, 10)
-                ->pdf();
+            ->pdf();
 
         return response($pdf)
             ->header('Content-Type', 'application/pdf')
