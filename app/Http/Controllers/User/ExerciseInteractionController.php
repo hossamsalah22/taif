@@ -21,7 +21,8 @@ class ExerciseInteractionController extends Controller
         $validated = $request->validate([
             'child_id' => 'required|exists:children,id',
             'learning_exercise_id' => 'required|exists:learning_exercises,id',
-            'is_successful' => 'required|boolean',
+            'is_successful' => 'nullable|boolean',
+            'answer' => 'nullable|string',
             'duration_seconds' => 'required|integer|min:0',
             'trials_count' => 'required|integer|min:1',
             'interaction_type' => 'nullable|string',
@@ -35,23 +36,34 @@ class ExerciseInteractionController extends Controller
             return $this->failedResponse(__('Data Not Found'), [], 404);
         }
 
+        $exercise = LearningExercise::findOrFail($validated['learning_exercise_id']);
+        
+        $isSuccessful = $validated['is_successful'] ?? false;
+        
+        if (!isset($validated['is_successful']) && isset($validated['answer'])) {
+            $correctAnswer = $exercise->configuration['correct_answer'] ?? null;
+            if ($correctAnswer !== null) {
+                $isSuccessful = (string)$validated['answer'] === (string)$correctAnswer;
+            }
+        }
+
         $interaction = ExerciseInteractionLog::create([
             'child_id' => $validated['child_id'],
             'learning_exercise_id' => $validated['learning_exercise_id'],
-            'is_successful' => $validated['is_successful'],
+            'is_successful' => $isSuccessful,
             'duration_seconds' => $validated['duration_seconds'],
             'trials_count' => $validated['trials_count'],
             'interaction_type' => $validated['interaction_type'] ?? null,
-            'metadata' => $validated['metadata'] ?? null,
+            'metadata' => array_merge($validated['metadata'] ?? [], ['submitted_answer' => $validated['answer'] ?? null]),
         ]);
 
-        if ($validated['is_successful']) {
+        if ($isSuccessful) {
             $this->processSuccessfulExercise($child, $validated['learning_exercise_id']);
         }
 
         return $this->successResponse(__('Exercise interaction logged successfully.'), [
             'interaction_id' => $interaction->id,
-            'is_successful' => $validated['is_successful'],
+            'is_successful' => $isSuccessful,
         ], 201);
     }
 
@@ -61,7 +73,8 @@ class ExerciseInteractionController extends Controller
             'interactions' => 'required|array',
             'interactions.*.child_id' => 'required|exists:children,id',
             'interactions.*.learning_exercise_id' => 'required|exists:learning_exercises,id',
-            'interactions.*.is_successful' => 'required|boolean',
+            'interactions.*.is_successful' => 'nullable|boolean',
+            'interactions.*.answer' => 'nullable|string',
             'interactions.*.duration_seconds' => 'required|integer|min:0',
             'interactions.*.trials_count' => 'required|integer|min:1',
             'interactions.*.interaction_type' => 'nullable|string',
@@ -77,17 +90,31 @@ class ExerciseInteractionController extends Controller
                     continue;
                 }
 
+                $exercise = LearningExercise::find($interactionData['learning_exercise_id']);
+                if (!$exercise) {
+                    continue;
+                }
+
+                $isSuccessful = $interactionData['is_successful'] ?? false;
+                
+                if (!isset($interactionData['is_successful']) && isset($interactionData['answer'])) {
+                    $correctAnswer = $exercise->configuration['correct_answer'] ?? null;
+                    if ($correctAnswer !== null) {
+                        $isSuccessful = (string)$interactionData['answer'] === (string)$correctAnswer;
+                    }
+                }
+
                 ExerciseInteractionLog::create([
                     'child_id' => $interactionData['child_id'],
                     'learning_exercise_id' => $interactionData['learning_exercise_id'],
-                    'is_successful' => $interactionData['is_successful'],
+                    'is_successful' => $isSuccessful,
                     'duration_seconds' => $interactionData['duration_seconds'],
                     'trials_count' => $interactionData['trials_count'],
-                    'interaction_type' => $interactionData['interaction_type'],
-                    'metadata' => $interactionData['metadata'] ?? null,
+                    'interaction_type' => $interactionData['interaction_type'] ?? null,
+                    'metadata' => array_merge($interactionData['metadata'] ?? [], ['submitted_answer' => $interactionData['answer'] ?? null]),
                 ]);
 
-                if ($interactionData['is_successful']) {
+                if ($isSuccessful) {
                     $this->processSuccessfulExercise($child, $interactionData['learning_exercise_id']);
                 }
             }
