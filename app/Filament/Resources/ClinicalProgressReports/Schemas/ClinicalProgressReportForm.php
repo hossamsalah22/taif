@@ -23,6 +23,7 @@ class ClinicalProgressReportForm
                 Select::make('child_id')
                     ->relationship('child', 'name')
                     ->searchable()
+                    ->preload()
                     ->label(__('Child'))
                     ->live()
                     ->afterStateUpdated(fn (Set $set) => $set('learning_plan_id', null))
@@ -34,9 +35,13 @@ class ClinicalProgressReportForm
                             $query->whereHas('childLearningPlans', function ($q) use ($childId) {
                                 $q->where('child_id', $childId);
                             });
+                        } else {
+                            $query->whereRaw('1 = 0');
                         }
                     })
                     ->searchable()
+                    ->preload()
+                    ->disabled(fn (Get $get) => ! $get('child_id'))
                     ->label(__('Plan'))
                     ->required()
                     ->afterStateUpdated(function ($state, Set $set) {
