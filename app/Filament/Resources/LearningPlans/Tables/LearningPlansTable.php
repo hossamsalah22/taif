@@ -114,7 +114,8 @@ class LearningPlansTable
                             ->success()
                             ->send();
                     }),
-                ReplicateAction::make(),
+                ReplicateAction::make()
+                    ->excludeAttributes(['child_learning_plans_count']),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
