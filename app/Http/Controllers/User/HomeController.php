@@ -82,12 +82,23 @@ class HomeController extends Controller
                     })->values()->toArray();
                 }
 
+                $oldSessions = $allLessons->filter(fn ($l) => in_array($l->id, $completedLessonIds))
+                    ->map(function ($lesson) {
+                        return [
+                            'id' => $lesson->id,
+                            'name' => $lesson->name,
+                            'is_locked' => false,
+                            'is_completed' => true,
+                        ];
+                    })->values()->toArray();
+
                 $planProgress = [
                     'id' => $childLearningPlan->id,
                     'status' => $childLearningPlan->status,
                     'daily_progress' => $dailyProgress,
                     'next_session' => $nextSession,
                     'other_sessions' => $otherSessions,
+                    'old_sessions' => $oldSessions,
                 ];
             }
         }
