@@ -55,6 +55,15 @@ class RewardForm
                     ->visible(fn (Get $get) => $get('type') === RewardTypeEnum::SOUND->value)
                     ->required(fn (Get $get) => $get('type') === RewardTypeEnum::SOUND->value),
 
+                SpatieMediaLibraryFileUpload::make('icon')
+                    ->label(__('Icon'))
+                    ->disk('public')
+                    ->collection('reward_icons')
+                    ->acceptedFileTypes(['image/*', 'application/json'])
+                    ->helperText(__('Recommended size: 128x128'))
+                    ->visible(fn (Get $get) => $get('type') !== RewardTypeEnum::SOUND->value)
+                    ->required(fn (Get $get) => $get('type') !== RewardTypeEnum::SOUND->value),
+
                 SpatieMediaLibraryFileUpload::make('image')
                     ->disk('public')
                     ->collection('rewards')
@@ -65,4 +74,3 @@ class RewardForm
             ]);
     }
 }
-

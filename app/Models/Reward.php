@@ -14,7 +14,7 @@ use Spatie\Translatable\HasTranslations;
 
 #[Guarded(['id'])]
 #[Hidden(['media'])]
-#[Appends(['media_url'])]
+#[Appends(['media_url', 'icon_url'])]
 class Reward extends Model implements HasMedia
 {
     use HasTranslations, InteractsWithMedia, SoftDeletes;
@@ -38,11 +38,22 @@ class Reward extends Model implements HasMedia
             ->addMediaCollection('rewards')
             ->useDisk('public')
             ->singleFile();
+        $this
+            ->addMediaCollection('reward_icons')
+            ->useDisk('public')
+            ->singleFile();
     }
 
     public function getMediaUrlAttribute(): ?string
     {
         $media = $this->getFirstMedia('rewards');
+
+        return $media ? $media->getFullUrl() : null;
+    }
+
+    public function getIconUrlAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('reward_icons');
 
         return $media ? $media->getFullUrl() : null;
     }

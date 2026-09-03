@@ -178,6 +178,7 @@ class ChildController extends Controller
                         'id' => $lesson->reward->id,
                         'name' => $lesson->reward->name,
                         'image' => $lesson->reward->media_url,
+                        'icon' => $lesson->reward->icon_url,
                         'lesson_name' => $lesson->name,
                         'is_unlocked' => in_array($lesson->reward->id, $unlockedRewardIds),
                     ];
@@ -238,11 +239,25 @@ class ChildController extends Controller
             ->latest()
             ->first();
 
+        $strengths = $report ? ($report->strengths ?? []) : [];
+        $strengths = array_map(function ($item) {
+            $item['icon_url'] = ! empty($item['icon']) ? asset('storage/'.$item['icon']) : null;
+
+            return $item;
+        }, $strengths);
+
+        $improvements = $report ? ($report->improvements ?? []) : [];
+        $improvements = array_map(function ($item) {
+            $item['icon_url'] = ! empty($item['icon']) ? asset('storage/'.$item['icon']) : null;
+
+            return $item;
+        }, $improvements);
+
         return $this->successResponse(__('Progress report retrieved successfully'), [
             'progress_percentage' => $progressPercentage,
             'chart_data' => $chartData,
-            'strengths' => $report ? ($report->strengths ?? []) : [],
-            'needs_improvement' => $report ? ($report->improvements ?? []) : [],
+            'strengths' => $strengths,
+            'needs_improvement' => $improvements,
             'smart_tip' => $report ? $report->smart_parental_advice : null,
         ]);
     }

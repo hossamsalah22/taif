@@ -718,5 +718,7 @@
     "Press Enter to add a strength": "اضغط Enter لإضافة نقطة قوة",
     "Needs Improvement": "تحتاج تحسين",
     "Press Enter to add an improvement": "اضغط Enter لإضافة نقطة تحتاج تحسين",
-    "Visible to Parent": "مرئي لولي الأمر"
+    "Visible to Parent": "مرئي لولي الأمر",
+    "Chlid": "الطفل",
+    "Plan": "الخطة"
 }

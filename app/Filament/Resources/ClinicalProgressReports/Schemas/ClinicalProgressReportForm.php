@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\ClinicalProgressReports\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ClinicalProgressReportForm
 {
@@ -20,10 +23,21 @@ class ClinicalProgressReportForm
                 Select::make('child_id')
                     ->relationship('child', 'name')
                     ->searchable()
+                    ->label(__('Child'))
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set) => $set('learning_plan_id', null))
                     ->required(),
                 Select::make('learning_plan_id')
-                    ->relationship('plan', 'name')
+                    ->relationship('plan', 'name', function (Builder $query, Get $get) {
+                        $childId = $get('child_id');
+                        if ($childId) {
+                            $query->whereHas('childLearningPlans', function ($q) use ($childId) {
+                                $q->where('child_id', $childId);
+                            });
+                        }
+                    })
                     ->searchable()
+                    ->label(__('Plan'))
                     ->required()
                     ->afterStateUpdated(function ($state, Set $set) {
                         $set('reportable_type', 'App\\Models\\LearningPlan');
@@ -37,12 +51,32 @@ class ClinicalProgressReportForm
                     ->required()
                     ->columnSpanFull()
                     ->label(__('Report Title (e.g. Week 1 Report)')),
-                TagsInput::make('strengths')
+                Repeater::make('strengths')
                     ->label(__('Strengths'))
-                    ->placeholder(__('Press Enter to add a strength')),
-                TagsInput::make('improvements')
+                    ->schema([
+                        TextInput::make('title')
+                            ->label(__('Title'))
+                            ->required(),
+                        FileUpload::make('icon')
+                            ->label(__('Icon'))
+                            ->directory('report-icons')
+                            ->image()
+                            ->required(),
+                    ])
+                    ->columns(2),
+                Repeater::make('improvements')
                     ->label(__('Needs Improvement'))
-                    ->placeholder(__('Press Enter to add an improvement')),
+                    ->schema([
+                        TextInput::make('title')
+                            ->label(__('Title'))
+                            ->required(),
+                        FileUpload::make('icon')
+                            ->label(__('Icon'))
+                            ->directory('report-icons')
+                            ->image()
+                            ->required(),
+                    ])
+                    ->columns(2),
                 Textarea::make('smart_parental_advice')
                     ->label(__('Smart Parental Advice'))
                     ->columnSpanFull(),
