@@ -70,7 +70,6 @@ class ClinicalProgressReportForm
                             ->image()
                             ->required(),
                     ])
-                    ->columns(2)
                     ->columnSpanFull(),
                 Repeater::make('improvements')
                     ->label(__('Needs Improvement'))
@@ -85,7 +84,6 @@ class ClinicalProgressReportForm
                             ->image()
                             ->required(),
                     ])
-                    ->columns(2)
                     ->columnSpanFull(),
                 Textarea::make('smart_parental_advice')
                     ->label(__('Smart Parental Advice'))
