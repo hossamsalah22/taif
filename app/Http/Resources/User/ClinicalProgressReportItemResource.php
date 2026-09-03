@@ -14,8 +14,15 @@ class ClinicalProgressReportItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $locale = app()->getLocale();
+        $title = $this['title'] ?? '';
+
+        if (is_array($title)) {
+            $title = $title[$locale] ?? ($title['ar'] ?? '');
+        }
+
         return [
-            'title' => $this['title'],
+            'title' => (string) $title,
             'icon_url' => ! empty($this['icon']) ? asset('storage/'.$this['icon']) : null,
         ];
     }
