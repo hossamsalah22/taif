@@ -67,6 +67,7 @@ class ClinicalProgressReportForm
                         FileUpload::make('icon')
                             ->label(__('Icon'))
                             ->directory('report-icons')
+                            ->disk('public')
                             ->image()
                             ->required(),
                     ])
@@ -81,6 +82,7 @@ class ClinicalProgressReportForm
                         FileUpload::make('icon')
                             ->label(__('Icon'))
                             ->directory('report-icons')
+                            ->disk('public')
                             ->image()
                             ->required(),
                     ])
