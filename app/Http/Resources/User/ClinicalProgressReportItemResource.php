@@ -15,7 +15,7 @@ class ClinicalProgressReportItemResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'title' => (string) $this['title'],
+            'title' => $this['title'],
             'icon_url' => ! empty($this['icon']) ? asset('storage/'.$this['icon']) : null,
         ];
     }
