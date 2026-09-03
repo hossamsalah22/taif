@@ -19,7 +19,7 @@ class LearningPlanInfolist
                     ->columns(3)
                     ->schema([
                         TextEntry::make('name')->label(__('Name')),
-                        TextEntry::make('target_severity_level')->label(__('Target severity level'))->badge(),
+                        TextEntry::make('autism_level')->label(__('Severity Level'))->badge(),
                         TextEntry::make('status')->label(__('Status'))->badge(),
                         TextEntry::make('weekly_sessions_count')->label(__('Weekly sessions count'))->numeric(),
                         TextEntry::make('phase_duration')->label(__('Phase duration'))->placeholder('-'),

@@ -48,7 +48,7 @@ class LearningPlanForm
                         };
                     })
                     ->translatableTabs(),
-                Select::make('severity_level')
+                Select::make('autism_level')
                     ->label(__('Severity Level'))
                     ->options(AutismLevelEnum::options())
                     ->disabled(fn (?LearningPlan $record) => $record !== null)

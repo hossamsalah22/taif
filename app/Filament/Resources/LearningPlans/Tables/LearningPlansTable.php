@@ -31,7 +31,7 @@ class LearningPlansTable
                                 ->orWhereRaw('LOWER(JSON_UNQUOTE(JSON_EXTRACT(name, "$.ar"))) LIKE ?', ['%'.strtolower($search).'%']);
                         });
                     }),
-                TextColumn::make('severity_level')
+                TextColumn::make('autism_level')
                     ->label(__('Severity Level'))
                     ->formatStateUsing(fn (AutismLevelEnum $state) => AutismLevelEnum::label($state))
                     ->color(fn (AutismLevelEnum $state) => AutismLevelEnum::color($state))
@@ -88,7 +88,7 @@ class LearningPlansTable
                             ->multiple()
                             ->searchable()
                             ->options(function (LearningPlan $record) {
-                                return Child::where('autism_level', $record->severity_level)
+                                return Child::where('autism_level', $record->autism_level)
                                     ->whereDoesntHave('childLearningPlans', function ($query) {
                                         $query->where('status', 'in_progress');
                                     })

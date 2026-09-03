@@ -46,7 +46,7 @@ class SubscriptionController extends Controller
                     'weekly_sessions_count' => $plan->weekly_sessions_count,
                     'phase_duration' => $plan->phase_duration,
                     'total_goals' => $plan->goals->count(),
-                    'severity_level' => $plan->severity_level,
+                    'severity_level' => $plan->autism_level,
                 ];
             }
         }

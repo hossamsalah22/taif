@@ -20,13 +20,13 @@ class LearningPlan extends Model
         'max_daily_goals',
         'max_daily_lessons',
         'max_daily_exercises',
-        'severity_level',
+        'autism_level',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'severity_level' => AutismLevelEnum::class,
+        'autism_level' => AutismLevelEnum::class,
     ];
 
     public function goals()
