@@ -44,11 +44,32 @@ class LearningPlanController extends Controller
         $isExpired = now()->greaterThan($gracePeriodEndsAt);
         $isBlocked = ! $isSubscribed && $isExpired;
 
+        $plan = $progressTree->learningPlan;
+
+        $exercisesCompletedToday = $child->completedExercises()->whereDate('child_completed_exercises.created_at', today())->count();
+        $lessonsCompletedToday = $child->completedLessons()->whereDate('child_completed_lessons.created_at', today())->count();
+        $goalsCompletedToday = $child->completedGoals()->whereDate('child_completed_goals.created_at', today())->count();
+
+        $dailyExercisesLimitReached = $plan && $plan->max_daily_exercises > 0 && $exercisesCompletedToday >= $plan->max_daily_exercises;
+        $dailyLessonsLimitReached = $plan && $plan->max_daily_lessons > 0 && $lessonsCompletedToday >= $plan->max_daily_lessons;
+        $dailyGoalsLimitReached = $plan && $plan->max_daily_goals > 0 && $goalsCompletedToday >= $plan->max_daily_goals;
+
+        $anyDailyLimitReached = $dailyExercisesLimitReached || $dailyLessonsLimitReached || $dailyGoalsLimitReached;
+
         $accessStatus = [
             'is_subscribed' => $isSubscribed,
             'is_blocked' => $isBlocked,
             'grace_period_ends_at' => ! $isSubscribed && ! $isExpired ? $gracePeriodEndsAt->toIso8601String() : null,
             'remaining_seconds' => ! $isSubscribed && ! $isExpired ? max(0, $gracePeriodEndsAt->diffInSeconds(now())) : 0,
+            'daily_limit_reached' => $anyDailyLimitReached,
+            'daily_limits' => [
+                'exercises_completed' => $exercisesCompletedToday,
+                'exercises_max' => $plan ? $plan->max_daily_exercises : 0,
+                'lessons_completed' => $lessonsCompletedToday,
+                'lessons_max' => $plan ? $plan->max_daily_lessons : 0,
+                'goals_completed' => $goalsCompletedToday,
+                'goals_max' => $plan ? $plan->max_daily_goals : 0,
+            ],
         ];
 
         if ($isBlocked) {
@@ -64,18 +85,59 @@ class LearningPlanController extends Controller
         $completedExerciseIds = $child->completedExercises()->pluck('learning_exercises.id')->toArray();
 
         // Transform the tree to inject statuses
-        $plan = $progressTree->learningPlan;
         if ($plan && $plan->goals) {
-            $plan->goals->transform(function ($goal) use ($completedGoalIds, $completedLessonIds, $completedExerciseIds) {
+            $previousGoalCompleted = true;
+            
+            $plan->goals->transform(function ($goal) use (
+                $completedGoalIds, $completedLessonIds, $completedExerciseIds,
+                $dailyGoalsLimitReached, $dailyLessonsLimitReached, $dailyExercisesLimitReached,
+                &$previousGoalCompleted
+            ) {
                 $goal->is_completed = in_array($goal->id, $completedGoalIds);
+                
+                if ($goal->is_completed) {
+                    $goal->is_locked = false;
+                } elseif ($goal->is_locked) {
+                    $goal->is_locked = $dailyGoalsLimitReached || !$previousGoalCompleted;
+                }
+
+                $previousGoalCompleted = $goal->is_completed;
 
                 if ($goal->lessons) {
-                    $goal->lessons->transform(function ($lesson) use ($completedLessonIds, $completedExerciseIds) {
+                    $previousLessonCompleted = true;
+
+                    $goal->lessons->transform(function ($lesson) use (
+                        $completedLessonIds, $completedExerciseIds,
+                        $dailyLessonsLimitReached, $dailyExercisesLimitReached,
+                        $goal, &$previousLessonCompleted
+                    ) {
                         $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
 
+                        if ($lesson->is_completed) {
+                            $lesson->is_locked = false;
+                        } elseif ($lesson->is_locked) {
+                            $lesson->is_locked = $goal->is_locked || $dailyLessonsLimitReached || !$previousLessonCompleted;
+                        }
+
+                        $previousLessonCompleted = $lesson->is_completed;
+
                         if ($lesson->exercises) {
-                            $lesson->exercises->transform(function ($exercise) use ($completedExerciseIds) {
+                            $previousExerciseCompleted = true;
+
+                            $lesson->exercises->transform(function ($exercise) use (
+                                $completedExerciseIds,
+                                $dailyExercisesLimitReached,
+                                $lesson, &$previousExerciseCompleted
+                            ) {
                                 $exercise->is_completed = in_array($exercise->id, $completedExerciseIds);
+
+                                if ($exercise->is_completed) {
+                                    $exercise->is_locked = false;
+                                } elseif ($exercise->is_locked) {
+                                    $exercise->is_locked = $lesson->is_locked || $dailyExercisesLimitReached || !$previousExerciseCompleted;
+                                }
+
+                                $previousExerciseCompleted = $exercise->is_completed;
 
                                 return $exercise;
                             });

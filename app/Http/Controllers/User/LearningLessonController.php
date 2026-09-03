@@ -4,13 +4,35 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\LearningLesson;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class LearningLessonController extends Controller
 {
-    public function show(LearningLesson $lesson)
+    public function show(LearningLesson $lesson, Request $request)
     {
+        $childId = $request->query('child_id');
+        $child = null;
+        
+        if ($childId) {
+            $child = auth('sanctum')->user()->children()->where('id', $childId)->first();
+        }
+
         $lesson->load(['exercises']);
+        
+        $dailyExercisesLimitReached = false;
+        $completedExerciseIds = [];
+        $previousExerciseCompleted = true;
+
+        if ($child) {
+            $completedExerciseIds = $child->completedExercises()->pluck('learning_exercises.id')->toArray();
+            
+            $plan = $lesson->goal->plan ?? null;
+            if ($plan) {
+                $exercisesCompletedToday = $child->completedExercises()->whereDate('child_completed_exercises.created_at', today())->count();
+                $dailyExercisesLimitReached = $plan->max_daily_exercises > 0 && $exercisesCompletedToday >= $plan->max_daily_exercises;
+            }
+        }
 
         return $this->successResponse(__('Lesson retrieved successfully'), [
             'lesson' => [
@@ -19,7 +41,7 @@ class LearningLessonController extends Controller
                 'reward_id' => $lesson->reward_id,
                 'is_locked' => $lesson->is_locked,
                 'display_priority' => $lesson->display_priority,
-                'exercises' => $lesson->exercises->map(function ($exercise) {
+                'exercises' => $lesson->exercises->map(function ($exercise) use ($child, $completedExerciseIds, $dailyExercisesLimitReached, &$previousExerciseCompleted) {
                     $configuration = $exercise->configuration;
 
                     if (is_array($configuration)) {
@@ -40,11 +62,27 @@ class LearningLessonController extends Controller
                         }
                     }
 
+                    $isCompleted = false;
+                    $isLocked = $exercise->is_locked;
+
+                    if ($child) {
+                        $isCompleted = in_array($exercise->id, $completedExerciseIds);
+                        
+                        if ($isCompleted) {
+                            $isLocked = false;
+                        } elseif ($isLocked) {
+                            $isLocked = $dailyExercisesLimitReached || !$previousExerciseCompleted;
+                        }
+                        
+                        $previousExerciseCompleted = $isCompleted;
+                    }
+
                     return [
                         'id' => $exercise->id,
                         'type' => $exercise->type,
                         'difficulty_level' => $exercise->difficulty_level,
-                        'is_locked' => $exercise->is_locked,
+                        'is_locked' => $isLocked,
+                        'is_completed' => $isCompleted,
                         'max_attempts' => $exercise->max_attempts,
                         'display_priority' => $exercise->display_priority,
                         'configuration' => $configuration,
