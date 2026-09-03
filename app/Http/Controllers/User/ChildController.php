@@ -99,4 +99,25 @@ class ChildController extends Controller
 
         return $this->successResponse(__('Deleted Successfully'), [], 200);
     }
+
+    /**
+     * Get the assessment and report status of the specified child.
+     */
+    public function status(Request $request, Child $child)
+    {
+        if ($child->parent_id !== $request->user()->id) {
+            return $this->failedResponse(__('Data Not Found'), [], 404);
+        }
+
+        $latestSubmission = $child->assessmentSubmissions()->latest()->first();
+
+        $hasAssessment = $latestSubmission !== null;
+        $hasReport = $hasAssessment && $latestSubmission->status === 'published';
+
+        return $this->successResponse(__('Retrieved Successfully'), [
+            'has_assessment' => $hasAssessment,
+            'has_report' => $hasReport,
+            'assessment_status' => $hasAssessment ? $latestSubmission->status : null,
+        ]);
+    }
 }
