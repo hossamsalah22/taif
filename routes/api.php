@@ -43,6 +43,8 @@ Route::prefix('user')->group(function () {
         Route::post('exercises/interactions', [ExerciseInteractionController::class, 'store']);
         Route::get('lessons/{lesson}', [LearningLessonController::class, 'show']);
         Route::get('children/{child}/status', [ChildController::class, 'status']);
+        Route::get('children/{child}/rewards', [ChildController::class, 'rewards']);
+        Route::get('children/{child}/progress-report', [ChildController::class, 'progressReport']);
         Route::apiResource('children', ChildController::class);
 
         Route::prefix('children/{child}/assessments')->group(function () {
