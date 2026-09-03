@@ -7,13 +7,16 @@ use App\Enums\DifficultyLevel;
 use App\Enums\ExerciseTypeEnum;
 use App\Enums\PriorityEnum;
 use App\Models\LearningPlan;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Filament\Tables\Grouping\Group;
 
 class LearningPlanForm
 {
@@ -129,18 +132,96 @@ class LearningPlanForm
                                             ->options(ExerciseTypeEnum::options())
                                             ->required()
                                             ->live(),
-                                        TextInput::make('video_url')
-                                            ->label(__('Video URL'))
-                                            ->url()
-                                            ->visible(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
+                                        Group::make()->statePath('configuration')->schema([
+                                            Repeater::make('matchingPairs')
+                                                ->label(__('Matching Matrix Rows Manager'))
+                                                ->schema([
+                                                    FileUpload::make('left_element')
+                                                        ->disk('public')
+                                                        ->directory('exercises/matching')
+                                                        ->label(__('Left element'))
+                                                        ->image()
+                                                        ->helperText(__('Recommended size: 500x500'))
+                                                        ->maxSize(5120)
+                                                        ->required(),
+                                                    FileUpload::make('right_element')
+                                                        ->disk('public')
+                                                        ->directory('exercises/matching')
+                                                        ->label(__('Right element'))
+                                                        ->image()
+                                                        ->helperText(__('Recommended size: 500x500'))
+                                                        ->maxSize(5120)
+                                                        ->required(),
+                                                ])
+                                                ->columns(2)
+                                                ->minItems(3)
+                                                ->visible(fn (Get $get) => $get('../type') === ExerciseTypeEnum::MATCHING->value)
+                                                ->required(fn (Get $get) => $get('../type') === ExerciseTypeEnum::MATCHING->value),
 
-                                        \Filament\Forms\Components\SpatieMediaLibraryFileUpload::make('video_thumbnail')
+                                            Repeater::make('orderingSteps')
+                                                ->label(__('Chronological Sequence Slider'))
+                                                ->schema([
+                                                    FileUpload::make('image')
+                                                        ->disk('public')
+                                                        ->directory('exercises/ordering')
+                                                        ->label(__('Image'))
+                                                        ->image()
+                                                        ->helperText(__('Recommended size: 500x500'))
+                                                        ->maxSize(5120)
+                                                        ->required(),
+                                                ])
+                                                ->minItems(2)
+                                                ->visible(fn (Get $get) => $get('../type') === ExerciseTypeEnum::ORDERING->value)
+                                                ->required(fn (Get $get) => $get('../type') === ExerciseTypeEnum::ORDERING->value),
+
+                                            Repeater::make('options')
+                                                ->label(__('Options'))
+                                                ->schema([
+                                                    TextInput::make('title')
+                                                        ->label(__('Card Title'))
+                                                        ->required(),
+                                                    FileUpload::make('image')
+                                                        ->disk('public')
+                                                        ->directory('exercises/options')
+                                                        ->label(__('Card Image'))
+                                                        ->image()
+                                                        ->helperText(__('Recommended size: 500x500'))
+                                                        ->maxSize(5120)
+                                                        ->required(),
+                                                    FileUpload::make('audio')
+                                                        ->disk('public')
+                                                        ->directory('exercises/audio')
+                                                        ->label(__('Card Audio File'))
+                                                        ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/m4a'])
+                                                        ->maxSize(5120)
+                                                        ->visible(fn (Get $get) => $get('../../type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
+                                                        ->required(fn (Get $get) => $get('../../type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value),
+                                                    Toggle::make('is_correct')
+                                                        ->label(__('Is Correct Answer'))
+                                                        ->default(false),
+                                                ])
+                                                ->minItems(2)
+                                                ->columns(2)
+                                                ->visible(fn (Get $get) => in_array($get('../type'), [ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value]))
+                                                ->required(fn (Get $get) => in_array($get('../type'), [ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value])),
+
+                                            TextInput::make('video_url')
+                                                ->label(__('Video URL'))
+                                                ->url()
+                                                ->maxLength(500)
+                                                ->visible(fn (Get $get) => $get('../type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value)
+                                                ->required(fn (Get $get) => $get('../type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
+                                        ])->columnSpanFull(),
+
+                                        SpatieMediaLibraryFileUpload::make('video_thumbnail')
                                             ->disk('public')
                                             ->collection('video_thumbnail')
                                             ->label(__('Video Thumbnail'))
                                             ->image()
                                             ->helperText(__('Recommended size: 1920x1080'))
-                                            ->visible(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
+                                            ->maxSize(5120)
+                                            ->visible(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value)
+                                            ->required(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
                                     ])
                                     ->columnSpanFull()
                                     ->itemLabel(function (array $state): string {
@@ -159,4 +240,3 @@ class LearningPlanForm
             ]);
     }
 }
-
