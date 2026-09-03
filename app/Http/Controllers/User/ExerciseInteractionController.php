@@ -87,9 +87,7 @@ class ExerciseInteractionController extends Controller
             'metadata' => array_merge($validated['metadata'] ?? [], ['submitted_answer' => $validated['answer'] ?? null]),
         ]);
 
-        if ($isSuccessful) {
-            $this->processSuccessfulExercise($child, $validated['learning_exercise_id']);
-        }
+        $this->processCompletedExercise($child, $validated['learning_exercise_id']);
 
         return $this->successResponse(__('Exercise interaction logged successfully.'), [
             'interaction_id' => $interaction->id,
@@ -174,16 +172,14 @@ class ExerciseInteractionController extends Controller
                     'metadata' => array_merge($interactionData['metadata'] ?? [], ['submitted_answer' => $interactionData['answer'] ?? null]),
                 ]);
 
-                if ($isSuccessful) {
-                    $this->processSuccessfulExercise($child, $interactionData['learning_exercise_id']);
-                }
+                $this->processCompletedExercise($child, $interactionData['learning_exercise_id']);
             }
         });
 
         return $this->successResponse(__('Exercise interactions synced successfully.'));
     }
 
-    private function processSuccessfulExercise($child, $exerciseId)
+    private function processCompletedExercise($child, $exerciseId)
     {
         $child->completedExercises()->syncWithoutDetaching([$exerciseId]);
 
