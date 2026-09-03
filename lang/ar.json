@@ -721,5 +721,9 @@
     "Visible to Parent": "مرئي لولي الأمر",
     "Chlid": "الطفل",
     "Plan": "الخطة",
-    "Icon": "أيقونة"
+    "Icon": "أيقونة",
+    "Progress report retrieved successfully": "تم جلب تقرير التقدم بنجاح",
+    "Rewards retrieved successfully": "تم جلب المكافآت بنجاح",
+    "Child status retrieved successfully": "تم جلب حالة الطفل بنجاح",
+    "Learning plan progress retrieved successfully": "تم جلب تقدم خطة التعلم بنجاح"
 }
