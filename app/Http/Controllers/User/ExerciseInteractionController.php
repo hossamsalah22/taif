@@ -191,7 +191,7 @@ class ExerciseInteractionController extends Controller
         $lesson = $exercise->lesson;
 
         $totalExercises = $lesson->exercises()->count();
-        $completedExercisesCount = $child->completedExercises()->where('learning_lesson_id', $lesson->id)->count();
+        $completedExercisesCount = $child->completedExercises()->where('learning_exercises.learning_lesson_id', $lesson->id)->count();
 
         if ($completedExercisesCount >= $totalExercises) {
             $child->completedLessons()->syncWithoutDetaching([$lesson->id]);

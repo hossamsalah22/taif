@@ -59,6 +59,8 @@ class HomeController extends Controller
                     }
                 }
 
+                $dailyLessonsLimitReached = $plan->max_daily_lessons > 0 && $completedToday >= $plan->max_daily_lessons;
+
                 $pendingLessons = $allLessons->filter(fn ($l) => ! in_array($l->id, $completedLessonIds))->values();
                 $nextSession = null;
                 $otherSessions = [];
@@ -68,7 +70,7 @@ class HomeController extends Controller
                     $nextSession = [
                         'id' => $next->id,
                         'name' => $next->name,
-                        'is_locked' => false,
+                        'is_locked' => $dailyLessonsLimitReached,
                     ];
 
                     $otherSessions = $pendingLessons->slice(1, 3)->map(function ($lesson) {
