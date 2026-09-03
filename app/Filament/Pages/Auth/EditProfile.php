@@ -34,6 +34,7 @@ class EditProfile extends BaseEditProfile
                                 ->collection('avatar')
                                 ->hiddenLabel()
                                 ->avatar()
+                                ->helperText(__('Recommended size: 500x500'))
                                 ->imageEditor()
                                 ->circleCropper()
                                 ->imagePreviewHeight('250')
@@ -83,3 +84,4 @@ class EditProfile extends BaseEditProfile
             ]);
     }
 }
+

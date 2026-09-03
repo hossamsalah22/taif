@@ -59,8 +59,10 @@ class RewardForm
                     ->disk('public')
                     ->collection('rewards')
                     ->acceptedFileTypes(['image/*', 'application/json'])
+                    ->helperText(__('Recommended size: 500x500'))
                     ->visible(fn (Get $get) => $get('type') !== RewardTypeEnum::SOUND->value)
                     ->required(fn (Get $get) => $get('type') !== RewardTypeEnum::SOUND->value),
             ]);
     }
 }
+

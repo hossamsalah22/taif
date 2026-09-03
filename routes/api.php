@@ -19,6 +19,7 @@ use App\Http\Controllers\User\LearningPlanController;
 use App\Http\Controllers\User\LogoutController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\SettingsController;
+use App\Http\Controllers\User\SliderController;
 use App\Http\Controllers\User\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,7 @@ Route::prefix('user')->group(function () {
     Route::middleware('auth:user')->group(function () {
         Route::delete('logout', LogoutController::class);
         Route::get('home', [HomeController::class, 'index']);
+        Route::get('sliders', [SliderController::class, 'index']);
         Route::get('subscriptions/gateway', [SubscriptionController::class, 'gateway']);
         Route::post('subscriptions/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::get('profile', [ProfileController::class, 'index']);
@@ -60,3 +62,4 @@ Route::prefix('global')->group(function () {
     Route::get('settings', SettingController::class);
     Route::get('about-app', AboutAppController::class);
 });
+

@@ -133,6 +133,14 @@ class LearningPlanForm
                                             ->label(__('Video URL'))
                                             ->url()
                                             ->visible(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
+
+                                        \Filament\Forms\Components\SpatieMediaLibraryFileUpload::make('video_thumbnail')
+                                            ->disk('public')
+                                            ->collection('video_thumbnail')
+                                            ->label(__('Video Thumbnail'))
+                                            ->image()
+                                            ->helperText(__('Recommended size: 1920x1080'))
+                                            ->visible(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
                                     ])
                                     ->columnSpanFull()
                                     ->itemLabel(function (array $state): string {
@@ -151,3 +159,4 @@ class LearningPlanForm
             ]);
     }
 }
+

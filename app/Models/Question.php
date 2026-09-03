@@ -19,6 +19,12 @@ class Question extends Model implements HasMedia
 
     public array $translatable = ['prompt'];
 
+    public function getVideoThumbnailAttribute(): ?string
+    {
+        $media = $this->getFirstMedia('video_thumbnail');
+        return $media ? $media->getFullUrl() : null;
+    }
+
     protected $casts = [
         'exercise_type' => ExerciseTypeEnum::class,
         'payload' => 'array',
@@ -28,7 +34,7 @@ class Question extends Model implements HasMedia
 
     protected $hidden = ['media'];
 
-    protected $appends = ['audio', 'image', 'shared_elements', 'distractors'];
+    protected $appends = ['audio', 'image', 'shared_elements', 'distractors', 'video_thumbnail'];
 
     public function assessment(): BelongsTo
     {
@@ -59,6 +65,10 @@ class Question extends Model implements HasMedia
     {
         $this->addMediaCollection('question_audio')
             ->acceptsMimeTypes(['audio/mpeg', 'audio/wav'])
+            ->singleFile();
+
+        $this->addMediaCollection('video_thumbnail')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
             ->singleFile();
 
         $this->addMediaCollection('question_image')
@@ -102,3 +112,4 @@ class Question extends Model implements HasMedia
         ]);
     }
 }
+

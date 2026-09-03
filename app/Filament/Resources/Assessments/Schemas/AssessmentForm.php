@@ -67,6 +67,7 @@ class AssessmentForm
                                             ->collection('left_element')
                                             ->label(__('Left element'))
                                             ->image()
+                                            ->helperText(__('Recommended size: 500x500'))
                                             ->maxSize(5120)
                                             ->required(),
                                         SpatieMediaLibraryFileUpload::make('right_element')
@@ -74,6 +75,7 @@ class AssessmentForm
                                             ->collection('right_element')
                                             ->label(__('Right element'))
                                             ->image()
+                                            ->helperText(__('Recommended size: 500x500'))
                                             ->maxSize(5120)
                                             ->required(),
                                     ])
@@ -91,6 +93,7 @@ class AssessmentForm
                                             ->collection('image')
                                             ->label(__('Image'))
                                             ->image()
+                                            ->helperText(__('Recommended size: 500x500'))
                                             ->maxSize(5120)
                                             ->required(),
                                     ])
@@ -115,6 +118,7 @@ class AssessmentForm
                                             ->collection('image')
                                             ->label(__('Card Image'))
                                             ->image()
+                                            ->helperText(__('Recommended size: 500x500'))
                                             ->maxSize(5120)
                                             ->required(),
                                         SpatieMediaLibraryFileUpload::make('audio')
@@ -139,6 +143,15 @@ class AssessmentForm
                                     ->maxLength(500)
                                     ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value)
                                     ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
+
+                                SpatieMediaLibraryFileUpload::make('video_thumbnail')
+                                    ->disk('public')
+                                    ->collection('video_thumbnail')
+                                    ->label(__('Video Thumbnail'))
+                                    ->image()
+                                    ->helperText(__('Recommended size: 1920x1080'))
+                                    ->visible(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value)
+                                    ->required(fn (Get $get) => $get('exercise_type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
                             ])
                             ->orderColumn('order')
                             ->defaultItems(1)
@@ -147,3 +160,5 @@ class AssessmentForm
             ]);
     }
 }
+
+
