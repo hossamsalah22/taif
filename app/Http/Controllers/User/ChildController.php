@@ -132,7 +132,7 @@ class ChildController extends Controller
             return $this->failedResponse(__('Data Not Found'), [], 404);
         }
 
-        $activePlan = $child->learningPlans()->where('status', ChildLearningPlanStatusEnum::InProgress->value)->latest()->first();
+        $activePlan = $child->childLearningPlans()->where('status', ChildLearningPlanStatusEnum::InProgress->value)->latest()->first();
         $plan = $activePlan ? $activePlan->learningPlan : null;
 
         $starJourneyPercentage = 0;
@@ -198,7 +198,7 @@ class ChildController extends Controller
             return $this->failedResponse(__('Data Not Found'), [], 404);
         }
 
-        $activePlan = $child->learningPlans()->where('status', ChildLearningPlanStatusEnum::InProgress->value)->latest()->first();
+        $activePlan = $child->childLearningPlans()->where('status', ChildLearningPlanStatusEnum::InProgress->value)->latest()->first();
         $plan = $activePlan ? $activePlan->learningPlan : null;
 
         $progressPercentage = 0;
