@@ -25,13 +25,17 @@ class LearningLessonController extends Controller
                     if (is_array($configuration)) {
                         foreach (['options', 'matchingPairs', 'orderingSteps'] as $key) {
                             if (isset($configuration[$key]) && is_array($configuration[$key])) {
-                                foreach ($configuration[$key] as &$item) {
+                                $formattedItems = [];
+                                foreach ($configuration[$key] as $uuid => $item) {
+                                    $item['id'] = $uuid;
                                     foreach (['image', 'audio', 'left_element', 'right_element'] as $fileKey) {
-                                        if (! empty($item[$fileKey])) {
+                                        if (!empty($item[$fileKey])) {
                                             $item[$fileKey] = Storage::disk('public')->url($item[$fileKey]);
                                         }
                                     }
+                                    $formattedItems[] = $item;
                                 }
+                                $configuration[$key] = $formattedItems;
                             }
                         }
                     }

@@ -22,7 +22,7 @@ class ExerciseInteractionController extends Controller
             'child_id' => 'required|exists:children,id',
             'learning_exercise_id' => 'required|exists:learning_exercises,id',
             'is_successful' => 'nullable|boolean',
-            'answer' => 'nullable|string',
+            'answer' => 'nullable',
             'duration_seconds' => 'required|integer|min:0',
             'trials_count' => 'required|integer|min:1',
             'interaction_type' => 'nullable|string',
@@ -41,9 +41,39 @@ class ExerciseInteractionController extends Controller
         $isSuccessful = $validated['is_successful'] ?? false;
         
         if (!isset($validated['is_successful']) && isset($validated['answer'])) {
-            $correctAnswer = $exercise->configuration['correct_answer'] ?? null;
-            if ($correctAnswer !== null) {
-                $isSuccessful = (string)$validated['answer'] === (string)$correctAnswer;
+            $type = $exercise->type->value ?? $exercise->type;
+            
+            if (in_array($type, [\App\Enums\ExerciseTypeEnum::IMAGE_SELECTION->value, \App\Enums\ExerciseTypeEnum::DISTINGUISHING->value, \App\Enums\ExerciseTypeEnum::AUDIO_FLASHCARDS->value])) {
+                $options = $exercise->configuration['options'] ?? [];
+                $correctOptionIds = [];
+                foreach ($options as $uuid => $opt) {
+                    if (!empty($opt['is_correct'])) {
+                        $correctOptionIds[] = $uuid;
+                    }
+                }
+                $submittedOptionIds = (array) $validated['answer'];
+                if (count($correctOptionIds) === count($submittedOptionIds) && empty(array_diff($correctOptionIds, $submittedOptionIds))) {
+                    $isSuccessful = true;
+                }
+            } elseif ($type === \App\Enums\ExerciseTypeEnum::MATCHING->value) {
+                $submittedPairs = (array) $validated['answer'];
+                $allMatched = true;
+                foreach ($submittedPairs as $pair) {
+                    if (($pair['left_option_id'] ?? null) !== ($pair['right_option_id'] ?? null)) {
+                        $allMatched = false;
+                        break;
+                    }
+                }
+                $matchingPairsCount = count($exercise->configuration['matchingPairs'] ?? []);
+                if ($allMatched && count($submittedPairs) === $matchingPairsCount && $matchingPairsCount > 0) {
+                    $isSuccessful = true;
+                }
+            } elseif ($type === \App\Enums\ExerciseTypeEnum::ORDERING->value) {
+                $correctOrderIds = array_keys($exercise->configuration['orderingSteps'] ?? []);
+                $submittedOrderIds = (array) $validated['answer'];
+                if ($correctOrderIds === $submittedOrderIds) {
+                    $isSuccessful = true;
+                }
             }
         }
 
@@ -74,7 +104,7 @@ class ExerciseInteractionController extends Controller
             'interactions.*.child_id' => 'required|exists:children,id',
             'interactions.*.learning_exercise_id' => 'required|exists:learning_exercises,id',
             'interactions.*.is_successful' => 'nullable|boolean',
-            'interactions.*.answer' => 'nullable|string',
+            'interactions.*.answer' => 'nullable',
             'interactions.*.duration_seconds' => 'required|integer|min:0',
             'interactions.*.trials_count' => 'required|integer|min:1',
             'interactions.*.interaction_type' => 'nullable|string',
@@ -98,9 +128,39 @@ class ExerciseInteractionController extends Controller
                 $isSuccessful = $interactionData['is_successful'] ?? false;
                 
                 if (!isset($interactionData['is_successful']) && isset($interactionData['answer'])) {
-                    $correctAnswer = $exercise->configuration['correct_answer'] ?? null;
-                    if ($correctAnswer !== null) {
-                        $isSuccessful = (string)$interactionData['answer'] === (string)$correctAnswer;
+                    $type = $exercise->type->value ?? $exercise->type;
+                    
+                    if (in_array($type, [\App\Enums\ExerciseTypeEnum::IMAGE_SELECTION->value, \App\Enums\ExerciseTypeEnum::DISTINGUISHING->value, \App\Enums\ExerciseTypeEnum::AUDIO_FLASHCARDS->value])) {
+                        $options = $exercise->configuration['options'] ?? [];
+                        $correctOptionIds = [];
+                        foreach ($options as $uuid => $opt) {
+                            if (!empty($opt['is_correct'])) {
+                                $correctOptionIds[] = $uuid;
+                            }
+                        }
+                        $submittedOptionIds = (array) $interactionData['answer'];
+                        if (count($correctOptionIds) === count($submittedOptionIds) && empty(array_diff($correctOptionIds, $submittedOptionIds))) {
+                            $isSuccessful = true;
+                        }
+                    } elseif ($type === \App\Enums\ExerciseTypeEnum::MATCHING->value) {
+                        $submittedPairs = (array) $interactionData['answer'];
+                        $allMatched = true;
+                        foreach ($submittedPairs as $pair) {
+                            if (($pair['left_option_id'] ?? null) !== ($pair['right_option_id'] ?? null)) {
+                                $allMatched = false;
+                                break;
+                            }
+                        }
+                        $matchingPairsCount = count($exercise->configuration['matchingPairs'] ?? []);
+                        if ($allMatched && count($submittedPairs) === $matchingPairsCount && $matchingPairsCount > 0) {
+                            $isSuccessful = true;
+                        }
+                    } elseif ($type === \App\Enums\ExerciseTypeEnum::ORDERING->value) {
+                        $correctOrderIds = array_keys($exercise->configuration['orderingSteps'] ?? []);
+                        $submittedOrderIds = (array) $interactionData['answer'];
+                        if ($correctOrderIds === $submittedOrderIds) {
+                            $isSuccessful = true;
+                        }
                     }
                 }
 
