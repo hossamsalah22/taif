@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ChildRequest;
 use App\Http\Resources\ChildResource;
 use App\Http\Resources\User\ChildRewardResource;
+use App\Http\Resources\User\ClinicalProgressReportItemResource;
 use App\Models\Child;
 use App\Models\ClinicalProgressReport;
 use App\Models\ExerciseInteractionLog;
@@ -230,17 +231,11 @@ class ChildController extends Controller
             ->latest()
             ->first();
 
-        $strengths = $report ? ($report->strengths ?? []) : [];
-        $strengths = array_map(function ($item) {
-            $item['icon_url'] = ! empty($item['icon']) ? asset('storage/'.$item['icon']) : null;
-            return $item;
-        }, $strengths);
+        $strengths = $report && is_array($report->strengths) ? $report->strengths : [];
+        $improvements = $report && is_array($report->improvements) ? $report->improvements : [];
 
-        $improvements = $report ? ($report->improvements ?? []) : [];
-        $improvements = array_map(function ($item) {
-            $item['icon_url'] = ! empty($item['icon']) ? asset('storage/'.$item['icon']) : null;
-            return $item;
-        }, $improvements);
+        $strengths = ClinicalProgressReportItemResource::collection($strengths);
+        $improvements = ClinicalProgressReportItemResource::collection($improvements);
 
         return $this->successResponse(__('Progress report retrieved successfully'), [
             'progress_percentage' => $progressPercentage,
