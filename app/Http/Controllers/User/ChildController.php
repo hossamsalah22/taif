@@ -6,6 +6,7 @@ use App\Enums\ChildLearningPlanStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ChildRequest;
 use App\Http\Resources\ChildResource;
+use App\Http\Resources\User\ChildRewardResource;
 use App\Models\Child;
 use App\Models\ClinicalProgressReport;
 use App\Models\ExerciseInteractionLog;
@@ -172,18 +173,8 @@ class ChildController extends Controller
                 $q->where('learning_plan_id', $plan->id);
             })->whereNotNull('reward_id')->with('reward')->get();
 
-            foreach ($lessonsWithRewards as $lesson) {
-                if ($lesson->reward) {
-                    $planRewards[] = [
-                        'id' => $lesson->reward->id,
-                        'name' => $lesson->reward->name,
-                        'image' => $lesson->reward->media_url,
-                        'icon' => $lesson->reward->icon_url,
-                        'lesson_name' => $lesson->name,
-                        'is_unlocked' => in_array($lesson->reward->id, $unlockedRewardIds),
-                    ];
-                }
-            }
+            ChildRewardResource::$unlockedRewardIds = $unlockedRewardIds;
+            $planRewards = ChildRewardResource::collection($lessonsWithRewards->filter(fn ($l) => $l->reward !== null));
         }
 
         return $this->successResponse(__('Rewards retrieved successfully'), [
@@ -242,14 +233,12 @@ class ChildController extends Controller
         $strengths = $report ? ($report->strengths ?? []) : [];
         $strengths = array_map(function ($item) {
             $item['icon_url'] = ! empty($item['icon']) ? asset('storage/'.$item['icon']) : null;
-
             return $item;
         }, $strengths);
 
         $improvements = $report ? ($report->improvements ?? []) : [];
         $improvements = array_map(function ($item) {
             $item['icon_url'] = ! empty($item['icon']) ? asset('storage/'.$item['icon']) : null;
-
             return $item;
         }, $improvements);
 

@@ -54,36 +54,42 @@ class ClinicalProgressReportForm
                 Hidden::make('reportable_id'),
                 TextInput::make('title')
                     ->required()
-                    ->columnSpanFull()
-                    ->label(__('Report Title (e.g. Week 1 Report)')),
+                    ->label(__('Report Title (e.g. Week 1 Report)'))
+                    ->translatableTabs()
+                    ->columnSpanFull(),
                 Repeater::make('strengths')
                     ->label(__('Strengths'))
                     ->schema([
                         TextInput::make('title')
                             ->label(__('Title'))
-                            ->required(),
+                            ->required()
+                            ->translatableTabs(),
                         FileUpload::make('icon')
                             ->label(__('Icon'))
                             ->directory('report-icons')
                             ->image()
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->columnSpanFull(),
                 Repeater::make('improvements')
                     ->label(__('Needs Improvement'))
                     ->schema([
                         TextInput::make('title')
                             ->label(__('Title'))
-                            ->required(),
+                            ->required()
+                            ->translatableTabs(),
                         FileUpload::make('icon')
                             ->label(__('Icon'))
                             ->directory('report-icons')
                             ->image()
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->columnSpanFull(),
                 Textarea::make('smart_parental_advice')
                     ->label(__('Smart Parental Advice'))
+                    ->translatableTabs()
                     ->columnSpanFull(),
                 Toggle::make('is_visible_to_parent')
                     ->label(__('Visible to Parent'))
