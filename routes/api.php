@@ -21,6 +21,7 @@ use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\SettingsController;
 use App\Http\Controllers\User\SliderController;
 use App\Http\Controllers\User\SubscriptionController;
+use App\Http\Controllers\User\SupportTicketController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('user')->group(function () {
@@ -46,7 +47,8 @@ Route::prefix('user')->group(function () {
         Route::get('children/{child}/rewards', [ChildController::class, 'rewards']);
         Route::get('children/{child}/progress-report', [ChildController::class, 'progressReport']);
         Route::apiResource('children', ChildController::class);
-
+        Route::apiResource('support-tickets', SupportTicketController::class)->only(['index', 'store', 'show']);
+        Route::post('support-tickets/{support_ticket}/reply', [SupportTicketController::class, 'reply']);
         Route::prefix('children/{child}/assessments')->group(function () {
             Route::get('registration', [AssessmentController::class, 'registrationTest']);
             Route::post('submit', [AssessmentController::class, 'submitTest']);

@@ -235,6 +235,9 @@ return [
         'trials_count' => 'عدد المحاولات',
         'interaction_type' => 'نوع التفاعل',
         'metadata' => 'البيانات الوصفية',
+        'reference_number' => 'رقم المرجع',
+        'title' => 'العنوان',
+        'status' => 'الحالة',
     ],
 
     'country_codes' => [
