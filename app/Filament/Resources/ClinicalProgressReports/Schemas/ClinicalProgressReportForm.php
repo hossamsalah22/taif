@@ -29,11 +29,20 @@ class ClinicalProgressReportForm
                     ->afterStateUpdated(fn (Set $set) => $set('learning_plan_id', null))
                     ->required(),
                 Select::make('learning_plan_id')
-                    ->relationship('plan', 'name', function (Builder $query, Get $get) {
+                    ->relationship('plan', 'name', function (Builder $query, Get $get, ?\Illuminate\Database\Eloquent\Model $record) {
                         $childId = $get('child_id');
                         if ($childId) {
                             $query->whereHas('childLearningPlans', function ($q) use ($childId) {
                                 $q->where('child_id', $childId);
+                            });
+                            
+                            $query->whereNotIn('id', function($q) use ($childId, $record) {
+                                $q->select('learning_plan_id')
+                                  ->from('clinical_progress_reports')
+                                  ->where('child_id', $childId);
+                                if ($record) {
+                                    $q->where('id', '!=', $record->id);
+                                }
                             });
                         } else {
                             $query->whereRaw('1 = 0');

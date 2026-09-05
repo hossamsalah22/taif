@@ -6,6 +6,7 @@ use App\Filament\Resources\Children\Pages\CreateChild;
 use App\Filament\Resources\Children\Pages\EditChild;
 use App\Filament\Resources\Children\Pages\ListChildren;
 use App\Filament\Resources\Children\Pages\ViewChild;
+use App\Filament\Resources\Children\Pages\ViewChildProgressPage;
 use App\Filament\Resources\Children\Schemas\ChildForm;
 use App\Filament\Resources\Children\Schemas\ChildInfolist;
 use App\Filament\Resources\Children\Tables\ChildrenTable;
@@ -51,6 +52,7 @@ class ChildResource extends MainResource
             'create' => CreateChild::route('/create'),
             'view' => ViewChild::route('/{record}'),
             'edit' => EditChild::route('/{record}/edit'),
+            'progress' => ViewChildProgressPage::route('/{record}/progress'),
         ];
     }
 }

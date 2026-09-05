@@ -11,7 +11,7 @@ class ClinicalProgressReport extends Model
 {
     use HasFactory, HasTranslations;
 
-    public $translatable = ['title', 'smart_parental_advice'];
+    public $translatable = ['title', 'body', 'smart_parental_advice'];
 
     protected $fillable = [
         'child_id',

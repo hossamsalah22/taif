@@ -21,13 +21,13 @@ class ExerciseInteractionLogObserver
 
     protected function checkMilestones(ExerciseInteractionLog $log): void
     {
-        // Milestone check logic to notify admins when an exercise is marked 'completed'
-        if ($log->status === 'completed' && (! $log->getOriginal('status') || $log->getOriginal('status') !== 'completed')) {
-            $log->loadMissing(['child', 'exercise.lesson.goal.plan']);
+        // Milestone check logic to notify admins when an exercise is marked 'is_successful'
+        if ($log->is_successful && (! $log->getOriginal('is_successful'))) {
+            $log->loadMissing(['child', 'learningExercise.lesson.goal.plan']);
 
             $childName = $log->child->name ?? 'A child';
-            $exerciseName = ExerciseTypeEnum::label($log->exercise->type);
-            $planName = $log->exercise->lesson->goal->plan->name ?? 'a learning plan';
+            $exerciseName = ExerciseTypeEnum::label($log->learningExercise->type);
+            $planName = $log->learningExercise->lesson->goal->plan->title ?? 'a learning plan';
 
             $admins = Admin::all();
 

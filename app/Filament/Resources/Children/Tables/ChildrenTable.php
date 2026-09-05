@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Children\Tables;
 
 use App\Enums\GenderEnum;
+use App\Filament\Resources\Children\ChildResource;
 use App\Models\Child;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -45,6 +46,12 @@ class ChildrenTable
                     ->modalDescription(__('Are you sure you want to allow this child to take the assessment again? This will bypass the maximum attempts limit.'))
                     ->action(fn (Child $record) => $record->update(['force_re_test' => true]))
                     ->visible(fn (Child $record) => ! $record->force_re_test),
+                Action::make('viewProgressDetails')
+                    ->label(__('View Progress Details'))
+                    ->icon('heroicon-o-chart-bar')
+                    ->color('success')
+                    ->url(fn (Child $record): string => ChildResource::getUrl('progress', ['record' => $record]))
+                    ->visible(fn (Child $record) => auth()->user()->can('view_progress_details_child')),
                 EditAction::make(),
             ])
             ->toolbarActions([

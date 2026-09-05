@@ -7,6 +7,7 @@ use App\Enums\SubscriptionStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Child;
 use App\Models\ChildLearningPlan;
+use App\Models\ExerciseInteractionLog;
 use App\Models\Subscription;
 use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
@@ -84,21 +85,24 @@ class LearningPlanController extends Controller
         $completedLessonIds = $child->completedLessons()->pluck('learning_lessons.id')->toArray();
         $completedExerciseIds = $child->completedExercises()->pluck('learning_exercises.id')->toArray();
 
+        $interactedExerciseIds = ExerciseInteractionLog::where('child_id', $child->id)
+            ->pluck('learning_exercise_id')->unique()->toArray();
+
         // Transform the tree to inject statuses
         if ($plan && $plan->goals) {
             $previousGoalCompleted = true;
-            
+
             $plan->goals->transform(function ($goal) use (
-                $completedGoalIds, $completedLessonIds, $completedExerciseIds,
+                $completedGoalIds, $completedLessonIds, $completedExerciseIds, $interactedExerciseIds,
                 $dailyGoalsLimitReached, $dailyLessonsLimitReached, $dailyExercisesLimitReached,
                 &$previousGoalCompleted
             ) {
                 $goal->is_completed = in_array($goal->id, $completedGoalIds);
-                
+
                 if ($goal->is_completed) {
                     $goal->is_locked = false;
                 } elseif ($goal->is_locked) {
-                    $goal->is_locked = $dailyGoalsLimitReached || !$previousGoalCompleted;
+                    $goal->is_locked = $dailyGoalsLimitReached || ! $previousGoalCompleted;
                 }
 
                 $previousGoalCompleted = $goal->is_completed;
@@ -107,7 +111,7 @@ class LearningPlanController extends Controller
                     $previousLessonCompleted = true;
 
                     $goal->lessons->transform(function ($lesson) use (
-                        $completedLessonIds, $completedExerciseIds,
+                        $completedLessonIds, $completedExerciseIds, $interactedExerciseIds,
                         $dailyLessonsLimitReached, $dailyExercisesLimitReached,
                         $goal, &$previousLessonCompleted
                     ) {
@@ -116,7 +120,7 @@ class LearningPlanController extends Controller
                         if ($lesson->is_completed) {
                             $lesson->is_locked = false;
                         } elseif ($lesson->is_locked) {
-                            $lesson->is_locked = $goal->is_locked || $dailyLessonsLimitReached || !$previousLessonCompleted;
+                            $lesson->is_locked = $goal->is_locked || $dailyLessonsLimitReached || ! $previousLessonCompleted;
                         }
 
                         $previousLessonCompleted = $lesson->is_completed;
@@ -125,7 +129,7 @@ class LearningPlanController extends Controller
                             $previousExerciseCompleted = true;
 
                             $lesson->exercises->transform(function ($exercise) use (
-                                $completedExerciseIds,
+                                $completedExerciseIds, $interactedExerciseIds,
                                 $dailyExercisesLimitReached,
                                 $lesson, &$previousExerciseCompleted
                             ) {
@@ -134,17 +138,22 @@ class LearningPlanController extends Controller
                                 if ($exercise->is_completed) {
                                     $exercise->is_locked = false;
                                 } elseif ($exercise->is_locked) {
-                                    $exercise->is_locked = $lesson->is_locked || $dailyExercisesLimitReached || !$previousExerciseCompleted;
+                                    $exercise->is_locked = $lesson->is_locked || $dailyExercisesLimitReached || ! $previousExerciseCompleted;
                                 }
 
                                 $previousExerciseCompleted = $exercise->is_completed;
+                                $exercise->is_in_progress = in_array($exercise->id, $interactedExerciseIds);
 
                                 return $exercise;
                             });
+
+                            $lesson->is_in_progress = $lesson->exercises->where('is_in_progress', true)->count() > 0 || $lesson->exercises->where('is_completed', true)->count() > 0;
                         }
 
                         return $lesson;
                     });
+
+                    $goal->is_in_progress = $goal->lessons->where('is_in_progress', true)->count() > 0 || $goal->lessons->where('is_completed', true)->count() > 0;
                 }
 
                 return $goal;
