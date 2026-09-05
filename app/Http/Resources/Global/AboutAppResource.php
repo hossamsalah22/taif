@@ -25,9 +25,22 @@ class AboutAppResource extends JsonResource
         $privacy_pillars_translated = [];
 
         foreach ($this->app_features as $feature) {
+            $tags_translated = [];
+
+            if (isset($feature['tags']) && is_array($feature['tags'])) {
+                foreach ($feature['tags'] as $tag) {
+                    $tags_translated[] = [
+                        'title' => $locale === 'ar' ? ($tag['title_ar'] ?? '') : ($tag['title_en'] ?? ''),
+                        'icon' => ! empty($tag['icon']) ? asset('storage/'.$tag['icon']) : null,
+                    ];
+                }
+            }
+
             $app_features_translated[] = [
-                'title' => $locale === 'ar' ? $feature['title_ar'] : $feature['title_en'],
-                'description' => $locale === 'ar' ? $feature['description_ar'] : $feature['description_en'],
+                'title' => $locale === 'ar' ? ($feature['title_ar'] ?? '') : ($feature['title_en'] ?? ''),
+                'description' => $locale === 'ar' ? ($feature['description_ar'] ?? '') : ($feature['description_en'] ?? ''),
+                'icon' => ! empty($feature['icon']) ? asset('storage/'.$feature['icon']) : null,
+                'tags' => $tags_translated,
             ];
         }
 

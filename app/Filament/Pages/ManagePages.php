@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Settings\PagesSettings;
 use BackedEnum;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -236,6 +237,32 @@ class ManagePages extends SettingsPage
                                         ->label(__('description_en'))
                                         ->required(),
                                 ]),
+                                FileUpload::make('icon')
+                                    ->label(__('Icon'))
+                                    ->image()
+                                    ->directory('app-features')
+                                    ->disk('public')
+                                    ->columnSpanFull(),
+                                Repeater::make('tags')
+                                    ->label(__('Tags'))
+                                    ->schema([
+                                        Grid::make(2)->schema([
+                                            TextInput::make('title_ar')
+                                                ->label(__('title_ar'))
+                                                ->required(),
+                                            TextInput::make('title_en')
+                                                ->label(__('title_en'))
+                                                ->required(),
+                                        ]),
+                                        FileUpload::make('icon')
+                                            ->label(__('Icon'))
+                                            ->image()
+                                            ->directory('feature-tags')
+                                            ->disk('public')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->collapsible()
+                                    ->columnSpanFull(),
                             ])
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => $state['title_ar'] ?? null),
