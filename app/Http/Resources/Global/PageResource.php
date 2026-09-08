@@ -25,10 +25,19 @@ class PageResource extends JsonResource
         $privacy_policy_html = Str::markdown($privacy_policy ?? '');
         $terms_and_conditions_html = Str::markdown($terms_and_conditions ?? '');
 
+        $privacyPillars = collect($this->privacy_pillars ?? [])->map(fn ($p) => [
+            'title' => $locale === 'ar' ? ($p['title_ar'] ?? '') : ($p['title_en'] ?? ''),
+            'body'  => $locale === 'ar' ? ($p['body_ar'] ?? '') : ($p['body_en'] ?? ''),
+        ])->values()->toArray();
+
         return [
             'about_us' => $about_us_html,
             'privacy_policy' => $privacy_policy_html,
             'terms_and_conditions' => $terms_and_conditions_html,
+            'help_center' => [
+                'slogan' => $locale === 'ar' ? ($this->help_center_slogan_ar ?? '') : ($this->help_center_slogan_en ?? ''),
+                'privacy_pillars' => $privacyPillars,
+            ],
         ];
     }
 }
