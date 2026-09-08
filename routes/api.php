@@ -47,6 +47,7 @@ Route::prefix('user')->group(function () {
         Route::get('children/{child}/rewards', [ChildController::class, 'rewards']);
         Route::get('children/{child}/progress-report', [ChildController::class, 'progressReport']);
         Route::get('children/{child}/profile', [ChildController::class, 'profile']);
+        Route::put('children/{child}/sensory-settings', [ChildController::class, 'updateSensorySettings']);
         Route::apiResource('children', ChildController::class);
         Route::apiResource('support-tickets', SupportTicketController::class)->only(['index', 'store', 'show']);
         Route::post('support-tickets/{support_ticket}/reply', [SupportTicketController::class, 'reply']);

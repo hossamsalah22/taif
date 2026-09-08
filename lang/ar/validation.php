@@ -238,6 +238,8 @@ return [
         'reference_number' => 'رقم المرجع',
         'title' => 'العنوان',
         'status' => 'الحالة',
+        'quiet_sound_level' => 'مستوى الصوت الهادئ',
+        'comfortable_screen_brightness' => 'سطوع الشاشة المريح',
     ],
 
     'country_codes' => [

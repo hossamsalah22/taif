@@ -256,4 +256,20 @@ class ChildController extends Controller
 
         return $this->successResponse(__('Profile retrieved successfully'), ChildProfileResource::make($child));
     }
+
+    public function updateSensorySettings(Request $request, Child $child)
+    {
+        if ($child->parent_id !== $request->user()->id) {
+            return $this->failedResponse(__('Data Not Found'), [], 404);
+        }
+
+        $validated = $request->validate([
+            'quiet_sound_level' => 'required|integer|min:0|max:100',
+            'comfortable_screen_brightness' => 'required|integer|min:0|max:100',
+        ]);
+
+        $child->update($validated);
+
+        return $this->successResponse(__('Sensory settings updated successfully'), ChildProfileResource::make($child));
+    }
 }
