@@ -6,6 +6,7 @@ use App\Enums\ChildLearningPlanStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ChildRequest;
 use App\Http\Resources\ChildResource;
+use App\Http\Resources\User\ChildProfileResource;
 use App\Http\Resources\User\ChildRewardResource;
 use App\Http\Resources\User\ClinicalProgressReportItemResource;
 use App\Models\Child;
@@ -244,5 +245,14 @@ class ChildController extends Controller
             'needs_improvement' => $improvements,
             'smart_tip' => $report ? $report->smart_parental_advice : null,
         ]);
+    }
+
+    public function profile(Request $request, Child $child)
+    {
+        if ($child->parent_id !== $request->user()->id) {
+            return $this->failedResponse(__('Data Not Found'), [], 404);
+        }
+
+        return $this->successResponse(__('Profile retrieved successfully'), ChildProfileResource::make($child));
     }
 }
