@@ -67,9 +67,10 @@ class ChildController extends Controller
         // TAYF-85: Check for critical diagnostic changes
         $criticalChanged = false;
         if (
-            $child->age != $validated['age'] ||
-            $child->autism_level !== $validated['autism_level'] ||
-            $child->speech_status !== $validated['speech_status']
+            // $child->age != $validated['age'] ||
+            // $child->autism_level !== $validated['autism_level'] ||
+            $child->autism_level !== $validated['autism_level']
+            // $child->speech_status !== $validated['speech_status']
         ) {
             $criticalChanged = true;
         }
