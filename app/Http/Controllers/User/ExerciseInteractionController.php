@@ -87,11 +87,17 @@ class ExerciseInteractionController extends Controller
             'metadata' => array_merge($validated['metadata'] ?? [], ['submitted_answer' => $validated['answer'] ?? null]),
         ]);
 
-        $this->processCompletedExercise($child, $validated['learning_exercise_id']);
+        $unlockedReward = $this->processCompletedExercise($child, $validated['learning_exercise_id']);
 
         return $this->successResponse(__('Exercise interaction logged successfully.'), [
             'interaction_id' => $interaction->id,
             'is_successful' => $isSuccessful,
+            'unlocked_reward' => $unlockedReward ? [
+                'id' => $unlockedReward->id,
+                'name' => $unlockedReward->name,
+                'image' => $unlockedReward->media_url,
+                'icon' => $unlockedReward->icon_url,
+            ] : null,
         ], 201);
     }
 
@@ -110,8 +116,9 @@ class ExerciseInteractionController extends Controller
         ]);
 
         $user = auth('sanctum')->user();
+        $unlockedRewards = [];
 
-        DB::transaction(function () use ($validated, $user) {
+        DB::transaction(function () use ($validated, $user, &$unlockedRewards) {
             foreach ($validated['interactions'] as $interactionData) {
                 $child = $user->children()->where('id', $interactionData['child_id'])->first();
                 if (! $child) {
@@ -172,15 +179,26 @@ class ExerciseInteractionController extends Controller
                     'metadata' => array_merge($interactionData['metadata'] ?? [], ['submitted_answer' => $interactionData['answer'] ?? null]),
                 ]);
 
-                $this->processCompletedExercise($child, $interactionData['learning_exercise_id']);
+                $reward = $this->processCompletedExercise($child, $interactionData['learning_exercise_id']);
+                if ($reward) {
+                    $unlockedRewards[] = [
+                        'id' => $reward->id,
+                        'name' => $reward->name,
+                        'image' => $reward->media_url,
+                        'icon' => $reward->icon_url,
+                    ];
+                }
             }
         });
 
-        return $this->successResponse(__('Exercise interactions synced successfully.'));
+        return $this->successResponse(__('Exercise interactions synced successfully.'), [
+            'unlocked_rewards' => $unlockedRewards,
+        ]);
     }
 
     private function processCompletedExercise($child, $exerciseId)
     {
+        $unlockedReward = null;
         $child->completedExercises()->syncWithoutDetaching([$exerciseId]);
 
         $exercise = LearningExercise::find($exerciseId);
@@ -193,10 +211,14 @@ class ExerciseInteractionController extends Controller
             $child->completedLessons()->syncWithoutDetaching([$lesson->id]);
 
             if ($lesson->reward_id) {
-                ChildReward::firstOrCreate([
+                $childReward = ChildReward::firstOrCreate([
                     'child_id' => $child->id,
                     'reward_id' => $lesson->reward_id,
                 ]);
+
+                if ($childReward->wasRecentlyCreated) {
+                    $unlockedReward = $lesson->reward;
+                }
             }
 
             $goal = $lesson->goal;
@@ -221,5 +243,7 @@ class ExerciseInteractionController extends Controller
                 }
             }
         }
+
+        return $unlockedReward;
     }
 }
