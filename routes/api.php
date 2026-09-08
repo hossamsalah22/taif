@@ -38,6 +38,7 @@ Route::prefix('user')->group(function () {
         Route::post('subscriptions/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::get('profile', [ProfileController::class, 'index']);
         Route::put('profile', [ProfileController::class, 'update']);
+        Route::delete('profile', [ProfileController::class, 'destroy']);
         Route::put('settings', [SettingsController::class, 'update']);
         Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
         Route::post('exercises/interactions/sync', [ExerciseInteractionController::class, 'sync']);

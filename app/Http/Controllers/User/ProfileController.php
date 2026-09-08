@@ -52,4 +52,14 @@ class ProfileController extends Controller
             'requires_verification' => false,
         ]);
     }
+
+    public function destroy()
+    {
+        $user = auth('user')->user();
+        
+        $user->tokens()->delete();
+        $user->delete();
+
+        return $this->successResponse(__('Profile deleted successfully.'));
+    }
 }
