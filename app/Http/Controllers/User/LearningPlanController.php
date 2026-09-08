@@ -73,12 +73,7 @@ class LearningPlanController extends Controller
             ],
         ];
 
-        if ($isBlocked) {
-            return $this->successResponse(__('Learning plan progress tree retrieved successfully.'), [
-                'progress_tree' => null,
-                'access_status' => $accessStatus,
-            ]);
-        }
+        // Removed early return for $isBlocked so the tree is always sent
 
         // Get completed IDs for quick lookup
         $completedGoalIds = $child->completedGoals()->pluck('learning_goals.id')->toArray();
@@ -95,14 +90,14 @@ class LearningPlanController extends Controller
             $plan->goals->transform(function ($goal) use (
                 $completedGoalIds, $completedLessonIds, $completedExerciseIds, $interactedExerciseIds,
                 $dailyGoalsLimitReached, $dailyLessonsLimitReached, $dailyExercisesLimitReached,
-                &$previousGoalCompleted
+                &$previousGoalCompleted, $isBlocked
             ) {
                 $goal->is_completed = in_array($goal->id, $completedGoalIds);
 
                 if ($goal->is_completed) {
                     $goal->is_locked = false;
-                } elseif ($goal->is_locked) {
-                    $goal->is_locked = $dailyGoalsLimitReached || ! $previousGoalCompleted;
+                } else {
+                    $goal->is_locked = $isBlocked || $dailyGoalsLimitReached || ! $previousGoalCompleted;
                 }
 
                 $previousGoalCompleted = $goal->is_completed;
@@ -113,14 +108,14 @@ class LearningPlanController extends Controller
                     $goal->lessons->transform(function ($lesson) use (
                         $completedLessonIds, $completedExerciseIds, $interactedExerciseIds,
                         $dailyLessonsLimitReached, $dailyExercisesLimitReached,
-                        $goal, &$previousLessonCompleted
+                        $goal, &$previousLessonCompleted, $isBlocked
                     ) {
                         $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
 
                         if ($lesson->is_completed) {
                             $lesson->is_locked = false;
-                        } elseif ($lesson->is_locked) {
-                            $lesson->is_locked = $goal->is_locked || $dailyLessonsLimitReached || ! $previousLessonCompleted;
+                        } else {
+                            $lesson->is_locked = $isBlocked || $goal->is_locked || $dailyLessonsLimitReached || ! $previousLessonCompleted;
                         }
 
                         $previousLessonCompleted = $lesson->is_completed;
@@ -131,14 +126,14 @@ class LearningPlanController extends Controller
                             $lesson->exercises->transform(function ($exercise) use (
                                 $completedExerciseIds, $interactedExerciseIds,
                                 $dailyExercisesLimitReached,
-                                $lesson, &$previousExerciseCompleted
+                                $lesson, &$previousExerciseCompleted, $isBlocked
                             ) {
                                 $exercise->is_completed = in_array($exercise->id, $completedExerciseIds);
 
                                 if ($exercise->is_completed) {
                                     $exercise->is_locked = false;
-                                } elseif ($exercise->is_locked) {
-                                    $exercise->is_locked = $lesson->is_locked || $dailyExercisesLimitReached || ! $previousExerciseCompleted;
+                                } else {
+                                    $exercise->is_locked = $isBlocked || $lesson->is_locked || $dailyExercisesLimitReached || ! $previousExerciseCompleted;
                                 }
 
                                 $previousExerciseCompleted = $exercise->is_completed;
