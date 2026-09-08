@@ -11,6 +11,31 @@ class SettingsController extends Controller
 {
     use ApiResponseTrait;
 
+    public function index()
+    {
+        $user = auth('user')->user();
+
+        $notificationsRecord = DB::table(config('settings.repositories.database.table') ?? 'settings')
+            ->where('group', 'notifications')
+            ->where('name', 'user_'.$user->id)
+            ->first();
+
+        $notifications = $notificationsRecord ? json_decode($notificationsRecord->payload, true) : [
+            'daily_session' => true,
+            'progress_reports' => true,
+            'plan_updates' => true,
+            'subscription_billing' => true,
+        ];
+
+        return $this->successResponse(__('Settings retrieved successfully.'), [
+            'notifications' => [
+                'daily_session' => $notifications['daily_session'] ?? true,
+                'progress_reports' => $notifications['progress_reports'] ?? true,
+                'plan_updates' => $notifications['plan_updates'] ?? true,
+            ],
+        ]);
+    }
+
     public function update(UpdateSettingsRequest $request)
     {
         $user = auth('user')->user();

@@ -17,6 +17,8 @@ use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\LearningLessonController;
 use App\Http\Controllers\User\LearningPlanController;
 use App\Http\Controllers\User\LogoutController;
+use App\Http\Controllers\User\NotificationController;
+use App\Http\Controllers\User\NotificationTopicController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\SettingsController;
 use App\Http\Controllers\User\SliderController;
@@ -39,7 +41,18 @@ Route::prefix('user')->group(function () {
         Route::get('profile', [ProfileController::class, 'index']);
         Route::put('profile', [ProfileController::class, 'update']);
         Route::delete('profile', [ProfileController::class, 'destroy']);
+        Route::get('settings', [SettingsController::class, 'index']);
         Route::put('settings', [SettingsController::class, 'update']);
+        
+        Route::post('notifications/topics/subscribe', [NotificationTopicController::class, 'subscribe']);
+        Route::post('notifications/topics/unsubscribe', [NotificationTopicController::class, 'unsubscribe']);
+
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::delete('notifications/all', [NotificationController::class, 'destroyAll']);
+        Route::delete('notifications/{id}', [NotificationController::class, 'destroy']);
+
         Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
         Route::post('exercises/interactions/sync', [ExerciseInteractionController::class, 'sync']);
         Route::post('exercises/interactions', [ExerciseInteractionController::class, 'store']);
