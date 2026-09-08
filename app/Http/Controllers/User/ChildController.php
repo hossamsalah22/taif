@@ -69,7 +69,7 @@ class ChildController extends Controller
         if (
             // $child->age != $validated['age'] ||
             // $child->autism_level !== $validated['autism_level'] ||
-            $child->autism_level !== $validated['autism_level']
+            $child->autism_level->value !== $validated['autism_level']
             // $child->speech_status !== $validated['speech_status']
         ) {
             $criticalChanged = true;
