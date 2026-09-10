@@ -20,5 +20,5 @@ return [
     | Place your firebase.json in the storage directory for security.
     |
     */
-    'credentials_path' => storage_path('firebase.json'),
+    'credentials_path' => storage_path('taif.json'),
 ];
