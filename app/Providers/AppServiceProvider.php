@@ -15,6 +15,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use SocialiteProviders\Apple\AppleExtendSocialite;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -48,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
         });
+
+        Event::listen(SocialiteWasCalled::class, [AppleExtendSocialite::class, 'handle']);
 
         Validator::extend('phone_number', function ($attribute, $value, $parameters, $validator) {
             $phoneNumberRule = new PhoneNumberRule($parameters[0] ?? 'SA');

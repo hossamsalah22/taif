@@ -8,6 +8,8 @@ use App\Http\Controllers\Global\PagesController;
 use App\Http\Controllers\Global\SettingController;
 use App\Http\Controllers\Global\SpeechStatusesController;
 use App\Http\Controllers\User\AssessmentController;
+use App\Http\Controllers\User\Auth\AppleLoginController;
+use App\Http\Controllers\User\Auth\GoogleLoginController;
 use App\Http\Controllers\User\Auth\LoginController;
 use App\Http\Controllers\User\Auth\OtpController;
 use App\Http\Controllers\User\Auth\RegisterController;
@@ -32,6 +34,9 @@ Route::prefix('user')->group(function () {
     Route::post('send-otp', [OtpController::class, 'sendOtp']);
     Route::post('login', LoginController::class);
 
+    Route::post('login/google', GoogleLoginController::class);
+    Route::post('login/apple', [AppleLoginController::class, 'login']);
+
     Route::middleware('auth:user')->group(function () {
         Route::delete('logout', LogoutController::class);
         Route::get('home', [HomeController::class, 'index']);
@@ -43,7 +48,7 @@ Route::prefix('user')->group(function () {
         Route::delete('profile', [ProfileController::class, 'destroy']);
         Route::get('settings', [SettingsController::class, 'index']);
         Route::put('settings', [SettingsController::class, 'update']);
-        
+
         Route::post('notifications/topics/subscribe', [NotificationTopicController::class, 'subscribe']);
         Route::post('notifications/topics/unsubscribe', [NotificationTopicController::class, 'unsubscribe']);
 
@@ -84,4 +89,3 @@ Route::prefix('global')->group(function () {
     Route::get('settings', SettingController::class);
     Route::get('about-app', AboutAppController::class);
 });
-
