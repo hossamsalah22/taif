@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\SupportTicketStatusEnum;
+use App\Events\SupportTicketReplyCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ReplySupportTicketRequest;
 use App\Http\Requests\User\StoreSupportTicketRequest;
 use App\Http\Resources\SupportTicketResource;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketReply;
-use App\Enums\SupportTicketStatusEnum;
 
 class SupportTicketController extends Controller
 {
@@ -61,11 +62,13 @@ class SupportTicketController extends Controller
             return response()->json(['message' => __('This ticket is closed and cannot be replied to.')], 400);
         }
 
-        SupportTicketReply::create([
+        $reply = SupportTicketReply::create([
             'support_ticket_id' => $supportTicket->id,
             'user_id' => auth()->id(),
             'reply_text' => $request->validated('reply_text'),
         ]);
+
+        event(new SupportTicketReplyCreated($reply));
 
         $supportTicket->load(['replies.admin', 'replies.user']);
 
