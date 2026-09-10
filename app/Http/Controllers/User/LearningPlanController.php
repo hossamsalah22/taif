@@ -163,4 +163,103 @@ class LearningPlanController extends Controller
             'unlocked_rewards' => $unlockedRewards,
         ]);
     }
+
+    public function activities(Request $request, Child $child)
+    {
+        if ($child->parent_id !== auth('sanctum')->id()) {
+            return $this->failedResponse(__('Data Not Found'), [], 404);
+        }
+
+        $progressTree = ChildLearningPlan::where('child_id', $child->id)
+            ->whereIn('status', [ChildLearningPlanStatusEnum::InProgress, ChildLearningPlanStatusEnum::Completed])
+            ->with([
+                'learningPlan.goals.lessons.exercises',
+            ])
+            ->first();
+
+        if (! $progressTree || ! $progressTree->learningPlan) {
+            return $this->successResponse(__('No active learning plan found.'), ['activities' => []]);
+        }
+
+        $user = auth('sanctum')->user();
+        $isSubscribed = Subscription::where('parent_id', $user->id)
+            ->where('status', SubscriptionStatusEnum::ACTIVE)
+            ->where('expiry_date', '>', now())
+            ->exists();
+
+        $gracePeriodDays = app(GeneralSettings::class)->plan_grace_period_days;
+        $planCreationTimestamp = $progressTree->created_at;
+        $gracePeriodEndsAt = $planCreationTimestamp->copy()->addDays($gracePeriodDays);
+
+        $isExpired = now()->greaterThan($gracePeriodEndsAt);
+        $isBlocked = ! $isSubscribed && $isExpired;
+
+        $plan = $progressTree->learningPlan;
+
+        $exercisesCompletedToday = $child->completedExercises()->whereDate('child_completed_exercises.created_at', today())->count();
+        $lessonsCompletedToday = $child->completedLessons()->whereDate('child_completed_lessons.created_at', today())->count();
+        $goalsCompletedToday = $child->completedGoals()->whereDate('child_completed_goals.created_at', today())->count();
+
+        $dailyExercisesLimitReached = $plan->max_daily_exercises > 0 && $exercisesCompletedToday >= $plan->max_daily_exercises;
+        $dailyLessonsLimitReached = $plan->max_daily_lessons > 0 && $lessonsCompletedToday >= $plan->max_daily_lessons;
+        $dailyGoalsLimitReached = $plan->max_daily_goals > 0 && $goalsCompletedToday >= $plan->max_daily_goals;
+
+        $completedGoalIds = $child->completedGoals()->pluck('learning_goals.id')->toArray();
+        $completedLessonIds = $child->completedLessons()->pluck('learning_lessons.id')->toArray();
+        $completedExerciseIds = $child->completedExercises()->pluck('learning_exercises.id')->toArray();
+
+        $interactedExerciseIds = ExerciseInteractionLog::where('child_id', $child->id)
+            ->pluck('learning_exercise_id')->unique()->toArray();
+
+        $activities = [];
+
+        if ($plan->goals) {
+            $previousGoalCompleted = true;
+
+            foreach ($plan->goals as $goal) {
+                $goalIsCompleted = in_array($goal->id, $completedGoalIds);
+                $goalIsLocked = $goalIsCompleted ? false : ($isBlocked || $dailyGoalsLimitReached || ! $previousGoalCompleted);
+                $previousGoalCompleted = $goalIsCompleted;
+
+                if ($goal->lessons) {
+                    $previousLessonCompleted = true;
+
+                    foreach ($goal->lessons as $lesson) {
+                        $lessonIsCompleted = in_array($lesson->id, $completedLessonIds);
+                        $lessonIsLocked = $lessonIsCompleted ? false : ($isBlocked || $goalIsLocked || $dailyLessonsLimitReached || ! $previousLessonCompleted);
+                        $previousLessonCompleted = $lessonIsCompleted;
+
+                        $lessonProgress = false;
+                        if ($lesson->exercises) {
+                            $previousExerciseCompleted = true;
+                            foreach ($lesson->exercises as $exercise) {
+                                $exerciseIsCompleted = in_array($exercise->id, $completedExerciseIds);
+                                $exerciseIsLocked = $exerciseIsCompleted ? false : ($isBlocked || $lessonIsLocked || $dailyExercisesLimitReached || ! $previousExerciseCompleted);
+                                $previousExerciseCompleted = $exerciseIsCompleted;
+                                $exerciseIsInProgress = in_array($exercise->id, $interactedExerciseIds);
+                                
+                                $exercise->is_completed = $exerciseIsCompleted;
+                                $exercise->is_locked = $exerciseIsLocked;
+                                $exercise->is_in_progress = $exerciseIsInProgress;
+                                
+                                if ($exerciseIsInProgress || $exerciseIsCompleted) {
+                                    $lessonProgress = true;
+                                }
+                            }
+                        }
+
+                        $lesson->is_completed = $lessonIsCompleted;
+                        $lesson->is_locked = $lessonIsLocked;
+                        $lesson->is_in_progress = $lessonProgress;
+                        
+                        $activities[] = $lesson;
+                    }
+                }
+            }
+        }
+
+        return $this->successResponse(__('Activities retrieved successfully.'), [
+            'activities' => $activities,
+        ]);
+    }
 }

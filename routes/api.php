@@ -54,6 +54,7 @@ Route::prefix('user')->group(function () {
         Route::delete('notifications/{id}', [NotificationController::class, 'destroy']);
 
         Route::get('children/{child}/learning-plan', [LearningPlanController::class, 'showProgressTree']);
+        Route::get('children/{child}/activities', [LearningPlanController::class, 'activities']);
         Route::post('exercises/interactions/sync', [ExerciseInteractionController::class, 'sync']);
         Route::post('exercises/interactions', [ExerciseInteractionController::class, 'store']);
         Route::get('lessons/{lesson}', [LearningLessonController::class, 'show']);
