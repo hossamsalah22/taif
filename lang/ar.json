@@ -849,5 +849,6 @@
     "sliders": "الشرائح",
     "slider": "الشريحة",
     "change_silder_order": "تغيير ترتيب الشريحة",
-    "change_silder_order_description": "من فضلك قم باختيار ترتيب جديد للشريحة"
+    "change_silder_order_description": "من فضلك قم باختيار ترتيب جديد للشريحة",
+    "Dashboard Kpi Overview": "نظرة عامة على مؤشرات الأداء الرئيسية في لوحة التحكم"
 }

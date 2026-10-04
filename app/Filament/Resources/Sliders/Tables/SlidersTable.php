@@ -39,7 +39,7 @@ class SlidersTable
             ->recordActions([
                 Action::make('changeOrder')
                     ->label(__('change_order'))
-                    ->visible(fn () => auth('web')->user()->can('reorder_slider'))
+                    ->visible(fn () => auth('web')->user()->can('Reorder:Slider'))
                     ->icon('heroicon-o-arrow-path-rounded-square')
                     ->color('warning')
                     ->form(function (Slider $record) {
@@ -84,7 +84,7 @@ class SlidersTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('activate')
-                        ->visible(fn () => auth('web')->user()->can('activate_any_slider'))
+                        ->visible(fn () => auth('web')->user()->can('ActivateAny:Slider'))
                         ->label(__('activate'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -93,7 +93,7 @@ class SlidersTable
                         ->requiresConfirmation(),
 
                     BulkAction::make('deactivate')
-                        ->visible(fn () => auth('web')->user()->can('activate_any_slider'))
+                        ->visible(fn () => auth('web')->user()->can('ActivateAny:Slider'))
                         ->label(__('deactivate'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
