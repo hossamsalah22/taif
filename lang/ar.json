@@ -835,5 +835,19 @@
     "target_skill": "المهارة المستهدفة",
     "Reward Details": "تفاصيل المكافأة",
     "Media Assets": "الوسائط",
-    "Image": "الصورة"
+    "Image": "الصورة",
+    "Slider": "الشريحة",
+    "Sliders": "الشرائح",
+    "Settings": "الإعدادات",
+    "Active": "نشط",
+    "Sort Order": "ترتيب العرض",
+    "Images": "الصور",
+    "English Large": "إنجليزي حجم كبير (كمبيوتر)",
+    "English Mobile": "إنجليزي حجم الجوال",
+    "Arabic Large": "عربي حجم كبير (كمبيوتر)",
+    "Arabic Mobile": "عربي حجم الجوال",
+    "sliders": "الشرائح",
+    "slider": "الشريحة",
+    "change_silder_order": "تغيير ترتيب الشريحة",
+    "change_silder_order_description": "من فضلك قم باختيار ترتيب جديد للشريحة"
 }

@@ -20,4 +20,3 @@ class Slider extends Model implements HasMedia
         $this->addMediaCollection('slider_ar_small')->singleFile();
     }
 }
-

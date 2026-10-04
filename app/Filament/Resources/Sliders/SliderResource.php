@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Sliders;
 
+use App\Filament\Resources\MainResource;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
@@ -9,16 +10,28 @@ use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class SliderResource extends Resource
+class SliderResource extends MainResource
 {
     protected static ?string $model = Slider::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('system_settings');
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return array_merge(parent::getPermissionPrefixes(), [
+            'reorder',
+            'activate_any',
+        ]);
+    }
 
     public static function form(Schema $schema): Schema
     {
