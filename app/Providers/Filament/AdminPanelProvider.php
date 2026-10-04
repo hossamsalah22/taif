@@ -167,7 +167,9 @@ class AdminPanelProvider extends PanelProvider
                     <style>
                         :root { --user-avatar-url: url('".auth()->user()?->getFilamentAvatarUrl()."'); }
                         .fi-logo {
-                            margin-inline-start: 4rem !important;
+                            margin: 0 auto !important;
+                            display: flex !important;
+                            justify-content: center !important;
                         }
 
                         .fi-dropdown-list-item[href*='profile'] .fi-dropdown-list-item-icon,
