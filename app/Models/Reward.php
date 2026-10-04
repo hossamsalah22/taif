@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RewardTargetEnum;
 use App\Enums\RewardTypeEnum;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
@@ -23,6 +24,7 @@ class Reward extends Model implements HasMedia
 
     protected $casts = [
         'type' => RewardTypeEnum::class,
+        'target_type' => RewardTargetEnum::class,
     ];
 
     protected $with = ['media'];
@@ -30,6 +32,21 @@ class Reward extends Model implements HasMedia
     public function lessons()
     {
         return $this->hasMany(LearningLesson::class);
+    }
+
+    public function goals()
+    {
+        return $this->hasMany(LearningGoal::class);
+    }
+
+    public function plans()
+    {
+        return $this->hasMany(LearningPlan::class);
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
     }
 
     public function registerMediaCollections(): void

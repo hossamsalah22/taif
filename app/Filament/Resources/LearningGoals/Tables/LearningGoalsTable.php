@@ -20,10 +20,18 @@ class LearningGoalsTable
                     ->label(__('Goal Name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('plan.name')
-                    ->label(__('Learning Plan'))
-                    ->sortable()
-                    ->searchable(),
+                TextColumn::make('plans.name')
+                    ->label(__('Learning Plans'))
+                    ->badge()
+                    ->placeholder(__('No plan')),
+                TextColumn::make('reward.name')
+                    ->label(__('Reward'))
+                    ->placeholder('-')
+                    ->toggleable(),
+                TextColumn::make('questions_count')
+                    ->label(__('Questions'))
+                    ->counts('questions')
+                    ->sortable(),
                 IconColumn::make('is_locked')
                     ->label(__('Locked'))
                     ->boolean(),

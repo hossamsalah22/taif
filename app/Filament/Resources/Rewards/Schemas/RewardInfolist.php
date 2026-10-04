@@ -13,6 +13,9 @@ class RewardInfolist
         return $schema
             ->components([
                 TextEntry::make('type'),
+                TextEntry::make('target_type')
+                    ->label(__('Reward Target'))
+                    ->badge(),
                 TextEntry::make('deleted_at')
                     ->dateTime()
                     ->visible(fn (Reward $record): bool => $record->trashed()),

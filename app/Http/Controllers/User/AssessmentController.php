@@ -9,6 +9,7 @@ use App\Http\Resources\User\AssessmentResource;
 use App\Models\Assessment;
 use App\Models\Child;
 use App\Models\Question;
+use App\Services\RewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,7 +54,10 @@ class AssessmentController extends Controller
             return $this->failedResponse(__('Assessment version mismatch with child severity level.'), 400);
         }
 
-        $submission = DB::transaction(function () use ($assessment, $child, $data) {
+        $unlockedRewards = [];
+        $rewardService = app(RewardService::class);
+
+        $submission = DB::transaction(function () use ($assessment, $child, $data, &$unlockedRewards, $rewardService) {
             $attemptNumber = $child->assessmentSubmissions()->where('assessment_id', $assessment->id)->count() + 1;
 
             $correctAnswersCount = 0;
@@ -100,6 +104,10 @@ class AssessmentController extends Controller
 
                 if ($isCorrect) {
                     $correctAnswersCount++;
+
+                    if ($granted = $rewardService->grant($child, $question->reward)) {
+                        $unlockedRewards[] = $rewardService->format($granted);
+                    }
                 }
             }
 
@@ -129,6 +137,8 @@ class AssessmentController extends Controller
             return $submission;
         });
 
-        return $this->successResponse(__('Assessment submitted successfully.'));
+        return $this->successResponse(__('Assessment submitted successfully.'), [
+            'unlocked_rewards' => $unlockedRewards,
+        ]);
     }
 }

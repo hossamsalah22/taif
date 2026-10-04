@@ -8,6 +8,7 @@ use App\Models\ChildLearningPlan;
 use App\Models\ChildReward;
 use App\Models\ExerciseInteractionLog;
 use App\Models\LearningExercise;
+use App\Services\RewardService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -179,14 +180,8 @@ class ExerciseInteractionController extends Controller
                     'metadata' => array_merge($interactionData['metadata'] ?? [], ['submitted_answer' => $interactionData['answer'] ?? null]),
                 ]);
 
-                $reward = $this->processCompletedExercise($child, $interactionData['learning_exercise_id']);
-                if ($reward) {
-                    $unlockedRewards[] = [
-                        'id' => $reward->id,
-                        'name' => $reward->name,
-                        'image' => $reward->media_url,
-                        'icon' => $reward->icon_url,
-                    ];
+                foreach ($this->processCompletedExercise($child, $interactionData['learning_exercise_id']) as $reward) {
+                    $unlockedRewards[] = app(RewardService::class)->format($reward);
                 }
             }
         });
@@ -196,9 +191,22 @@ class ExerciseInteractionController extends Controller
         ]);
     }
 
-    private function processCompletedExercise($child, $exerciseId)
+    /**
+     * Mark the exercise as completed and cascade completion up the chain
+     * (lesson -> goal -> plans), granting any reward attached to each level.
+     *
+     * @return \App\Models\Reward[] newly unlocked rewards
+     */
+    private function processCompletedExercise($child, $exerciseId): array
     {
-        $unlockedReward = null;
+        $rewards = app(RewardService::class);
+        $unlocked = [];
+        $collect = function (?\App\Models\Reward $reward) use (&$unlocked, $child, $rewards) {
+            if ($granted = $rewards->grant($child, $reward)) {
+                $unlocked[] = $granted;
+            }
+        };
+
         $child->completedExercises()->syncWithoutDetaching([$exerciseId]);
 
         $exercise = LearningExercise::find($exerciseId);
@@ -207,43 +215,45 @@ class ExerciseInteractionController extends Controller
         $totalExercises = $lesson->exercises()->count();
         $completedExercisesCount = $child->completedExercises()->where('learning_exercises.learning_lesson_id', $lesson->id)->count();
 
-        if ($completedExercisesCount >= $totalExercises) {
-            $child->completedLessons()->syncWithoutDetaching([$lesson->id]);
+        if ($completedExercisesCount < $totalExercises) {
+            return $unlocked;
+        }
 
-            if ($lesson->reward_id) {
-                $childReward = ChildReward::firstOrCreate([
-                    'child_id' => $child->id,
-                    'reward_id' => $lesson->reward_id,
-                ]);
+        $child->completedLessons()->syncWithoutDetaching([$lesson->id]);
+        $collect($lesson->reward);
 
-                if ($childReward->wasRecentlyCreated) {
-                    $unlockedReward = $lesson->reward;
-                }
+        $goal = $lesson->goal;
+        $totalLessons = $goal->lessons()->count();
+        $completedLessonsCount = $child->completedLessons()->where('learning_goal_id', $goal->id)->count();
+
+        if ($completedLessonsCount < $totalLessons) {
+            return $unlocked;
+        }
+
+        $child->completedGoals()->syncWithoutDetaching([$goal->id]);
+        $collect($goal->reward);
+
+        // A goal can belong to several plans: check each plan the child is enrolled in.
+        foreach ($goal->plans()->with('reward')->get() as $plan) {
+            $totalGoals = $plan->goals()->count();
+            $completedGoalsCount = $child->completedGoals()
+                ->whereIn('learning_goals.id', $plan->goals()->pluck('learning_goals.id'))
+                ->count();
+
+            if ($completedGoalsCount < $totalGoals) {
+                continue;
             }
 
-            $goal = $lesson->goal;
-            $totalLessons = $goal->lessons()->count();
-            $completedLessonsCount = $child->completedLessons()->where('learning_goal_id', $goal->id)->count();
+            $childLearningPlan = ChildLearningPlan::where('child_id', $child->id)
+                ->where('learning_plan_id', $plan->id)
+                ->first();
 
-            if ($completedLessonsCount >= $totalLessons) {
-                $child->completedGoals()->syncWithoutDetaching([$goal->id]);
-
-                $plan = $goal->plan;
-                $totalGoals = $plan->goals()->count();
-                $completedGoalsCount = $child->completedGoals()->where('learning_plan_id', $plan->id)->count();
-
-                if ($completedGoalsCount >= $totalGoals) {
-                    $childLearningPlan = ChildLearningPlan::where('child_id', $child->id)
-                        ->where('learning_plan_id', $plan->id)
-                        ->first();
-
-                    if ($childLearningPlan) {
-                        $childLearningPlan->update(['status' => ChildLearningPlanStatusEnum::Completed]);
-                    }
-                }
+            if ($childLearningPlan) {
+                $childLearningPlan->update(['status' => ChildLearningPlanStatusEnum::Completed]);
+                $collect($plan->reward);
             }
         }
 
-        return $unlockedReward;
+        return $unlocked;
     }
 }

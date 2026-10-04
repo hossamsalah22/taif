@@ -22,6 +22,7 @@ class LearningPlan extends Model
         'max_daily_exercises',
         'autism_level',
         'is_active',
+        'reward_id',
     ];
 
     protected $casts = [
@@ -31,7 +32,15 @@ class LearningPlan extends Model
 
     public function goals()
     {
-        return $this->hasMany(LearningGoal::class);
+        return $this->belongsToMany(LearningGoal::class, 'learning_goal_learning_plan')
+            ->withPivot('display_priority')
+            ->withTimestamps()
+            ->orderBy('learning_goals.display_priority');
+    }
+
+    public function reward()
+    {
+        return $this->belongsTo(Reward::class);
     }
 
     public function childLearningPlans()

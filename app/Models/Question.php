@@ -41,6 +41,18 @@ class Question extends Model implements HasMedia
         return $this->belongsTo(Assessment::class);
     }
 
+    public function goals()
+    {
+        return $this->belongsToMany(LearningGoal::class, 'learning_goal_question')
+            ->withPivot('order')
+            ->withTimestamps();
+    }
+
+    public function reward(): BelongsTo
+    {
+        return $this->belongsTo(Reward::class);
+    }
+
     public function options(): HasMany
     {
         return $this->hasMany(QuestionOption::class)->orderBy('order');

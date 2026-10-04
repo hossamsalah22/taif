@@ -5,6 +5,9 @@ namespace App\Filament\Resources\Assessments\Schemas;
 use AbdulmajeedJamaan\FilamentTranslatableTabs\TranslatableTabs;
 use App\Enums\AutismLevelEnum;
 use App\Enums\ExerciseTypeEnum;
+use App\Enums\RewardTargetEnum;
+use App\Models\Reward;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -22,6 +25,9 @@ class AssessmentForm
         return $schema
             ->components([
                 Section::make(__('Section 1: Core Systemic Driver'))
+                    ->icon('heroicon-o-document-text')
+                    ->columns(2)
+                    ->columnSpanFull()
                     ->schema([
                         ToggleButtons::make('autism_level')
                             ->label(__('Target Severity Level'))
@@ -29,7 +35,8 @@ class AssessmentForm
                             ->inline()
                             ->helperText(fn (string $operation): ?string => $operation === 'create' ? __('If there is an active assessment with this severity level, it will be automatically deprecated.') : null)
                             ->disabled(fn (string $operation): bool => $operation === 'edit')
-                            ->required(),
+                            ->required()
+                            ->columnSpanFull(),
                         TextInput::make('title')
                             ->label(__('Title'))
                             ->required()
@@ -40,8 +47,9 @@ class AssessmentForm
                             ->default(3)
                             ->minValue(1)
                             ->required(),
-                    ])->columnSpanFull(),
+                    ]),
                 Section::make(__('Section 2: Question Nodes'))
+                    ->icon('heroicon-o-question-mark-circle')
                     ->schema([
                         Repeater::make('questions')
                             ->label(__('Questions'))
@@ -51,6 +59,14 @@ class AssessmentForm
                                     ->label(__('Instructional Prompt'))
                                     ->required()
                                     ->translatableTabs(),
+                                Select::make('reward_id')
+                                    ->label(__('Correct Answer Reward'))
+                                    ->options(fn () => Reward::query()
+                                        ->where('target_type', RewardTargetEnum::QUESTION->value)
+                                        ->get()
+                                        ->pluck('name', 'id'))
+                                    ->searchable()
+                                    ->placeholder(__('No reward')),
                                 Radio::make('exercise_type')
                                     ->label(__('Exercise Type Picker'))
                                     ->options(ExerciseTypeEnum::options())

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Rewards\Tables;
 
+use App\Enums\RewardTargetEnum;
 use App\Enums\RewardTypeEnum;
 use App\Models\Reward;
 use Filament\Actions\BulkActionGroup;
@@ -12,6 +13,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,6 +42,12 @@ class RewardsTable
                     ->formatStateUsing(fn ($state) => RewardTypeEnum::label($state))
                     ->color(fn ($state) => RewardTypeEnum::colors($state))
                     ->searchable(),
+                TextColumn::make('target_type')
+                    ->label(__('Reward Target'))
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => RewardTargetEnum::label($state))
+                    ->color(fn ($state) => RewardTargetEnum::colors($state))
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('Created At'))
                     ->dateTime()
@@ -52,18 +60,24 @@ class RewardsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('target_type')
+                    ->label(__('Reward Target'))
+                    ->options(RewardTargetEnum::options()),
                 TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
                     ->before(function (Reward $record, DeleteAction $action) {
-                        $linkedCount = $record->lessons()->count();
+                        $linkedCount = $record->lessons()->count()
+                            + $record->goals()->count()
+                            + $record->plans()->count()
+                            + $record->questions()->count();
                         if ($linkedCount > 0) {
                             Notification::make()
                                 ->warning()
                                 ->title(__('Action Blocked'))
-                                ->body(__('This reward is linked to active lessons and cannot be deleted.'))
+                                ->body(__('This reward is linked to active lessons, goals, plans or questions and cannot be deleted.'))
                                 ->send();
 
                             $action->halt();

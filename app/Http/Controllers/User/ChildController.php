@@ -142,7 +142,7 @@ class ChildController extends Controller
         $starJourneyPercentage = 0;
         if ($plan) {
             $totalGoals = $plan->goals()->count();
-            $completedGoals = $child->completedGoals()->where('learning_plan_id', $plan->id)->count();
+            $completedGoals = $child->completedGoals()->whereHas('plans', fn ($q) => $q->where('learning_plans.id', $plan->id))->count();
             if ($totalGoals > 0) {
                 $starJourneyPercentage = round(($completedGoals / $totalGoals) * 100);
             }
@@ -172,8 +172,8 @@ class ChildController extends Controller
         $planRewards = [];
 
         if ($plan) {
-            $lessonsWithRewards = LearningLesson::whereHas('goal', function ($q) use ($plan) {
-                $q->where('learning_plan_id', $plan->id);
+            $lessonsWithRewards = LearningLesson::whereHas('goal.plans', function ($q) use ($plan) {
+                $q->where('learning_plans.id', $plan->id);
             })->whereNotNull('reward_id')->with('reward')->get();
 
             ChildRewardResource::$unlockedRewardIds = $unlockedRewardIds;
@@ -200,19 +200,19 @@ class ChildController extends Controller
         $chartData = [];
 
         if ($plan) {
-            $totalLessons = LearningLesson::whereHas('goal', function ($q) use ($plan) {
-                $q->where('learning_plan_id', $plan->id);
+            $totalLessons = LearningLesson::whereHas('goal.plans', function ($q) use ($plan) {
+                $q->where('learning_plans.id', $plan->id);
             })->count();
 
-            $completedLessons = $child->completedLessons()->whereHas('goal', function ($q) use ($plan) {
-                $q->where('learning_plan_id', $plan->id);
+            $completedLessons = $child->completedLessons()->whereHas('goal.plans', function ($q) use ($plan) {
+                $q->where('learning_plans.id', $plan->id);
             })->count();
 
             if ($totalLessons > 0) {
                 $progressPercentage = round(($completedLessons / $totalLessons) * 100);
             }
 
-            $goals = $plan->goals()->orderBy('display_priority')->get();
+            $goals = $plan->goals()->get();
             $labels = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة', 'التاسعة', 'العاشرة'];
 
             foreach ($goals as $index => $goal) {

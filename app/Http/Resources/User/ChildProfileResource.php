@@ -27,8 +27,8 @@ class ChildProfileResource extends JsonResource
         $upcomingRewards = [];
 
         if ($plan) {
-            $upcomingLessonsWithRewards = LearningLesson::whereHas('goal', function ($q) use ($plan) {
-                $q->where('learning_plan_id', $plan->id);
+            $upcomingLessonsWithRewards = LearningLesson::whereHas('goal.plans', function ($q) use ($plan) {
+                $q->where('learning_plans.id', $plan->id);
             })->whereNotNull('reward_id')
                 ->whereNotIn('reward_id', $unlockedRewardIds)
                 ->with('reward')
