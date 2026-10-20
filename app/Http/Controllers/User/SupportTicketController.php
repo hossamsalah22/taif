@@ -9,7 +9,9 @@ use App\Http\Requests\User\ReplySupportTicketRequest;
 use App\Http\Requests\User\StoreSupportTicketRequest;
 use App\Http\Resources\SupportTicketResource;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketAttachment;
 use App\Models\SupportTicketReply;
+use Illuminate\Support\Facades\DB;
 
 class SupportTicketController extends Controller
 {
@@ -34,7 +36,17 @@ class SupportTicketController extends Controller
      */
     public function store(StoreSupportTicketRequest $request)
     {
-        $ticket = SupportTicket::create($request->validated());
+        $ticket = DB::transaction(function () use ($request): SupportTicket {
+            $ticket = SupportTicket::create($request->validated());
+
+            foreach ($request->file('attachments', []) as $file) {
+                SupportTicketAttachment::storeFor($file, $ticket);
+            }
+
+            return $ticket;
+        });
+
+        $ticket->load('attachments');
 
         return $this->successResponse(__('Ticket created successfully'), SupportTicketResource::make($ticket));
     }
@@ -48,7 +60,7 @@ class SupportTicketController extends Controller
             abort(403);
         }
 
-        $supportTicket->load(['replies.admin', 'replies.user']);
+        $supportTicket->load(['attachments', 'replies.admin', 'replies.user', 'replies.attachments']);
 
         return $this->successResponse(__('Ticket details retrieved successfully.'), SupportTicketResource::make($supportTicket));
     }
@@ -62,15 +74,23 @@ class SupportTicketController extends Controller
             return response()->json(['message' => __('This ticket is closed and cannot be replied to.')], 400);
         }
 
-        $reply = SupportTicketReply::create([
-            'support_ticket_id' => $supportTicket->id,
-            'user_id' => auth()->id(),
-            'reply_text' => $request->validated('reply_text'),
-        ]);
+        $reply = DB::transaction(function () use ($request, $supportTicket): SupportTicketReply {
+            $reply = SupportTicketReply::create([
+                'support_ticket_id' => $supportTicket->id,
+                'user_id' => auth()->id(),
+                'reply_text' => $request->validated('reply_text') ?? '',
+            ]);
+
+            foreach ($request->file('attachments', []) as $file) {
+                SupportTicketAttachment::storeFor($file, $supportTicket, $reply);
+            }
+
+            return $reply;
+        });
 
         event(new SupportTicketReplyCreated($reply));
 
-        $supportTicket->load(['replies.admin', 'replies.user']);
+        $supportTicket->load(['attachments', 'replies.admin', 'replies.user', 'replies.attachments']);
 
         return $this->successResponse(__('Reply sent successfully'), SupportTicketResource::make($supportTicket));
     }

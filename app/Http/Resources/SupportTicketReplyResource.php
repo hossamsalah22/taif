@@ -17,6 +17,7 @@ class SupportTicketReplyResource extends JsonResource
         return [
             'id' => $this->id,
             'reply_text' => $this->reply_text,
+            'attachments' => SupportTicketAttachmentResource::collection($this->whenLoaded('attachments')),
             'is_admin' => $this->admin_id !== null,
             'sender_name' => $this->admin_id ? ($this->admin->name ?? 'System') : ($this->user->name ?? 'Parent'),
             'created_at' => formatDate($this->created_at),

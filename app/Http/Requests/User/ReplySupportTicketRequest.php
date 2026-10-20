@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\SupportTicketAttachment;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,7 +24,8 @@ class ReplySupportTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reply_text' => ['required', 'string', 'max:2000'],
+            'reply_text' => ['required_without:attachments', 'nullable', 'string', 'max:2000'],
+            ...SupportTicketAttachment::validationRules(),
         ];
     }
 }

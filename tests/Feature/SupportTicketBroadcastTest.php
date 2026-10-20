@@ -144,7 +144,7 @@ class SupportTicketBroadcastTest extends TestCase
         $payload = (new SupportTicketReplyCreated($reply))->broadcastWith();
 
         $this->assertSame(
-            ['id', 'support_ticket_id', 'reply_text', 'user_id', 'admin_id', 'created_at'],
+            ['id', 'support_ticket_id', 'reply_text', 'user_id', 'admin_id', 'attachments', 'created_at'],
             array_keys($payload),
         );
     }

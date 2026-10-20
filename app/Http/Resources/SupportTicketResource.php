@@ -20,6 +20,7 @@ class SupportTicketResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'status' => $this->status,
+            'attachments' => SupportTicketAttachmentResource::collection($this->whenLoaded('attachments')),
             'replies' => SupportTicketReplyResource::collection($this->whenLoaded('replies')),
             'created_at' => formatDate($this->created_at),
         ];

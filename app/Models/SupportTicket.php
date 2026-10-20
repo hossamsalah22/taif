@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SupportTicketStatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use App\Enums\SupportTicketStatusEnum;
 
 #[Fillable([
     'user_id',
@@ -49,5 +49,13 @@ class SupportTicket extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(SupportTicketReply::class);
+    }
+
+    /**
+     * Files attached when the ticket was opened (not those attached to replies).
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(SupportTicketAttachment::class)->whereNull('support_ticket_reply_id');
     }
 }

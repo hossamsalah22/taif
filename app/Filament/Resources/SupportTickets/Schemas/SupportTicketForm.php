@@ -7,7 +7,6 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
 class SupportTicketForm
@@ -37,6 +36,13 @@ class SupportTicketForm
                         Placeholder::make('description')
                             ->label(__('Detailed Description'))
                             ->content(fn ($record) => $record?->description)
+                            ->columnSpanFull(),
+                        Placeholder::make('attachments')
+                            ->label(__('Ticket Attachments'))
+                            ->content(fn ($record) => new HtmlString(view('livewire.partials.support-ticket-attachments', [
+                                'attachments' => $record->attachments,
+                            ])->render()))
+                            ->visible(fn ($record) => $record?->attachments()->exists())
                             ->columnSpanFull(),
                     ])->columns(2),
 

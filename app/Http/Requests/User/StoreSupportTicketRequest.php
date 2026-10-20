@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Enums\SupportTicketStatusEnum;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketAttachment;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -28,6 +29,7 @@ class StoreSupportTicketRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'min:5', 'max:100'],
             'description' => ['required', 'string', 'max:1000'],
+            ...SupportTicketAttachment::validationRules(),
         ];
     }
 
@@ -41,7 +43,7 @@ class StoreSupportTicketRequest extends FormRequest
             $referenceNumber = 'TYF-TK-'.strtoupper(Str::random(5));
         }
 
-        return array_merge(parent::validated(), [
+        return array_merge(collect(parent::validated())->except('attachments')->all(), [
             'reference_number' => $referenceNumber,
             'user_id' => $this->user()->id,
             'status' => SupportTicketStatusEnum::OPEN,

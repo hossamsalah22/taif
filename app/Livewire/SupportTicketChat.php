@@ -5,22 +5,32 @@ namespace App\Livewire;
 use App\Enums\SupportTicketStatusEnum;
 use App\Events\SupportTicketReplyCreated;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketAttachment;
 use App\Models\SupportTicketReply;
 use App\Notifications\SupportTicketRepliedNotification;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 
 class SupportTicketChat extends Component
 {
+    use WithFileUploads;
+
     public SupportTicket $ticket;
 
     public string $replyText = '';
 
+    /** @var array<int, TemporaryUploadedFile> */
+    public array $attachments = [];
+
     public function sendReply()
     {
         $this->validate([
-            'replyText' => 'required|string|max:2000',
+            'replyText' => ['required_without:attachments', 'nullable', 'string', 'max:2000'],
+            ...SupportTicketAttachment::validationRules(),
         ]);
 
         if ($this->ticket->status === SupportTicketStatusEnum::CLOSED) {
@@ -33,11 +43,19 @@ class SupportTicketChat extends Component
             $this->ticket->update(['assigned_admin_id' => auth()->id()]);
         }
 
-        $reply = SupportTicketReply::create([
-            'support_ticket_id' => $this->ticket->id,
-            'admin_id' => auth()->id(),
-            'reply_text' => $this->replyText,
-        ]);
+        $reply = DB::transaction(function (): SupportTicketReply {
+            $reply = SupportTicketReply::create([
+                'support_ticket_id' => $this->ticket->id,
+                'admin_id' => auth()->id(),
+                'reply_text' => $this->replyText,
+            ]);
+
+            foreach ($this->attachments as $file) {
+                SupportTicketAttachment::storeFor($file, $this->ticket, $reply);
+            }
+
+            return $reply;
+        });
 
         event(new SupportTicketReplyCreated($reply));
 
@@ -48,6 +66,7 @@ class SupportTicketChat extends Component
         }
 
         $this->replyText = '';
+        $this->attachments = [];
 
         Notification::make()->title(__('Reply sent successfully to parent.'))->success()->send();
 
@@ -62,10 +81,17 @@ class SupportTicketChat extends Component
         $this->dispatch('reply-sent');
     }
 
+    public function removeAttachment(int $index): void
+    {
+        unset($this->attachments[$index]);
+        $this->attachments = array_values($this->attachments);
+    }
+
     public function render()
     {
         return view('livewire.support-ticket-chat', [
-            'replies' => $this->ticket->replies()->with(['admin', 'user'])->oldest()->get(),
+            'ticketAttachments' => $this->ticket->attachments()->get(),
+            'replies' => $this->ticket->replies()->with(['admin', 'user', 'attachments'])->oldest()->get(),
         ]);
     }
 }

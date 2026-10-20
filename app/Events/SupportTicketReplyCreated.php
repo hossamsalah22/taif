@@ -53,7 +53,7 @@ class SupportTicketReplyCreated implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         // Ensure the related user and admin models are loaded before broadcasting
-        $this->reply->loadMissing(['user', 'admin']);
+        $this->reply->loadMissing(['user', 'admin', 'attachments']);
 
         // Return a simple array representing the reply
         return [
@@ -62,6 +62,7 @@ class SupportTicketReplyCreated implements ShouldBroadcastNow
             'reply_text' => $this->reply->reply_text,
             'user_id' => $this->reply->user_id,
             'admin_id' => $this->reply->admin_id,
+            'attachments' => $this->reply->attachments->map->toPayload()->all(),
             'created_at' => $this->reply->created_at->toIso8601String(),
             // You can also use a Resource class if you have one, e.g.:
             // 'reply' => (new SupportTicketReplyResource($this->reply))->resolve(),
