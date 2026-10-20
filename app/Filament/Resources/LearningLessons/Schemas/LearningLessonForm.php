@@ -4,6 +4,7 @@ namespace App\Filament\Resources\LearningLessons\Schemas;
 
 use App\Enums\PriorityEnum;
 use App\Enums\RewardTargetEnum;
+use App\Filament\Resources\LearningPlans\Schemas\LearningStructureHint;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -17,6 +18,8 @@ class LearningLessonForm
         return $schema
             ->columns(1)
             ->components([
+                LearningStructureHint::make('lesson'),
+
                 Section::make(__('Lesson Details'))
                     ->icon('heroicon-o-academic-cap')
                     ->columns(2)
@@ -32,11 +35,13 @@ class LearningLessonForm
                             ->relationship('goal', 'name')
                             ->searchable()
                             ->preload()
+                            ->helperText(__('The goal this lesson belongs to. Its exercises are edited from that goal.'))
                             ->required(),
                         Select::make('display_priority')
                             ->label(__('Display priority'))
                             ->required()
-                            ->options(PriorityEnum::options()),
+                            ->options(PriorityEnum::options())
+                            ->helperText(__('Order inside the goal: 1 comes first.')),
                     ]),
 
                 Section::make(__('Access & Reward'))
@@ -53,7 +58,8 @@ class LearningLessonForm
                             )
                             ->searchable()
                             ->preload()
-                            ->placeholder(__('No reward')),
+                            ->placeholder(__('No reward'))
+                            ->helperText(__('Given to the child once every exercise in this lesson is completed.')),
                         Toggle::make('is_locked')
                             ->label(__('Locked'))
                             ->helperText(__('Locked lessons open only after the previous lesson is completed.'))

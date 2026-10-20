@@ -17,20 +17,24 @@ class DashboardAnalyticsExport implements FromArray, WithHeadings
     public function array(): array
     {
         return [
-            $this->data
+            $this->data,
         ];
     }
 
     public function headings(): array
     {
         return [
-            'Period Filter',
+            'Period',
             'Total Registered Parents',
             'Active Children Profiles',
             'Active Subscription Plans',
             'Executed Therapy Sessions',
             'Average Progress Percentage',
-            'Total Revenue (SAR)',
+            'Total Revenue (SAR, tax included)',
+            'Tax (SAR)',
+            'Revenue Before Tax (SAR)',
+            'Platform Commission (SAR)',
+            'Service Provider Share (SAR)',
         ];
     }
 }

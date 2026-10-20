@@ -4,6 +4,7 @@ namespace App\Filament\Resources\LearningGoals\Schemas;
 
 use App\Enums\PriorityEnum;
 use App\Enums\RewardTargetEnum;
+use App\Filament\Resources\LearningPlans\Schemas\LearningStructureHint;
 use App\Models\LearningPlan;
 use App\Models\Question;
 use App\Models\Reward;
@@ -21,6 +22,8 @@ class LearningGoalForm
         return $schema
             ->columns(1)
             ->components([
+                LearningStructureHint::make('goal'),
+
                 Section::make(__('Goal Details'))
                     ->icon('heroicon-o-academic-cap')
                     ->columns(2)
@@ -37,6 +40,7 @@ class LearningGoalForm
                             ->columnSpanFull(),
                         TextInput::make('acquired_skills')
                             ->label(__('Acquired Skills'))
+                            ->helperText(__('What the child will be able to do after finishing this goal, shown to the parent.'))
                             ->translatableTabs()
                             ->columnSpanFull(),
                         Select::make('plans')
@@ -50,10 +54,12 @@ class LearningGoalForm
                         Select::make('display_priority')
                             ->label(__('Display priority'))
                             ->required()
-                            ->options(PriorityEnum::options()),
+                            ->options(PriorityEnum::options())
+                            ->helperText(__('Order inside the plan: 1 comes first.')),
                     ]),
 
                 Section::make(__('Content & Settings'))
+                    ->description(__('Add the lessons of this goal, and inside each lesson the exercises the child plays.'))
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->columns(2)
                     ->columnSpanFull()
@@ -65,6 +71,7 @@ class LearningGoalForm
                             ->multiple()
                             ->searchable(false)
                             ->preload()
+                            ->helperText(__('Optional. Assessment questions linked to this goal.'))
                             ->columnSpanFull(),
                         LessonsRepeater::make()
                             ->columnSpanFull(),
@@ -82,9 +89,11 @@ class LearningGoalForm
                                 ->get()
                                 ->pluck('name', 'id'))
                             ->searchable()
-                            ->placeholder(__('No reward')),
+                            ->placeholder(__('No reward'))
+                            ->helperText(__('Given to the child once every lesson in this goal is completed.')),
                         Toggle::make('is_locked')
                             ->label(__('Locked (Sequential)'))
+                            ->helperText(__('Locked goals open only after the previous goal is completed.'))
                             ->inline(false),
                     ]),
             ]);

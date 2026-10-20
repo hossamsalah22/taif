@@ -5,6 +5,8 @@ namespace App\Filament\Resources\LearningGoals\Schemas;
 use App\Enums\DifficultyLevel;
 use App\Enums\ExerciseTypeEnum;
 use App\Enums\PriorityEnum;
+use App\Enums\RewardTargetEnum;
+use App\Models\Reward;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -31,15 +33,18 @@ class LessonsRepeater
                     ->translatableTabs(),
                 Toggle::make('is_locked')
                     ->label(__('Locked'))
+                    ->helperText(__('Locked lessons open only after the previous lesson is completed.'))
                     ->default(true),
                 Select::make('reward_id')
                     ->label(__('Reward'))
-                    ->options(fn () => \App\Models\Reward::query()->where('target_type', \App\Enums\RewardTargetEnum::LESSON->value)->get()->pluck('name', 'id'))
+                    ->options(fn () => Reward::query()->where('target_type', RewardTargetEnum::LESSON->value)->get()->pluck('name', 'id'))
                     ->searchable()
-                    ->placeholder(__('No reward')),
+                    ->placeholder(__('No reward'))
+                    ->helperText(__('Given to the child once every exercise in this lesson is completed.')),
                 Select::make('display_priority')
                     ->label(__('Display Priority'))
-                    ->options(array_combine(range(1, 30), range(1, 30))),
+                    ->options(array_combine(range(1, 30), range(1, 30)))
+                    ->helperText(__('Order inside the goal: 1 comes first.')),
                 Repeater::make('exercises')
                     ->label(__('Exercises'))
                     ->relationship('exercises')
@@ -50,16 +55,19 @@ class LessonsRepeater
                             ->required(),
                         Toggle::make('is_locked')
                             ->label(__('Locked'))
+                            ->helperText(__('Locked exercises open only after the previous exercise is completed.'))
                             ->default(true),
                         TextInput::make('max_attempts')
                             ->label(__('Max Attempts Bound'))
                             ->numeric()
                             ->default(3)
                             ->minValue(1)
-                            ->maxValue(10),
+                            ->maxValue(10)
+                            ->helperText(__('How many times the child can try this exercise (1 to 10).')),
                         Select::make('display_priority')
                             ->label(__('Display Priority'))
-                            ->options(PriorityEnum::options()),
+                            ->options(PriorityEnum::options())
+                            ->helperText(__('Order inside the lesson: 1 comes first.')),
                         TextInput::make('prompt')
                             ->label(__('Instructional Prompt'))
                             ->required()
@@ -69,7 +77,15 @@ class LessonsRepeater
                             ->label(__('Exercise Type'))
                             ->options(ExerciseTypeEnum::options())
                             ->required()
-                            ->live(),
+                            ->live()
+                            ->helperText(fn (Get $get): string => match ($get('type') instanceof ExerciseTypeEnum ? $get('type')->value : $get('type')) {
+                                ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value => __('Add at least 2 picture cards and switch on "Is Correct Answer" for the right one(s).'),
+                                ExerciseTypeEnum::AUDIO_FLASHCARDS->value => __('Add at least 2 cards, each with a picture and an audio file; mark the correct one(s).'),
+                                ExerciseTypeEnum::MATCHING->value => __('Add at least 3 rows; the child matches each left picture with the right picture on the same row.'),
+                                ExerciseTypeEnum::ORDERING->value => __('Add at least 2 pictures in the correct order; the app shuffles them for the child.'),
+                                ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value => __('Add the video link and a thumbnail picture.'),
+                                default => __('Choose a type to see which content the exercise needs.'),
+                            }),
                         Group::make()->statePath('configuration')->schema([
                             Repeater::make('matchingPairs')
                                 ->label(__('Matching Matrix Rows Manager'))
@@ -162,6 +178,8 @@ class LessonsRepeater
                             ->required(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
                     ])
                     ->columnSpanFull()
+                    ->addActionLabel(__('Add exercise'))
+                    ->collapsible()
                     ->itemLabel(function (array $state): string {
                         return match (true) {
                             empty($state['type']) => __('New Exercise'),
@@ -171,7 +189,8 @@ class LessonsRepeater
                     }),
             ])
             ->columnSpanFull()
+            ->addActionLabel(__('Add lesson'))
+            ->collapsible()
             ->itemLabel(fn (array $state): ?string => $state['name'][app()->getLocale()] ?? null);
     }
 }
-

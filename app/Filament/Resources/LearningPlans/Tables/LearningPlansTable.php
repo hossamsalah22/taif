@@ -15,6 +15,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -36,9 +37,13 @@ class LearningPlansTable
                     ->formatStateUsing(fn (AutismLevelEnum $state) => AutismLevelEnum::label($state))
                     ->color(fn (AutismLevelEnum $state) => AutismLevelEnum::color($state))
                     ->badge(),
-                TextColumn::make('status')
-                    ->label(__('Status'))
-                    ->badge(),
+                TextColumn::make('goals_count')
+                    ->counts('goals')
+                    ->label(__('Goals'))
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'info' : 'danger')
+                    ->tooltip(fn (int $state): ?string => $state > 0 ? null : __('This plan has no goals yet, so a child assigned to it has nothing to learn.'))
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label(__('Created At'))
                     ->dateTime()
@@ -55,27 +60,37 @@ class LearningPlansTable
                     ->sortable(),
                 TextColumn::make('phase_duration')
                     ->label(__('Phase Duration'))
-                    ->searchable(),
+                    ->placeholder('-'),
                 TextColumn::make('max_daily_goals')
                     ->label(__('Max Daily Goals'))
                     ->numeric()
-                    ->sortable(),
+                    ->placeholder(__('No limit'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('max_daily_lessons')
                     ->label(__('Max Daily Lessons'))
                     ->numeric()
-                    ->sortable(),
+                    ->placeholder(__('No limit'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('max_daily_exercises')
                     ->label(__('Max Daily Exercises'))
                     ->numeric()
-                    ->sortable(),
+                    ->placeholder(__('No limit'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('child_learning_plans_count')
                     ->counts('childLearningPlans')
                     ->label(__('Assigned Children Count'))
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('autism_level')
+                    ->label(__('Severity Level'))
+                    ->options(AutismLevelEnum::options()),
             ])
+            ->emptyStateHeading(__('No learning plans yet'))
+            ->emptyStateDescription(__('Create a plan, add goals to it, then assign it to children with the same severity level.'))
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -108,6 +123,8 @@ class LearningPlansTable
                     ->requiresConfirmation()
                     ->modalHeading(__('Assign Plan to Children'))
                     ->modalDescription(__('This will assign the plan to the selected children. Only children with matching severity level and no active plans are shown.'))
+                    ->disabled(fn (LearningPlan $record): bool => $record->goals_count === 0)
+                    ->tooltip(fn (LearningPlan $record): ?string => $record->goals_count === 0 ? __('Add goals to the plan before assigning it.') : null)
                     ->after(function () {
                         Notification::make()
                             ->title(__('Plan assigned successfully'))
@@ -115,7 +132,7 @@ class LearningPlansTable
                             ->send();
                     }),
                 ReplicateAction::make()
-                    ->excludeAttributes(['child_learning_plans_count']),
+                    ->excludeAttributes(['child_learning_plans_count', 'goals_count']),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -17,7 +17,7 @@
 <body>
     <div class="header">
         <h1>{{ __('Dashboard Analytics Report') }}</h1>
-        <p>{{ __('Period') }}: {{ __(ucfirst($data['period'])) }} | {{ __('Date') }}: {{ now()->format('Y-m-d H:i') }}</p>
+        <p>{{ __('Period') }}: {{ $data['period'] }} | {{ __('Date') }}: {{ now()->format('Y-m-d H:i') }}</p>
     </div>
 
     <table>
@@ -51,6 +51,18 @@
             <tr>
                 <td>{{ __('Total Revenue (SAR)') }}</td>
                 <td>{{ number_format($data['total_revenue_sar'], 2) }}</td>
+            </tr>
+            <tr>
+                <td>{{ __('Tax (SAR)') }}</td>
+                <td>{{ number_format($data['revenue_tax_sar'], 2) }}</td>
+            </tr>
+            <tr>
+                <td>{{ __('Platform Commission (SAR)') }}</td>
+                <td>{{ number_format($data['platform_commission_sar'], 2) }}</td>
+            </tr>
+            <tr>
+                <td>{{ __('Service Provider Share (SAR)') }}</td>
+                <td>{{ number_format($data['provider_share_sar'], 2) }}</td>
             </tr>
         </tbody>
     </table>

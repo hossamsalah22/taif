@@ -8,6 +8,7 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\RequestPasswordReset;
 use App\Filament\Widgets\DashboardKpiOverview;
 use App\Filament\Widgets\PerformanceLineChart;
+use App\Filament\Widgets\RevenueBreakdownOverview;
 use App\Filament\Widgets\SkillMappingPieChart;
 use App\Http\Middleware\AuthenticateAdminSocketToken;
 use App\Models\Admin;
@@ -66,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 DashboardKpiOverview::class,
+                RevenueBreakdownOverview::class,
                 PerformanceLineChart::class,
                 SkillMappingPieChart::class,
             ])

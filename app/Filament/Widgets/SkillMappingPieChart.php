@@ -2,79 +2,76 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\SubscriptionStatusEnum;
+use App\Filament\Widgets\Concerns\InteractsWithDashboardRange;
 use App\Models\Subscription;
-use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Facades\DB;
 
 class SkillMappingPieChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
+    use InteractsWithDashboardRange;
 
-    protected ?string $heading = 'Active Plans Breakdown';
+    protected static ?int $sort = 4;
 
-    protected static ?int $sort = 3;
+    protected ?string $pollingInterval = null;
+
+    protected ?string $maxHeight = '300px';
+
+    protected int|string|array $columnSpan = ['default' => 'full', 'lg' => 1];
 
     public function getHeading(): string
     {
         return __('Active Plans Breakdown');
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->getData()['datasets'][0]['data'] === []
+            ? __('No data available for the selected period.')
+            : __('Active subscriptions started in the selected period, by package.');
+    }
+
     protected function getData(): array
     {
-        $period = $this->filters['period'] ?? 'monthly';
-        $startDate = match ($period) {
-            'daily' => Carbon::today(),
-            'yearly' => Carbon::now()->startOfYear(),
-            default => Carbon::now()->startOfMonth(),
-        };
-
         $plans = Subscription::select('subscription_packages.name', DB::raw('count(subscriptions.id) as total'))
             ->join('subscription_packages', 'subscriptions.subscription_package_id', '=', 'subscription_packages.id')
-            ->where('subscriptions.status', \App\Enums\SubscriptionStatusEnum::ACTIVE)
-            ->where('subscriptions.created_at', '>=', $startDate)
+            ->where('subscriptions.status', SubscriptionStatusEnum::ACTIVE)
+            ->whereBetween('subscriptions.created_at', [$this->rangeStart(), $this->rangeEnd()])
             ->groupBy('subscription_packages.name')
             ->get();
 
-        if ($plans->isEmpty()) {
-            return [];
-        }
-
-        $labels = [];
-        $data = [];
         $colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-        foreach ($plans as $index => $plan) {
-            $nameData = json_decode($plan->name, true);
-            $labels[] = is_array($nameData) ? ($nameData[app()->getLocale()] ?? collect($nameData)->first()) : $plan->name;
-            $data[] = $plan->total;
-        }
+        $labels = $plans->map(function (Subscription $plan): string {
+            $name = json_decode($plan->name, true);
+
+            return is_array($name) ? ($name[app()->getLocale()] ?? collect($name)->first()) : $plan->name;
+        })->all();
 
         return [
             'datasets' => [
                 [
                     'label' => __('Active Plans'),
-                    'data' => $data,
-                    'backgroundColor' => array_slice($colors, 0, count($data)),
+                    'data' => $plans->pluck('total')->all(),
+                    'backgroundColor' => array_slice($colors, 0, $plans->count()),
                 ],
             ],
             'labels' => $labels,
         ];
     }
 
-    protected function getType(): string
+    protected function getOptions(): array
     {
-        return 'pie';
+        return [
+            'scales' => ['x' => ['display' => false], 'y' => ['display' => false]],
+            'plugins' => ['legend' => ['position' => 'bottom']],
+            'cutout' => '62%',
+        ];
     }
 
-    public function getDescription(): ?string
+    protected function getType(): string
     {
-        $data = $this->getData();
-        if (empty($data) || empty($data['datasets'])) {
-            return __('No data available for the selected period.');
-        }
-
-        return null;
+        return 'doughnut';
     }
 }

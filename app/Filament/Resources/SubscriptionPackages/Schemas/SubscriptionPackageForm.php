@@ -3,11 +3,13 @@
 namespace App\Filament\Resources\SubscriptionPackages\Schemas;
 
 use App\Enums\BillingCycleEnum;
+use App\Services\SubscriptionPricing;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Validation\Rules\Enum;
 
 class SubscriptionPackageForm
@@ -37,7 +39,22 @@ class SubscriptionPackageForm
                             ->numeric()
                             ->minValue(0)
                             ->step('0.01')
-                            ->required(),
+                            ->required()
+                            ->live(onBlur: true)
+                            ->helperText(function (mixed $state): string {
+                                $pricing = SubscriptionPricing::calculate((float) $state);
+
+                                return __('Tax included. Parent pays :price SAR = :net SAR + :tax SAR tax (:tax_rate%). Platform commission (:commission_rate%): :commission SAR · service provider: :provider SAR.', [
+                                    'price' => number_format($pricing['price'], 2),
+                                    'net' => number_format($pricing['net_amount'], 2),
+                                    'tax' => number_format($pricing['tax_amount'], 2),
+                                    'tax_rate' => $pricing['tax_rate'] + 0,
+                                    'commission_rate' => $pricing['commission_rate'] + 0,
+                                    'commission' => number_format($pricing['platform_commission'], 2),
+                                    'provider' => number_format($pricing['provider_amount'], 2),
+                                ]);
+                            })
+                            ->hintIcon(Heroicon::OutlinedInformationCircle, __('Tax and commission rates are set in Settings → Tax & Commission.')),
                     ])
                     ->columns(2),
                 Section::make(__('Package Features'))
