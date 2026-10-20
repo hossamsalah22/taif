@@ -5,5 +5,9 @@ window.io = io;
 
 window.Echo = new Echo({
     broadcaster: "socket.io",
-    host: window.location.hostname + ":3003",
+    host: import.meta.env.VITE_SOCKET_URL || window.location.hostname + ":3003",
+    // Identifies this connection as an Echo client so the socket server emits Echo's (event, channel, data) format.
+    query: { client: "echo" },
+    // WebSocket only: the session cookie is sent with the handshake and no cross-origin polling is needed.
+    transports: ["websocket"],
 });

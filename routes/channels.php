@@ -20,4 +20,4 @@ Broadcast::channel('support-ticket.{id}', function ($user, $id) {
     $ticket = SupportTicket::find($id);
 
     return $ticket && (int) $ticket->user_id === (int) $user->id;
-}, ['guards' => ['user', 'admin']]);
+}, ['guards' => ['user', 'web']]);

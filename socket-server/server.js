@@ -56,29 +56,118 @@ redis.on('pmessage', (pattern, channel, message) => {
         }
 
         console.log(`Emitting event '${eventName}' to room '${cleanChannel}'`);
+        // Mobile clients receive (event, data); Laravel Echo clients expect (event, channel, data)
         io.to(cleanChannel).emit(eventName, eventData);
-        
+        io.to(echoRoom(cleanChannel)).emit(eventName, cleanChannel, eventData);
+
     } catch (e) {
         console.error('Error parsing Redis message:', e);
     }
 });
+
+// Laravel endpoint that authorizes private/presence channels (routes/channels.php)
+const AUTH_ENDPOINT = process.env.AUTH_ENDPOINT || 'https://app.taifapp.com/broadcasting/auth';
+
+// Browser origins (e.g. the admin panel) allowed to authenticate with their session cookie
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const isEchoClient = (socket) => socket.handshake.query?.client === 'echo';
+const echoRoom = (channel) => `echo:${channel}`;
+const roomFor = (socket, channel) => (isEchoClient(socket) ? echoRoom(channel) : channel);
+
+if (!AUTH_ENDPOINT) {
+    console.warn('⚠️  AUTH_ENDPOINT is not set — private channel subscriptions will be rejected.');
+}
+
+// Ask Laravel whether this socket may join the given private channel.
+// Mobile clients send their Sanctum token either in the handshake (io(url, { auth: { token } }))
+// or in the subscribe payload (auth.headers.Authorization). Browser clients send their session cookie.
+async function canJoinChannel(socket, channel, auth = {}) {
+    if (!channel.startsWith('private-') && !channel.startsWith('presence-')) {
+        return true;
+    }
+
+    if (!AUTH_ENDPOINT) {
+        return false;
+    }
+
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+    };
+
+    const handshakeToken = socket.handshake.auth?.token;
+    const authorization = auth.headers?.Authorization
+        || auth.headers?.authorization
+        || (handshakeToken ? `Bearer ${handshakeToken}` : null);
+
+    if (authorization) {
+        headers['Authorization'] = authorization;
+    }
+
+    // Only trust cookies from known origins, otherwise any website could subscribe with an admin's session
+    if (socket.handshake.headers.cookie && ALLOWED_ORIGINS.includes(socket.handshake.headers.origin)) {
+        headers['Cookie'] = socket.handshake.headers.cookie;
+    }
+
+    try {
+        const response = await fetch(AUTH_ENDPOINT, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ channel_name: channel, socket_id: socket.id }),
+        });
+
+        return response.ok;
+    } catch (e) {
+        console.error(`Auth request failed for ${channel}:`, e.message);
+
+        return false;
+    }
+}
 
 // Handle Client Connections
 io.on('connection', (socket) => {
     console.log(`New client connected: ${socket.id}`);
 
     // Client requests to join a channel (e.g., 'private-support-ticket.1')
-    socket.on('subscribe', (data) => {
-        let channel = typeof data === 'string' ? data : data.channel;
+    socket.on('subscribe', async (data, ack) => {
+        const channel = typeof data === 'string' ? data : data?.channel;
+
+        if (!channel) {
+            return;
+        }
+
+        const allowed = await canJoinChannel(socket, channel, data?.auth);
+        const respond = typeof ack === 'function' ? ack : () => {};
+
+        if (!allowed) {
+            console.log(`Client ${socket.id} denied channel ${channel}`);
+            socket.emit('subscription_error', { channel, status: 403 });
+            respond({ channel, subscribed: false });
+
+            return;
+        }
+
         console.log(`Client ${socket.id} joining channel ${channel}`);
-        socket.join(channel);
+        socket.join(roomFor(socket, channel));
+        socket.emit('subscription_succeeded', { channel });
+        respond({ channel, subscribed: true });
     });
 
     // Client requests to leave a channel
     socket.on('unsubscribe', (data) => {
-        let channel = typeof data === 'string' ? data : data.channel;
+        const channel = typeof data === 'string' ? data : data?.channel;
+
+        if (!channel) {
+            return;
+        }
+
         console.log(`Client ${socket.id} leaving channel ${channel}`);
-        socket.leave(channel);
+        socket.leave(roomFor(socket, channel));
     });
 
     socket.on('disconnect', () => {

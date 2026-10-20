@@ -58,7 +58,8 @@ class SupportTicketChat extends Component
     public function refreshChat()
     {
         // This method will be triggered when a new reply is broadcasted.
-        // Livewire will automatically re-render the component.
+        // Livewire will automatically re-render the component, then scroll to the newest reply.
+        $this->dispatch('reply-sent');
     }
 
     public function render()

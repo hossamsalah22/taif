@@ -4,23 +4,26 @@ namespace App\Providers\Filament;
 
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\RequestPasswordReset;
+use App\Filament\Widgets\DashboardKpiOverview;
+use App\Filament\Widgets\PerformanceLineChart;
+use App\Filament\Widgets\SkillMappingPieChart;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
@@ -37,6 +40,10 @@ class AdminPanelProvider extends PanelProvider
             ->authPasswordBroker('admins')
             ->authGuard('web')
             ->viteTheme('resources/css/filament/admin/theme.css')
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn (): string => Blade::render("@vite('resources/js/app.js')"),
+            )
             ->font('Tajawal')
             // ->collapsibleNavigationGroups(true)
             ->login()
@@ -54,9 +61,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                \App\Filament\Widgets\DashboardKpiOverview::class,
-                \App\Filament\Widgets\PerformanceLineChart::class,
-                \App\Filament\Widgets\SkillMappingPieChart::class,
+                DashboardKpiOverview::class,
+                PerformanceLineChart::class,
+                SkillMappingPieChart::class,
             ])
             ->databaseNotifications()
             ->databaseNotificationsPolling('5s')
