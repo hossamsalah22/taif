@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\SupportTicketReplyCreated;
+use App\Http\Middleware\AuthenticateAdminSocketToken;
 use App\Livewire\SupportTicketChat;
 use App\Models\Admin;
 use App\Models\SupportTicket;
@@ -58,16 +59,51 @@ class SupportTicketBroadcastTest extends TestCase
     public function test_admin_can_authorize_ticket_channel_with_panel_session(): void
     {
         $ticket = SupportTicket::factory()->create();
-        $admin = Admin::create([
-            'name' => 'Support Admin',
-            'email' => 'support@example.com',
-            'phone' => '500000000',
-            'password' => 'password',
-        ]);
-
-        $this->actingAs($admin, 'web')
+        $this->actingAs($this->createAdmin(), 'web')
             ->postJson('/broadcasting/auth', ['channel_name' => 'private-support-ticket.'.$ticket->id])
             ->assertOk();
+    }
+
+    public function test_admin_can_authorize_ticket_channel_with_socket_token(): void
+    {
+        $ticket = SupportTicket::factory()->create();
+
+        $this->withHeader(AuthenticateAdminSocketToken::HEADER, AuthenticateAdminSocketToken::tokenFor($this->createAdmin()))
+            ->postJson('/broadcasting/auth', ['channel_name' => 'private-support-ticket.'.$ticket->id])
+            ->assertOk();
+    }
+
+    public function test_expired_admin_socket_token_is_rejected(): void
+    {
+        $ticket = SupportTicket::factory()->create();
+        $token = AuthenticateAdminSocketToken::tokenFor($this->createAdmin());
+
+        $this->travel(AuthenticateAdminSocketToken::TTL_HOURS + 1)->hours();
+
+        $this->withHeader(AuthenticateAdminSocketToken::HEADER, $token)
+            ->postJson('/broadcasting/auth', ['channel_name' => 'private-support-ticket.'.$ticket->id])
+            ->assertForbidden();
+    }
+
+    public function test_tampered_admin_socket_token_is_rejected(): void
+    {
+        $ticket = SupportTicket::factory()->create();
+
+        $this->withHeader(AuthenticateAdminSocketToken::HEADER, 'not-a-valid-token')
+            ->postJson('/broadcasting/auth', ['channel_name' => 'private-support-ticket.'.$ticket->id])
+            ->assertForbidden();
+    }
+
+    public function test_inactive_admin_socket_token_is_rejected(): void
+    {
+        $ticket = SupportTicket::factory()->create();
+        $admin = $this->createAdmin();
+        $token = AuthenticateAdminSocketToken::tokenFor($admin);
+        $admin->update(['is_active' => false]);
+
+        $this->withHeader(AuthenticateAdminSocketToken::HEADER, $token)
+            ->postJson('/broadcasting/auth', ['channel_name' => 'private-support-ticket.'.$ticket->id])
+            ->assertForbidden();
     }
 
     public function test_admin_chat_listens_for_reply_broadcasts_on_ticket_channel(): void
@@ -111,5 +147,15 @@ class SupportTicketBroadcastTest extends TestCase
             ['id', 'support_ticket_id', 'reply_text', 'user_id', 'admin_id', 'created_at'],
             array_keys($payload),
         );
+    }
+
+    private function createAdmin(): Admin
+    {
+        return Admin::create([
+            'name' => 'Support Admin',
+            'email' => 'support@example.com',
+            'phone' => '500000000',
+            'password' => 'password',
+        ]);
     }
 }

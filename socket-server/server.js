@@ -110,6 +110,13 @@ async function canJoinChannel(socket, channel, auth = {}) {
         headers['Authorization'] = authorization;
     }
 
+    // Admin panel clients send a short-lived encrypted token issued by Laravel
+    const adminToken = auth.headers?.['X-Admin-Socket-Token'];
+
+    if (adminToken) {
+        headers['X-Admin-Socket-Token'] = adminToken;
+    }
+
     // Only trust cookies from known origins, otherwise any website could subscribe with an admin's session
     if (socket.handshake.headers.cookie && ALLOWED_ORIGINS.includes(socket.handshake.headers.origin)) {
         headers['Cookie'] = socket.handshake.headers.cookie;
@@ -120,7 +127,12 @@ async function canJoinChannel(socket, channel, auth = {}) {
             method: 'POST',
             headers,
             body: JSON.stringify({ channel_name: channel, socket_id: socket.id }),
+            signal: AbortSignal.timeout(5000),
         });
+
+        if (!response.ok) {
+            console.log(`Auth for ${channel} returned HTTP ${response.status} (cookie: ${Boolean(headers['Cookie'])}, bearer: ${Boolean(headers['Authorization'])}, admin token: ${Boolean(headers['X-Admin-Socket-Token'])})`);
+        }
 
         return response.ok;
     } catch (e) {
@@ -141,6 +153,8 @@ io.on('connection', (socket) => {
         if (!channel) {
             return;
         }
+
+        console.log(`Client ${socket.id} requesting channel ${channel} (origin: ${socket.handshake.headers.origin ?? 'none'})`);
 
         const allowed = await canJoinChannel(socket, channel, data?.auth);
         const respond = typeof ack === 'function' ? ack : () => {};

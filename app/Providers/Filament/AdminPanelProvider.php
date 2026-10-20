@@ -9,6 +9,8 @@ use App\Filament\Pages\RequestPasswordReset;
 use App\Filament\Widgets\DashboardKpiOverview;
 use App\Filament\Widgets\PerformanceLineChart;
 use App\Filament\Widgets\SkillMappingPieChart;
+use App\Http\Middleware\AuthenticateAdminSocketToken;
+use App\Models\Admin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -42,7 +44,9 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render("@vite('resources/js/app.js')"),
+                fn (): string => (auth('web')->user() instanceof Admin
+                    ? '<meta name="admin-socket-token" content="'.e(AuthenticateAdminSocketToken::tokenFor(auth('web')->user())).'">'
+                    : '').Blade::render("@vite('resources/js/app.js')"),
             )
             ->font('Tajawal')
             // ->collapsibleNavigationGroups(true)
