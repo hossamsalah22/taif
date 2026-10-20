@@ -3,7 +3,8 @@ import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import http from 'http';
 
-dotenv.config();
+// Always load socket-server/.env, regardless of the directory pm2 was started from
+dotenv.config({ path: new URL('.env', import.meta.url) });
 
 // Create HTTP Server
 const server = http.createServer((req, res) => {

@@ -1,6 +1,18 @@
 <div style="display: flex; flex-direction: column; gap: 1rem;">
     <!-- Chat messages area -->
-    <div id="chat-container" style="display: flex; flex-direction: column; gap: 1rem; max-height: 500px; overflow-y: auto; padding-inline-end: 0.5rem;" class="custom-scrollbar">
+    <div id="chat-container"
+        x-data="{
+            scrollToBottom() {
+                requestAnimationFrame(() => this.$el.scrollTop = this.$el.scrollHeight);
+            },
+        }"
+        x-init="
+            scrollToBottom();
+            setTimeout(() => scrollToBottom(), 300);
+            new MutationObserver(() => scrollToBottom()).observe($el, { childList: true, subtree: true });
+        "
+        x-on:reply-sent.window="scrollToBottom()"
+        style="display: flex; flex-direction: column; gap: 1rem; max-height: 500px; overflow-y: auto; padding-inline-end: 0.5rem;" class="custom-scrollbar">
         @foreach ($replies as $reply)
             @php
                 $isAdmin = $reply->admin_id !== null;
@@ -75,17 +87,4 @@
             border-radius: 20px;
         }
     </style>
-
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            const chatContainer = document.getElementById('chat-container');
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            Livewire.on('reply-sent', () => {
-                setTimeout(() => {
-                    if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-                }, 100);
-            });
-        });
-    </script>
 </div>
