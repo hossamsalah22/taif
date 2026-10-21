@@ -572,5 +572,18 @@
     "New parents, new child profiles and exercise attempts between the selected dates, compared with the same number of days just before. Success rate of the attempts: :rate.": "New parents, new child profiles and exercise attempts between the selected dates, compared with the same number of days just before. Success rate of the attempts: :rate.",
     "Same as the previous :days days": "Same as the previous :days days",
     "Up from none in the previous :days days": "Up from none in the previous :days days",
-    ":change% vs the previous :days days": ":change% vs the previous :days days"
+    ":change% vs the previous :days days": ":change% vs the previous :days days",
+    "Waiting for review": "Waiting for review",
+    "Reviewed, not published": "Reviewed, not published",
+    "Published to parent": "Published to parent",
+    "Assessment": "Assessment",
+    "All": "All",
+    "Evaluate each submission to write the report, then publish it so the parent can see it in the app.": "Evaluate each submission to write the report, then publish it so the parent can see it in the app.",
+    "Not closed": "Not closed",
+    "Assign to me": "Assign to me",
+    "Ticket :number is now assigned to you": "Ticket :number is now assigned to you",
+    "Change status": "Change status",
+    "Closing a ticket stops further replies, and it cannot be reopened.": "Closing a ticket stops further replies, and it cannot be reopened.",
+    "Free Subscription Granted": "Free Subscription Granted",
+    "User granted free access for :days days.": "User granted free access for :days days."
 }

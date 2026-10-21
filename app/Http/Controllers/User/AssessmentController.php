@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\ExerciseTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubmitAssessmentRequest;
@@ -117,7 +118,7 @@ class AssessmentController extends Controller
             $submission = $assessment->submissions()->create([
                 'child_id' => $child->id,
                 'assessment_version' => $assessment->version,
-                'status' => 'pending_review',
+                'status' => AssessmentSubmissionStatusEnum::PENDING_REVIEW,
                 'attempt_number' => $attemptNumber,
                 'performance_accuracy' => $performanceAccuracy,
             ]);

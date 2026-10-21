@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Enums\SubscriptionStatusEnum;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -118,8 +119,9 @@ class UsersTable
                                 ->minValue(1),
                         ])
                         ->action(function (User $record, array $data) {
+                            // No package: free access is not tied to one, and app access only checks status and expiry.
                             $record->subscriptions()->create([
-                                'status' => 'active',
+                                'status' => SubscriptionStatusEnum::ACTIVE,
                                 'start_date' => now(),
                                 'expiry_date' => now()->addDays($data['duration_days']),
                                 'is_free' => true,
@@ -128,7 +130,7 @@ class UsersTable
 
                             Notification::make()
                                 ->title(__('Free Subscription Granted'))
-                                ->body(__("User granted free access for {$data['duration_days']} days."))
+                                ->body(__('User granted free access for :days days.', ['days' => $data['duration_days']]))
                                 ->success()
                                 ->send();
                         }),

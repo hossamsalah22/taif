@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions\Tables;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\AutismLevelEnum;
+use App\Models\Assessment;
 use App\Models\AssessmentSubmission;
 use App\Notifications\ReportPublishedNotification;
 use Filament\Actions\Action;
@@ -13,9 +15,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\Browsershot\Browsershot;
 
 class AssessmentSubmissionsTable
@@ -46,16 +47,20 @@ class AssessmentSubmissionsTable
                     ->label(__('Attempt Number'))
                     ->prefix('#')
                     ->sortable(),
+                TextColumn::make('status')
+                    ->label(__('Status'))
+                    ->badge(),
                 TextColumn::make('created_at')
                     ->label(__('Submission Time'))
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
-                Filter::make('waiting_for_review')
-                    ->label(__('Waiting for review only'))
-                    ->toggle()
-                    ->query(fn (Builder $query): Builder => $query->where('status', 'pending_review')),
+                SelectFilter::make('assessment_id')
+                    ->label(__('Assessment'))
+                    ->relationship('assessment', 'title')
+                    ->getOptionLabelFromRecordUsing(fn (Assessment $record): string => $record->title)
+                    ->preload(),
             ])
             ->recordActions([
                 ViewAction::make()->slideOver(),
@@ -63,8 +68,10 @@ class AssessmentSubmissionsTable
                     ->label(__('Evaluate'))
                     ->icon('heroicon-o-clipboard-document-check')
                     ->slideOver()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['status'] = 'reviewed_with_report';
+                    ->mutateFormDataUsing(function (array $data, AssessmentSubmission $record): array {
+                        $data['status'] = $record->status === AssessmentSubmissionStatusEnum::PUBLISHED
+                            ? AssessmentSubmissionStatusEnum::PUBLISHED
+                            : AssessmentSubmissionStatusEnum::REVIEWED;
 
                         return $data;
                     }),
@@ -73,10 +80,10 @@ class AssessmentSubmissionsTable
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (AssessmentSubmission $record) => $record->status !== 'published')
+                    ->visible(fn (AssessmentSubmission $record) => $record->status !== AssessmentSubmissionStatusEnum::PUBLISHED)
                     ->action(function (AssessmentSubmission $record) {
                         $record->update([
-                            'status' => 'published',
+                            'status' => AssessmentSubmissionStatusEnum::PUBLISHED,
                             'report_published_at' => now(),
                         ]);
                         $record->child->parent->notify(new ReportPublishedNotification($record));

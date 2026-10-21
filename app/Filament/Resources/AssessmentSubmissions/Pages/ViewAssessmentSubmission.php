@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions\Pages;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
 use App\Models\AssessmentSubmission;
 use App\Notifications\ReportPublishedNotification;
@@ -23,10 +24,10 @@ class ViewAssessmentSubmission extends ViewRecord
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->requiresConfirmation()
-                ->visible(fn (AssessmentSubmission $record) => $record->status !== 'published')
+                ->visible(fn (AssessmentSubmission $record) => $record->status !== AssessmentSubmissionStatusEnum::PUBLISHED)
                 ->action(function (AssessmentSubmission $record) {
                     $record->update([
-                        'status' => 'published',
+                        'status' => AssessmentSubmissionStatusEnum::PUBLISHED,
                         'report_published_at' => now(),
                     ]);
                     $record->child->parent->notify(new ReportPublishedNotification($record));

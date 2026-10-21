@@ -103,7 +103,7 @@ class SubscriptionsAdminTest extends TestCase
         $waiting = AssessmentSubmission::create(['child_id' => $child->id, 'assessment_id' => $assessment->id, 'status' => 'pending_review']);
         $published = AssessmentSubmission::create(['child_id' => $child->id, 'assessment_id' => $assessment->id, 'status' => 'published']);
 
-        Livewire::withQueryParams(['filters' => ['waiting_for_review' => ['isActive' => '1']]])
+        Livewire::withQueryParams(['tab' => 'waiting'])
             ->test(ListAssessmentSubmissions::class)
             ->assertCanSeeTableRecords([$waiting])
             ->assertCanNotSeeTableRecords([$published]);
@@ -111,7 +111,7 @@ class SubscriptionsAdminTest extends TestCase
         $open = SupportTicket::factory()->create(['status' => SupportTicketStatusEnum::OPEN]);
         $closed = SupportTicket::factory()->create(['status' => SupportTicketStatusEnum::CLOSED]);
 
-        Livewire::withQueryParams(['filters' => ['status' => ['values' => [SupportTicketStatusEnum::OPEN->value]]]])
+        Livewire::withQueryParams(['tab' => 'open'])
             ->test(ListSupportTickets::class)
             ->assertCanSeeTableRecords([$open])
             ->assertCanNotSeeTableRecords([$closed]);

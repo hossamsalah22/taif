@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\ChildLearningPlanStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\ChildRequest;
@@ -121,12 +122,12 @@ class ChildController extends Controller
         $latestSubmission = $child->assessmentSubmissions()->latest()->first();
 
         $hasAssessment = $latestSubmission !== null;
-        $hasReport = $hasAssessment && $latestSubmission->status === 'published';
+        $hasReport = $hasAssessment && $latestSubmission->status === AssessmentSubmissionStatusEnum::PUBLISHED;
 
         return $this->successResponse(__('Retrieved Successfully'), [
             'has_assessment' => $hasAssessment,
             'has_report' => $hasReport,
-            'assessment_status' => $hasAssessment ? $latestSubmission->status : null,
+            'assessment_status' => $hasAssessment ? $latestSubmission->status->value : null,
         ]);
     }
 

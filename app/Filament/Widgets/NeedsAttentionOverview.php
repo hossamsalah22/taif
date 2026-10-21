@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
 use App\Filament\Resources\Children\ChildResource;
@@ -59,15 +60,13 @@ class NeedsAttentionOverview extends StatsOverviewWidget
             return null;
         }
 
-        $count = AssessmentSubmission::where('status', 'pending_review')->count();
+        $count = AssessmentSubmission::whereIn('status', AssessmentSubmissionStatusEnum::waitingForReview())->count();
 
         return Stat::make(__('Assessments to review'), Number::format($count))
             ->description($count > 0 ? __('Evaluate them and publish the report to the parent') : __('All caught up'))
             ->descriptionIcon($count > 0 ? 'heroicon-m-clipboard-document-check' : 'heroicon-m-check-circle')
             ->color($count > 0 ? 'warning' : 'success')
-            ->url(AssessmentSubmissionResource::getUrl('index', [
-                'filters' => ['waiting_for_review' => ['isActive' => true]],
-            ]));
+            ->url(AssessmentSubmissionResource::getUrl('index', ['tab' => 'waiting']));
     }
 
     private function openTickets(): ?Stat
@@ -85,9 +84,7 @@ class NeedsAttentionOverview extends StatsOverviewWidget
                 : __('Every ticket has a specialist'))
             ->descriptionIcon($unassigned > 0 ? 'heroicon-m-user-minus' : 'heroicon-m-check-circle')
             ->color($count > 0 ? 'danger' : 'success')
-            ->url(SupportTicketResource::getUrl('index', [
-                'filters' => ['status' => ['values' => [SupportTicketStatusEnum::OPEN->value]]],
-            ]));
+            ->url(SupportTicketResource::getUrl('index', ['tab' => 'open']));
     }
 
     private function subscriptionsEndingSoon(): ?Stat

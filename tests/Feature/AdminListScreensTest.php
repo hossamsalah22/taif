@@ -76,7 +76,7 @@ class AdminListScreensTest extends TestCase
         ]);
         $closed = SupportTicket::factory()->create(['status' => SupportTicketStatusEnum::CLOSED]);
 
-        Livewire::test(ListSupportTickets::class)
+        Livewire::test(ListSupportTickets::class, ['activeTab' => 'all'])
             ->assertCanSeeTableRecords([$open, $assigned, $closed])
             ->filterTable('unassigned', true)
             ->assertCanSeeTableRecords([$open, $closed])

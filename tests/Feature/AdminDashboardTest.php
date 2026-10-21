@@ -211,8 +211,8 @@ class AdminDashboardTest extends TestCase
             ->assertSee(__('Needs attention'))
             ->assertSee(__('Assessments to review'))
             ->assertSee(trans_choice(':count ticket is not assigned to anyone|:count tickets are not assigned to anyone', 1, ['count' => 1]))
-            ->assertSee(AssessmentSubmissionResource::getUrl('index', ['filters' => ['waiting_for_review' => ['isActive' => true]]]))
-            ->assertSee(SupportTicketResource::getUrl('index', ['filters' => ['status' => ['values' => [SupportTicketStatusEnum::OPEN->value]]]]))
+            ->assertSee(AssessmentSubmissionResource::getUrl('index', ['tab' => 'waiting']))
+            ->assertSee(SupportTicketResource::getUrl('index', ['tab' => 'open']))
             ->assertSee(SubscriptionResource::getUrl('index', ['filters' => ['ending_soon' => ['isActive' => true]]]))
             ->assertSee(ChildResource::getUrl('index', ['filters' => ['has_learning_plan' => ['value' => '0']]]));
     }

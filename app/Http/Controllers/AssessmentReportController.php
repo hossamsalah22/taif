@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Http\Resources\AssessmentReportResource;
 use App\Models\AssessmentSubmission;
 use App\Models\Child;
@@ -19,7 +20,7 @@ class AssessmentReportController extends Controller
             abort(403, 'Unauthorized access to this report.');
         }
 
-        if ($submission->status !== 'published') {
+        if ($submission->status !== AssessmentSubmissionStatusEnum::PUBLISHED) {
             abort(400, 'Report is not published yet.');
         }
 
@@ -36,7 +37,7 @@ class AssessmentReportController extends Controller
             abort(403, 'Unauthorized access to this report.');
         }
 
-        if ($submission->status !== 'published') {
+        if ($submission->status !== AssessmentSubmissionStatusEnum::PUBLISHED) {
             abort(400, 'Report is not published yet.');
         }
 

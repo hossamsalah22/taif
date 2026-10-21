@@ -1019,5 +1019,18 @@
     "New parents, new child profiles and exercise attempts between the selected dates, compared with the same number of days just before. Success rate of the attempts: :rate.": "أولياء الأمور الجدد وملفات الأطفال الجديدة ومحاولات التمارين بين التاريخين المحددين، مقارنةً بنفس عدد الأيام السابقة مباشرة. نسبة نجاح المحاولات: :rate.",
     "Same as the previous :days days": "مثل الأيام الـ :days السابقة",
     "Up from none in the previous :days days": "ارتفاع من لا شيء في الأيام الـ :days السابقة",
-    ":change% vs the previous :days days": ":change% مقارنة بالأيام الـ :days السابقة"
+    ":change% vs the previous :days days": ":change% مقارنة بالأيام الـ :days السابقة",
+    "Waiting for review": "بانتظار المراجعة",
+    "Reviewed, not published": "تمت المراجعة، لم يُنشر",
+    "Published to parent": "منشور لولي الأمر",
+    "Assessment": "التقييم",
+    "All": "الكل",
+    "Evaluate each submission to write the report, then publish it so the parent can see it in the app.": "قيّم كل تقييم لكتابة التقرير، ثم انشره ليظهر لولي الأمر في التطبيق.",
+    "Not closed": "غير مغلقة",
+    "Assign to me": "تعيين لي",
+    "Ticket :number is now assigned to you": "التذكرة :number معيّنة لك الآن",
+    "Change status": "تغيير الحالة",
+    "Closing a ticket stops further replies, and it cannot be reopened.": "إغلاق التذكرة يوقف الردود ولا يمكن إعادة فتحها.",
+    "Free Subscription Granted": "تم منح اشتراك مجاني",
+    "User granted free access for :days days.": "تم منح المستخدم وصولاً مجانياً لمدة :days يوم."
 }

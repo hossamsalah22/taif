@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\AssessmentSubmissions\Pages\EditAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ListAssessmentSubmissions;
@@ -33,7 +34,7 @@ class AssessmentSubmissionResource extends MainResource
      */
     public static function getNavigationBadge(): ?string
     {
-        $pendingReview = AssessmentSubmission::where('status', 'pending_review')->count();
+        $pendingReview = AssessmentSubmission::whereIn('status', AssessmentSubmissionStatusEnum::waitingForReview())->count();
 
         return $pendingReview > 0 ? (string) $pendingReview : null;
     }

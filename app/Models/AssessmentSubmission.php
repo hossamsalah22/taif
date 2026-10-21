@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AssessmentSubmissionStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -28,6 +29,7 @@ class AssessmentSubmission extends Model implements HasMedia
 
     protected $casts = [
         'report_published_at' => 'datetime',
+        'status' => AssessmentSubmissionStatusEnum::class,
     ];
 
     public function child()
