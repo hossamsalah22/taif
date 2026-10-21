@@ -2,9 +2,11 @@
 
 namespace App\Filament\Widgets\Concerns;
 
+use App\Services\AnalyticsService;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,6 +27,48 @@ trait InteractsWithDashboardRange
     protected function rangeEnd(): CarbonInterface
     {
         return Carbon::parse($this->pageFilters['endDate'] ?? now())->endOfDay();
+    }
+
+    /**
+     * KPIs for the selected range and for the same number of days just before it.
+     *
+     * @return array{0: array<string, mixed>, 1: array<string, mixed>}
+     */
+    protected function kpisWithPreviousPeriod(): array
+    {
+        [$previousStart, $previousEnd] = AnalyticsService::previousPeriod($this->rangeStart(), $this->rangeEnd());
+
+        return [
+            AnalyticsService::cachedDashboardKpis($this->rangeStart(), $this->rangeEnd()),
+            AnalyticsService::cachedDashboardKpis($previousStart, $previousEnd),
+        ];
+    }
+
+    /**
+     * Adds "+12% vs previous 30 days" with a matching arrow and colour to a stat card.
+     */
+    protected function compareWithPreviousPeriod(Stat $stat, float $current, float $previous): Stat
+    {
+        $days = (int) $this->rangeStart()->diffInDays($this->rangeEnd()->copy()->startOfDay()) + 1;
+
+        if ($current == $previous) {
+            return $stat->description(__('Same as the previous :days days', ['days' => $days]))
+                ->descriptionIcon('heroicon-m-minus');
+        }
+
+        if ($previous == 0) {
+            return $stat->description(__('Up from none in the previous :days days', ['days' => $days]))
+                ->descriptionIcon('heroicon-m-arrow-trending-up');
+        }
+
+        $change = (int) round(($current - $previous) / $previous * 100);
+
+        return $stat->description(__(':change% vs the previous :days days', [
+            'change' => ($change > 0 ? '+' : '').$change,
+            'days' => $days,
+        ]))
+            ->descriptionIcon($current > $previous ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+            ->descriptionColor($current > $previous ? 'success' : 'danger');
     }
 
     /** Daily buckets for ranges up to ~2 months, monthly buckets beyond that. */

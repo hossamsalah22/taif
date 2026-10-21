@@ -2,15 +2,41 @@
 
 namespace App\Services;
 
-use App\Enums\SubscriptionStatusEnum;
 use App\Models\Child;
 use App\Models\ExerciseInteractionLog;
 use App\Models\Subscription;
 use App\Models\User;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Cache;
 
 class AnalyticsService
 {
+    /**
+     * Same as getDashboardKpis(), kept for a minute so the dashboard widgets (each loaded in its own request)
+     * and the previous-period comparison do not run the same queries again.
+     *
+     * @return array<string, mixed>
+     */
+    public static function cachedDashboardKpis(CarbonInterface $startDate, CarbonInterface $endDate): array
+    {
+        $key = 'dashboard-kpis:'.$startDate->format('Y-m-d').':'.$endDate->format('Y-m-d');
+
+        return Cache::remember($key, now()->addMinute(), fn (): array => static::getDashboardKpis($startDate, $endDate));
+    }
+
+    /**
+     * The period of the same length that ends the day before the given one starts.
+     *
+     * @return array{0: CarbonInterface, 1: CarbonInterface}
+     */
+    public static function previousPeriod(CarbonInterface $startDate, CarbonInterface $endDate): array
+    {
+        $days = (int) $startDate->copy()->startOfDay()->diffInDays($endDate->copy()->startOfDay()) + 1;
+        $previousEnd = $startDate->copy()->subDay()->endOfDay();
+
+        return [$previousEnd->copy()->subDays($days - 1)->startOfDay(), $previousEnd];
+    }
+
     /**
      * Dashboard KPIs for the selected date range (both ends inclusive).
      *
@@ -27,10 +53,7 @@ class AnalyticsService
 
         $activeChildren = Child::whereBetween('created_at', $range)->count();
 
-        $activeSubscriptions = Subscription::where('status', SubscriptionStatusEnum::ACTIVE)
-            ->where('start_date', '<=', now())
-            ->where('expiry_date', '>=', now())
-            ->count();
+        $activeSubscriptions = Subscription::query()->runningNow()->count();
 
         $executedSessions = ExerciseInteractionLog::whereBetween('created_at', $range)->count();
         $successfulLogs = ExerciseInteractionLog::whereBetween('created_at', $range)->where('is_successful', true)->count();

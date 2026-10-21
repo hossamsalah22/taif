@@ -2,23 +2,35 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AutismLevelEnum;
 use App\Enums\SubscriptionStatusEnum;
+use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ManageGeneral;
+use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
+use App\Filament\Resources\Children\ChildResource;
 use App\Filament\Resources\SubscriptionPackages\Pages\CreateSubscriptionPackage;
+use App\Filament\Resources\Subscriptions\SubscriptionResource;
+use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Filament\Widgets\DashboardKpiOverview;
+use App\Filament\Widgets\NeedsAttentionOverview;
 use App\Filament\Widgets\PerformanceLineChart;
 use App\Filament\Widgets\RevenueBreakdownOverview;
 use App\Filament\Widgets\SkillMappingPieChart;
 use App\Models\Admin;
+use App\Models\Assessment;
+use App\Models\AssessmentSubmission;
+use App\Models\Child;
 use App\Models\Subscription;
 use App\Models\SubscriptionPackage;
+use App\Models\SupportTicket;
 use App\Models\User;
 use App\Services\AnalyticsService;
 use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -153,10 +165,131 @@ class AdminDashboardTest extends TestCase
             ->assertSee('170.00');
     }
 
-    private function createSubscription(float $amountPaid, string $createdAt): Subscription
+    public function test_previous_period_has_the_same_length_and_ends_the_day_before(): void
+    {
+        [$start, $end] = AnalyticsService::previousPeriod(Carbon::parse('2026-10-11'), Carbon::parse('2026-10-20 23:59:59'));
+
+        $this->assertSame('2026-10-01 00:00:00', $start->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-10-10 23:59:59', $end->format('Y-m-d H:i:s'));
+    }
+
+    public function test_kpi_cards_compare_with_the_previous_period(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+        $parent = User::factory()->create(['created_at' => '2026-10-15']);
+        User::factory()->create(['created_at' => '2026-10-15']);
+        User::factory()->create(['created_at' => '2026-10-05']);
+        Child::factory()->for($parent, 'parent')->create(['created_at' => '2026-10-16']);
+
+        Livewire::test(DashboardKpiOverview::class, ['pageFilters' => ['startDate' => '2026-10-11', 'endDate' => '2026-10-20']])
+            ->assertSee(__(':change% vs the previous :days days', ['change' => '+100', 'days' => 10]))
+            ->assertSee(__('Up from none in the previous :days days', ['days' => 10]))
+            ->assertSee(SubscriptionResource::getUrl('index', ['filters' => ['running_now' => ['isActive' => true]]]));
+    }
+
+    public function test_revenue_card_compares_with_the_previous_period(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+        $this->createSubscription(100, '2026-10-15');
+        $this->createSubscription(200, '2026-10-05');
+
+        Livewire::test(RevenueBreakdownOverview::class, ['pageFilters' => ['startDate' => '2026-10-11', 'endDate' => '2026-10-20']])
+            ->assertSee(__(':change% vs the previous :days days', ['change' => '-50', 'days' => 10]));
+    }
+
+    public function test_needs_attention_counts_waiting_work_and_links_to_filtered_lists(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        $child = Child::factory()->create();
+        $assessment = Assessment::create(['autism_level' => AutismLevelEnum::MILD->value, 'title' => ['en' => 'Screening', 'ar' => 'فحص']]);
+        AssessmentSubmission::create(['child_id' => $child->id, 'assessment_id' => $assessment->id, 'status' => 'pending_review']);
+        SupportTicket::factory()->create(['status' => SupportTicketStatusEnum::OPEN]);
+        $this->createRunningSubscription(expiresAt: '2026-10-23');
+
+        Livewire::test(NeedsAttentionOverview::class)
+            ->assertSee(__('Needs attention'))
+            ->assertSee(__('Assessments to review'))
+            ->assertSee(trans_choice(':count ticket is not assigned to anyone|:count tickets are not assigned to anyone', 1, ['count' => 1]))
+            ->assertSee(AssessmentSubmissionResource::getUrl('index', ['filters' => ['waiting_for_review' => ['isActive' => true]]]))
+            ->assertSee(SupportTicketResource::getUrl('index', ['filters' => ['status' => ['values' => [SupportTicketStatusEnum::OPEN->value]]]]))
+            ->assertSee(SubscriptionResource::getUrl('index', ['filters' => ['ending_soon' => ['isActive' => true]]]))
+            ->assertSee(ChildResource::getUrl('index', ['filters' => ['has_learning_plan' => ['value' => '0']]]));
+    }
+
+    public function test_needs_attention_says_all_clear_when_nothing_is_waiting(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(NeedsAttentionOverview::class)
+            ->assertSee(__('All caught up'))
+            ->assertSee(__('Every ticket has a specialist'))
+            ->assertSee(__('Every child has a plan'));
+    }
+
+    public function test_range_presets_fill_the_dates(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(Dashboard::class)
+            ->call('applyPreset', 'last7Days')
+            ->assertSet('filters.startDate', '2026-10-14')
+            ->assertSet('filters.endDate', '2026-10-20')
+            ->call('applyPreset', 'thisYear')
+            ->assertSet('filters.startDate', '2026-01-01');
+    }
+
+    public function test_end_date_before_start_date_is_rejected(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(Dashboard::class)
+            ->set('filters.startDate', '2026-10-10')
+            ->set('filters.endDate', '2026-10-01')
+            ->call('applyFilters')
+            ->assertHasErrors(['filters.endDate']);
+    }
+
+    public function test_excel_export_file_name_carries_the_selected_range(): void
+    {
+        Excel::fake();
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(Dashboard::class)
+            ->call('applyPreset', 'last7Days')
+            ->callAction('exportExcel');
+
+        Excel::assertDownloaded('analytics_2026-10-14_to_2026-10-20.xlsx');
+    }
+
+    public function test_packages_chart_gives_every_package_a_colour(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        foreach (range(1, 11) as $day) {
+            $this->createSubscription(100, sprintf('2026-10-%02d', $day), "Package {$day}");
+        }
+
+        Livewire::test(SkillMappingPieChart::class, ['pageFilters' => ['startDate' => '2026-10-01', 'endDate' => '2026-10-20']])
+            ->assertSee('#64748b');
+    }
+
+    private function createRunningSubscription(string $expiresAt): Subscription
+    {
+        return Subscription::create([
+            'parent_id' => User::factory()->create()->id,
+            'amount_paid' => 0,
+            'status' => SubscriptionStatusEnum::ACTIVE,
+            'start_date' => '2026-10-01',
+            'expiry_date' => $expiresAt,
+            'is_free' => true,
+        ]);
+    }
+
+    private function createSubscription(float $amountPaid, string $createdAt, string $packageName = 'Monthly'): Subscription
     {
         $package = SubscriptionPackage::create([
-            'name' => ['en' => 'Monthly', 'ar' => 'شهري'],
+            'name' => ['en' => $packageName, 'ar' => $packageName],
             'billing_cycle' => 'monthly',
             'duration_value' => 1,
             'price' => $amountPaid,

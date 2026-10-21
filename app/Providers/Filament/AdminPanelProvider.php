@@ -8,6 +8,7 @@ use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\RequestPasswordReset;
 use App\Filament\Widgets\DashboardKpiOverview;
+use App\Filament\Widgets\NeedsAttentionOverview;
 use App\Filament\Widgets\PerformanceLineChart;
 use App\Filament\Widgets\RevenueBreakdownOverview;
 use App\Filament\Widgets\SkillMappingPieChart;
@@ -70,13 +71,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                NeedsAttentionOverview::class,
                 DashboardKpiOverview::class,
                 RevenueBreakdownOverview::class,
                 PerformanceLineChart::class,
                 SkillMappingPieChart::class,
             ])
             ->databaseNotifications()
-            ->databaseNotificationsPolling('5s')
+            ->databaseNotificationsPolling('30s')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

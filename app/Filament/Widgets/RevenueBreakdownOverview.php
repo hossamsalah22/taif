@@ -3,9 +3,9 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Pages\ManageGeneral;
+use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Widgets\Concerns\InteractsWithDashboardRange;
 use App\Models\Subscription;
-use App\Services\AnalyticsService;
 use App\Settings\GeneralSettings;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -45,7 +45,7 @@ class RevenueBreakdownOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $kpis = AnalyticsService::getDashboardKpis($this->rangeStart(), $this->rangeEnd());
+        [$kpis, $previous] = $this->kpisWithPreviousPeriod();
         $settings = app(GeneralSettings::class);
         $settingsUrl = ManageGeneral::canAccess() ? ManageGeneral::getUrl(['tab' => 'pricing']) : null;
         $money = fn (float $value): string => number_format($value, 2).' '.__('SAR');
@@ -53,10 +53,13 @@ class RevenueBreakdownOverview extends StatsOverviewWidget
         [, $revenue] = $this->series(Subscription::query(), 'created_at', 'amount_paid');
 
         return [
-            Stat::make(__('Collected from parents'), $money($kpis['total_revenue_sar']))
-                ->description(__('Paid subscriptions, tax included'))
-                ->descriptionIcon('heroicon-m-banknotes')
+            $this->compareWithPreviousPeriod(
+                Stat::make(__('Collected from parents'), $money($kpis['total_revenue_sar'])),
+                $kpis['total_revenue_sar'],
+                $previous['total_revenue_sar'],
+            )
                 ->chart($revenue)
+                ->url(SubscriptionResource::canViewAny() ? SubscriptionResource::getUrl('index') : null)
                 ->color('success'),
 
             Stat::make(__('Tax (:rate%)', ['rate' => (float) $settings->tax + 0]), $money($kpis['revenue_tax_sar']))

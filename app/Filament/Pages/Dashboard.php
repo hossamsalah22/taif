@@ -62,8 +62,17 @@ class Dashboard extends BaseDashboard
         return $schema
             ->components([
                 Section::make()
-                    ->description(__('Pick a date range and press Filter. Every card and chart below follows these dates.'))
+                    ->description(__('Pick a quick range, or choose dates and press Filter. Every card and chart below follows these dates.'))
                     ->schema([
+                        Actions::make(collect($this->rangePresets())
+                            ->map(fn (array $preset, string $key): Action => Action::make($key)
+                                ->label($preset['label'])
+                                ->size('sm')
+                                ->color(fn (): string => $this->isActivePreset($key) ? 'primary' : 'gray')
+                                ->outlined(fn (): bool => ! $this->isActivePreset($key))
+                                ->action(fn () => $this->applyPreset($key)))
+                            ->values()
+                            ->all()),
                         Grid::make(['default' => 12])
                             // Buttons sit on the same line as the inputs, not next to their labels.
                             ->extraAttributes(['style' => 'align-items: end;'])
@@ -77,14 +86,16 @@ class Dashboard extends BaseDashboard
                                     ->label(__('End Date'))
                                     ->default(now()->format('Y-m-d'))
                                     ->maxDate(now())
+                                    ->afterOrEqual('startDate')
+                                    ->validationMessages([
+                                        'after_or_equal' => __('The end date cannot be before the start date.'),
+                                    ])
                                     ->columnSpan(['default' => 12, 'md' => 4]),
                                 Actions::make([
                                     Action::make('filter')
                                         ->label(__('Filter'))
                                         ->icon('heroicon-m-funnel')
-                                        ->action(function (): void {
-                                            $this->filters = $this->getFiltersForm()->getState();
-                                        }),
+                                        ->action(fn () => $this->applyFilters()),
                                     Action::make('reset')
                                         ->label(__('Reset'))
                                         ->icon('heroicon-m-x-mark')
@@ -103,6 +114,51 @@ class Dashboard extends BaseDashboard
             ]);
     }
 
+    /**
+     * Validates the picked dates and refreshes every widget with them.
+     */
+    public function applyFilters(): void
+    {
+        $this->filters = $this->getFiltersForm()->getState();
+    }
+
+    public function applyPreset(string $preset): void
+    {
+        $range = $this->rangePresets()[$preset] ?? null;
+
+        if ($range === null) {
+            return;
+        }
+
+        $this->filters = ['startDate' => $range['start'], 'endDate' => $range['end']];
+        $this->getFiltersForm()->fill($this->filters);
+    }
+
+    /**
+     * One-click ranges, all ending today.
+     *
+     * @return array<string, array{label: string, start: string, end: string}>
+     */
+    private function rangePresets(): array
+    {
+        $today = now()->format('Y-m-d');
+
+        return [
+            'last7Days' => ['label' => __('Last 7 days'), 'start' => now()->subDays(6)->format('Y-m-d'), 'end' => $today],
+            'last30Days' => ['label' => __('Last 30 days'), 'start' => now()->subDays(29)->format('Y-m-d'), 'end' => $today],
+            'thisMonth' => ['label' => __('This month'), 'start' => now()->startOfMonth()->format('Y-m-d'), 'end' => $today],
+            'thisYear' => ['label' => __('This year'), 'start' => now()->startOfYear()->format('Y-m-d'), 'end' => $today],
+        ];
+    }
+
+    private function isActivePreset(string $preset): bool
+    {
+        $range = $this->rangePresets()[$preset];
+
+        return ($this->filters['startDate'] ?? null) === $range['start']
+            && ($this->filters['endDate'] ?? null) === $range['end'];
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -115,7 +171,7 @@ class Dashboard extends BaseDashboard
 
                     $pdf = Pdf::loadView('pdf.analytics', ['data' => $data]);
 
-                    return response()->streamDownload(fn () => print ($pdf->output()), 'analytics_'.now()->format('Y_m_d').'.pdf');
+                    return response()->streamDownload(fn () => print ($pdf->output()), $this->exportFileName('pdf'));
                 }),
             Action::make('exportExcel')
                 ->label(__('Export Excel'))
@@ -124,10 +180,20 @@ class Dashboard extends BaseDashboard
                 ->action(function () {
                     return Excel::download(
                         new DashboardAnalyticsExport($this->dashboardKpis()),
-                        'analytics_'.now()->format('Y_m_d').'.xlsx'
+                        $this->exportFileName('xlsx')
                     );
                 }),
         ];
+    }
+
+    /**
+     * e.g. analytics_2026-09-21_to_2026-10-20.pdf
+     */
+    private function exportFileName(string $extension): string
+    {
+        $filters = array_filter($this->filters ?? []) + $this->getDefaultFilters();
+
+        return "analytics_{$filters['startDate']}_to_{$filters['endDate']}.{$extension}";
     }
 
     /**

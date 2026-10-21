@@ -13,7 +13,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Browsershot\Browsershot;
 
 class AssessmentSubmissionsTable
@@ -50,7 +52,10 @@ class AssessmentSubmissionsTable
                     ->sortable(),
             ])
             ->filters([
-                //
+                Filter::make('waiting_for_review')
+                    ->label(__('Waiting for review only'))
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->where('status', 'pending_review')),
             ])
             ->recordActions([
                 ViewAction::make()->slideOver(),

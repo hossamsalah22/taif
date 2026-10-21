@@ -41,7 +41,9 @@ class SkillMappingPieChart extends ChartWidget
             ->groupBy('subscription_packages.name')
             ->get();
 
-        $colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+        $palette = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#64748b'];
+        // Repeat the palette so every package gets a colour, however many there are.
+        $colors = $plans->keys()->map(fn (int $index): string => $palette[$index % count($palette)])->all();
 
         $labels = $plans->map(function (Subscription $plan): string {
             $name = json_decode($plan->name, true);
@@ -54,7 +56,7 @@ class SkillMappingPieChart extends ChartWidget
                 [
                     'label' => __('Active Plans'),
                     'data' => $plans->pluck('total')->all(),
-                    'backgroundColor' => array_slice($colors, 0, $plans->count()),
+                    'backgroundColor' => $colors,
                 ],
             ],
             'labels' => $labels,
