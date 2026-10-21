@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Regions;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\Regions\Pages\CreateRegion;
 use App\Filament\Resources\Regions\Pages\EditRegion;
@@ -14,17 +15,15 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class RegionResource extends MainResource
 {
     protected static ?string $model = Region::class;
 
-    protected static ?int $navigationSort = 2;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('location_management');
-    }
+    protected static ?int $navigationSort = 2;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMap;
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Sliders;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
@@ -13,17 +14,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class SliderResource extends MainResource
 {
     protected static ?string $model = Slider::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::APP_CONTENT;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('system_settings');
-    }
+    protected static ?int $navigationSort = 1;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
     public static function getPermissionPrefixes(): array
     {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroupEnum;
 use App\Services\SubscriptionPricing;
 use App\Settings\GeneralSettings;
 use BackedEnum;
@@ -30,7 +31,7 @@ class ManageGeneral extends SettingsPage
 
     protected static string $settings = GeneralSettings::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'system_settings';
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SETTINGS;
 
     protected static ?int $navigationSort = 1;
 
@@ -52,11 +53,6 @@ class ManageGeneral extends SettingsPage
     public function getSubheading(): ?string
     {
         return __('general_settings_description');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('system_settings');
     }
 
     public function form(Schema $schema): Schema

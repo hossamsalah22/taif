@@ -45,14 +45,4 @@ abstract class MainResource extends Resource implements HasShieldPermissions
             ->replace('_', ' ')
             ->lower());
     }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
-
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'primary';
-    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LearningPlans;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\LearningPlans\Pages\CreateLearningPlan;
 use App\Filament\Resources\LearningPlans\Pages\EditLearningPlan;
 use App\Filament\Resources\LearningPlans\Pages\ListLearningPlans;
@@ -15,19 +16,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class LearningPlanResource extends MainResource
 {
     protected static ?string $model = LearningPlan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Learning Plans Management');
-    }
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
 
     protected static ?int $navigationSort = 1;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
     public static function form(Schema $schema): Schema
     {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Admins;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Admins\Pages\CreateAdmin;
 use App\Filament\Resources\Admins\Pages\EditAdmin;
 use App\Filament\Resources\Admins\Pages\ListAdmins;
@@ -17,17 +18,15 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class AdminResource extends MainResource
 {
     protected static ?string $model = Admin::class;
 
-    protected static ?int $navigationSort = 0;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SETTINGS;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('user_management');
-    }
+    protected static ?int $navigationSort = 2;
 
     public static function getPermissionPrefixes(): array
     {
@@ -41,7 +40,7 @@ class AdminResource extends MainResource
         ]);
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
 
     public static function form(Schema $schema): Schema
     {

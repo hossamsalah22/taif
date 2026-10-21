@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ChildLearningPlans;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\ChildLearningPlans\Pages\CreateChildLearningPlan;
 use App\Filament\Resources\ChildLearningPlans\Pages\EditChildLearningPlan;
 use App\Filament\Resources\ChildLearningPlans\Pages\ListChildLearningPlans;
@@ -16,17 +17,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ChildLearningPlanResource extends MainResource
 {
     protected static ?string $model = ChildLearningPlan::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::FAMILIES;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Assessments Management');
-    }
+    protected static ?int $navigationSort = 3;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
     protected static ?string $recordTitleAttribute = 'id';
 

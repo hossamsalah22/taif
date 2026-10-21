@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Districts;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Districts\Pages\CreateDistrict;
 use App\Filament\Resources\Districts\Pages\EditDistrict;
 use App\Filament\Resources\Districts\Pages\ListDistricts;
@@ -13,17 +14,15 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DistrictResource extends MainResource
 {
     protected static ?string $model = District::class;
 
-    protected static ?int $navigationSort = 4;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('location_management');
-    }
+    protected static ?int $navigationSort = 4;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AssessmentSubmissions;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\AssessmentSubmissions\Pages\EditAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ListAssessmentSubmissions;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ViewAssessmentSubmission;
@@ -15,17 +16,37 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class AssessmentSubmissionResource extends MainResource
 {
     protected static ?string $model = AssessmentSubmission::class;
 
-    public static function getNavigationGroup(): ?string
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::OPERATIONS;
+
+    protected static ?int $navigationSort = 2;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
+
+    /**
+     * Number of submissions waiting for a specialist review; hidden when there are none.
+     */
+    public static function getNavigationBadge(): ?string
     {
-        return __('Assessments Management');
+        $pendingReview = AssessmentSubmission::where('status', 'pending_review')->count();
+
+        return $pendingReview > 0 ? (string) $pendingReview : null;
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    public static function getNavigationBadgeColor(): string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return __('Submissions waiting for review');
+    }
 
     public static function form(Schema $schema): Schema
     {

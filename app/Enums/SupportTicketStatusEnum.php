@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum SupportTicketStatusEnum: string implements HasLabel, HasColor
+enum SupportTicketStatusEnum: string implements HasColor, HasLabel
 {
     case OPEN = 'Open';
     case IN_PROGRESS = 'In Progress';
@@ -25,10 +25,11 @@ enum SupportTicketStatusEnum: string implements HasLabel, HasColor
     public function getColor(): string|array|null
     {
         return match ($this) {
-            self::OPEN => 'gray',
+            // New tickets need attention; closed ones fade into the background.
+            self::OPEN => 'danger',
             self::IN_PROGRESS => 'warning',
             self::REPLIED => 'info',
-            self::CLOSED => 'success',
+            self::CLOSED => 'gray',
         };
     }
 

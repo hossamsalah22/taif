@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\RequestPasswordReset;
@@ -13,12 +14,14 @@ use App\Filament\Widgets\SkillMappingPieChart;
 use App\Http\Middleware\AuthenticateAdminSocketToken;
 use App\Models\Admin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Actions\CreateAction;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Resources\Pages\CreateRecord;
 use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -50,7 +53,8 @@ class AdminPanelProvider extends PanelProvider
                     : '').Blade::render("@vite('resources/js/app.js')"),
             )
             ->font('Tajawal')
-            // ->collapsibleNavigationGroups(true)
+            ->navigationGroups(NavigationGroupEnum::navigationGroups())
+            ->collapsibleNavigationGroups()
             ->login()
             ->profile(EditProfile::class)
             ->colors([
@@ -93,127 +97,14 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make(),
             ])
             ->renderHook(
-                'panels::body.end',
-                fn (): string => "
-                    <script>
-                        const navKey = 'filament.navigation.groups.collapsed';
-
-                        function initAccordion() {
-                            const groups = document.querySelectorAll('.fi-sidebar-group');
-
-                            // Function to collapse a group
-                            const collapseGroup = (group) => {
-                                const button = group.querySelector('button[aria-expanded=\"true\"]');
-                                if (button) button.click();
-                            };
-
-                            // Function to expand a group
-                            const expandGroup = (group) => {
-                                const button = group.querySelector('button[aria-expanded=\"false\"]');
-                                if (button) button.click();
-                            };
-
-                            // 1. On Load: Handle expansion/collapse
-                            groups.forEach(group => {
-                                const currentPath = window.location.pathname;
-                                const hasActive = group.querySelector('.fi-sidebar-item-active, .fi-active, .fi-sidebar-group-active');
-                                const hasMatchedLink = Array.from(group.querySelectorAll('a')).some(a => a.pathname === currentPath);
-
-                                if (hasActive || hasMatchedLink) {
-                                    setTimeout(() => expandGroup(group), 10);
-                                } else {
-                                    collapseGroup(group);
-                                }
-                            });
-
-                            // 2. Clear persistence to avoid browser fighting our code
-                            localStorage.removeItem(navKey);
-
-                            // 3. Listen for manual clicks to close others (Accordion behavior)
-                            groups.forEach(group => {
-                                const button = group.querySelector('button');
-                                if (button && !button.hasAttribute('data-acc-init')) {
-                                    button.setAttribute('data-acc-init', 'true');
-                                    button.addEventListener('click', (e) => {
-                                        // If we are opening this group
-                                        setTimeout(() => {
-                                            if (button.getAttribute('aria-expanded') === 'true') {
-                                                groups.forEach(other => {
-                                                    if (other !== group) collapseGroup(other);
-                                                });
-                                            }
-                                        }, 10);
-                                    });
-                                }
-                            });
-                        }
-
-                        function applyNoValidate() {
-                            document.querySelectorAll('form').forEach(form => {
-                                if (!form.hasAttribute('novalidate')) {
-                                    form.setAttribute('novalidate', 'novalidate');
-                                }
-                            });
-                        }
-
-                        document.addEventListener('DOMContentLoaded', function() {
-                            document.querySelectorAll('form').forEach(form => form.setAttribute('novalidate', 'novalidate'));
-                            initAccordion();
-
-                            // Watch for new forms or attribute changes to ensure novalidate is never removed by Livewire morphing
-                            const observer = new MutationObserver((mutations) => {
-                                applyNoValidate();
-                            });
-                            observer.observe(document.body, {
-                                childList: true,
-                                subtree: true,
-                                attributes: true,
-                                attributeFilter: ['novalidate']
-                            });
-                        });
-
-                        document.addEventListener('livewire:navigated', function() {
-                            applyNoValidate();
-                            initAccordion();
-                        });
-                    </script>
-                    <style>
-                        :root { --user-avatar-url: url('".auth()->user()?->getFilamentAvatarUrl()."'); }
-                        .fi-logo {
-                            margin: 0 auto !important;
-                            display: flex !important;
-                            justify-content: center !important;
-                        }
-
-                        .fi-dropdown-list-item[href*='profile'] .fi-dropdown-list-item-icon,
-                        .fi-dropdown-list-item[href*='profile'] svg {
-                            display: none !important;
-                        }
-                        .fi-dropdown-list-item[href*='profile'] {
-                            display: flex !important;
-                            align-items: center !important;
-                        }
-                        .fi-dropdown-list-item[href*='profile']::before {
-                            content: '';
-                            display: block;
-                            width: 24px;
-                            height: 24px;
-                            background-image: var(--user-avatar-url);
-                            background-size: cover;
-                            background-position: center;
-                            border-radius: 50%;
-                            margin-inline-end: 0.75rem;
-                            flex-shrink: 0;
-                        }
-
-                        button[type='submit'][wire\\:click*='createAnother'],
-                        button[type='button'][wire\\:click*='createAnother'] {
-                            display: none !important;
-                        }
-                    </style>
-                ",
+                PanelsRenderHook::BODY_END,
+                fn (): string => view('filament.admin.body-end')->render(),
             )
-
+            ->bootUsing(function (): void {
+                // Every create screen returns to the list after saving, so "Create & create another" is not offered.
+                CreateRecord::disableCreateAnother();
+                CreateAction::configureUsing(fn (CreateAction $action): CreateAction => $action->createAnother(false));
+            })
             ->resourceCreatePageRedirect('index')
             ->resourceEditPageRedirect('index');
     }

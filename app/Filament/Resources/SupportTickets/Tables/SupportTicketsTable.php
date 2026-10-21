@@ -7,8 +7,10 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SupportTicketsTable
 {
@@ -18,31 +20,45 @@ class SupportTicketsTable
             ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('reference_number')
-                    ->label(__('Ticket Reference ID'))
-                    ->searchable(),
+                    ->label(__('Ticket Number'))
+                    ->searchable()
+                    ->copyable(),
                 TextColumn::make('user.name')
-                    ->label(__('Parent Account Name'))
+                    ->label(__('Parent'))
                     ->searchable(),
                 TextColumn::make('title')
-                    ->label(__('Problem Title Summary'))
+                    ->label(__('Subject'))
                     ->searchable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->tooltip(fn (TextColumn $column): ?string => strlen((string) $column->getState()) > 50 ? $column->getState() : null),
                 TextColumn::make('status')
-                    ->label(__('Ticket Status Component'))
-                    ->formatStateUsing(fn (SupportTicketStatusEnum $state) => $state->getLabel())
-                    ->badge()
-                    ->searchable(),
+                    ->label(__('Status'))
+                    ->badge(),
                 TextColumn::make('assignedAdmin.name')
                     ->label(__('Assigned Specialist'))
+                    ->placeholder(__('Unassigned'))
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label(__('Date Submitted'))
                     ->dateTime()
+                    ->since()
+                    ->dateTimeTooltip()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->options(SupportTicketStatusEnum::options()),
+                    ->label(__('Status'))
+                    ->options(SupportTicketStatusEnum::options())
+                    ->multiple(),
+                SelectFilter::make('assigned_admin_id')
+                    ->label(__('Assigned Specialist'))
+                    ->relationship('assignedAdmin', 'name')
+                    ->searchable()
+                    ->preload(),
+                Filter::make('unassigned')
+                    ->label(__('Unassigned only'))
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->whereNull('assigned_admin_id')),
             ])
             ->recordActions([
                 EditAction::make()->label(__('View & Manage')),

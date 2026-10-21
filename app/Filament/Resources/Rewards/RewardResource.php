@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Rewards;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\Rewards\Pages\CreateReward;
 use App\Filament\Resources\Rewards\Pages\EditReward;
@@ -16,19 +17,17 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class RewardResource extends MainResource
 {
     protected static ?string $model = Reward::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Learning Plans Management');
-    }
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
 
     protected static ?int $navigationSort = 4;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGift;
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Countries;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Countries\Pages\CreateCountry;
 use App\Filament\Resources\Countries\Pages\EditCountry;
 use App\Filament\Resources\Countries\Pages\ListCountries;
@@ -14,17 +15,15 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class CountryResource extends MainResource
 {
     protected static ?string $model = Country::class;
 
-    protected static ?int $navigationSort = 1;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('location_management');
-    }
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
 

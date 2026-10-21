@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LearningGoals;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\LearningGoals\Pages\CreateLearningGoal;
 use App\Filament\Resources\LearningGoals\Pages\EditLearningGoal;
 use App\Filament\Resources\LearningGoals\Pages\ListLearningGoals;
@@ -15,19 +16,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class LearningGoalResource extends MainResource
 {
     protected static ?string $model = LearningGoal::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Learning Plans Management');
-    }
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
 
     protected static ?int $navigationSort = 3;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedViewfinderCircle;
 
     protected static ?string $recordTitleAttribute = 'name';
 

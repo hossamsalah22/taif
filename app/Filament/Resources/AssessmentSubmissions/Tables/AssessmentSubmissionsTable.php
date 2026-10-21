@@ -6,6 +6,7 @@ use App\Enums\AutismLevelEnum;
 use App\Models\AssessmentSubmission;
 use App\Notifications\ReportPublishedNotification;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -20,6 +21,7 @@ class AssessmentSubmissionsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('id')
                     ->label(__('Submission ID'))
@@ -61,31 +63,6 @@ class AssessmentSubmissionsTable
 
                         return $data;
                     }),
-                Action::make('export_pdf')
-                    ->label(__('Export PDF'))
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->color('info')
-                    ->action(function (AssessmentSubmission $record) {
-                        $html = view('assessments.report_pdf', ['record' => $record])->render();
-                        $pdf = Browsershot::html($html)
-                            ->format('A4')
-                            ->margins(10, 10, 10, 10)
-                            ->showBackground()
-                            ->noSandbox()
-                            ->pdf();
-
-                        return response()->streamDownload(fn () => print ($pdf), "report-{$record->id}.pdf");
-                    }),
-                Action::make('request_re_evaluation')
-                    ->label(__('Request Re-evaluation'))
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->visible(fn (AssessmentSubmission $record) => ! $record->child->force_re_test)
-                    ->action(function (AssessmentSubmission $record) {
-                        $record->child->update(['force_re_test' => true]);
-                        Notification::make()->title(__('Re-evaluation token injected.'))->success()->send();
-                    }),
                 Action::make('publish')
                     ->label(__('Publish Report'))
                     ->icon('heroicon-o-check-circle')
@@ -100,6 +77,33 @@ class AssessmentSubmissionsTable
                         $record->child->parent->notify(new ReportPublishedNotification($record));
                         Notification::make()->title(__('Report Published Successfully'))->success()->send();
                     }),
+                ActionGroup::make([
+                    Action::make('export_pdf')
+                        ->label(__('Export PDF'))
+                        ->icon('heroicon-o-document-arrow-down')
+                        ->color('info')
+                        ->action(function (AssessmentSubmission $record) {
+                            $html = view('assessments.report_pdf', ['record' => $record])->render();
+                            $pdf = Browsershot::html($html)
+                                ->format('A4')
+                                ->margins(10, 10, 10, 10)
+                                ->showBackground()
+                                ->noSandbox()
+                                ->pdf();
+
+                            return response()->streamDownload(fn () => print ($pdf), "report-{$record->id}.pdf");
+                        }),
+                    Action::make('request_re_evaluation')
+                        ->label(__('Request Re-evaluation'))
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->visible(fn (AssessmentSubmission $record) => ! $record->child->force_re_test)
+                        ->action(function (AssessmentSubmission $record) {
+                            $record->child->update(['force_re_test' => true]);
+                            Notification::make()->title(__('Re-evaluation token injected.'))->success()->send();
+                        }),
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

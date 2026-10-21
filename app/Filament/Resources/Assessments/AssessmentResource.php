@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Assessments;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Assessments\Pages\CreateAssessment;
 use App\Filament\Resources\Assessments\Pages\EditAssessment;
 use App\Filament\Resources\Assessments\Pages\ListAssessments;
@@ -13,17 +14,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class AssessmentResource extends MainResource
 {
     protected static ?string $model = Assessment::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Assessments Management');
-    }
+    protected static ?int $navigationSort = 5;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     public static function form(Schema $schema): Schema
     {

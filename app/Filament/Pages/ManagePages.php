@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\NavigationGroupEnum;
 use App\Settings\PagesSettings;
 use BackedEnum;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
@@ -23,13 +24,13 @@ class ManagePages extends SettingsPage
 {
     use HasPageShield;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
     protected static string $settings = PagesSettings::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'system_settings';
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::APP_CONTENT;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function getNavigationLabel(): string
     {
@@ -49,11 +50,6 @@ class ManagePages extends SettingsPage
     public function getSubheading(): ?string
     {
         return __('pages_settings_description');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('system_settings');
     }
 
     public function form(Schema $schema): Schema

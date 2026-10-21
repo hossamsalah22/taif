@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Children;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Children\Pages\CreateChild;
 use App\Filament\Resources\Children\Pages\EditChild;
 use App\Filament\Resources\Children\Pages\ListChildren;
@@ -16,12 +17,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ChildResource extends MainResource
 {
     protected static ?string $model = Child::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::FAMILIES;
+
+    protected static ?int $navigationSort = 2;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFaceSmile;
 
     public static function form(Schema $schema): Schema
     {

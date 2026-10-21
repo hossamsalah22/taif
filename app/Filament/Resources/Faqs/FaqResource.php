@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Faqs;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Faqs\Pages\CreateFaq;
 use App\Filament\Resources\Faqs\Pages\EditFaq;
 use App\Filament\Resources\Faqs\Pages\ListFaqs;
@@ -13,15 +14,15 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class FaqResource extends MainResource
 {
     protected static ?string $model = Faq::class;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('system_settings');
-    }
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::APP_CONTENT;
+
+    protected static ?int $navigationSort = 2;
 
     public static function getPermissionPrefixes(): array
     {
@@ -31,7 +32,7 @@ class FaqResource extends MainResource
         ]);
     }
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
 
     public static function form(Schema $schema): Schema
     {

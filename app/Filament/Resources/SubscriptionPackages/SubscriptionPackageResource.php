@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SubscriptionPackages;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\SubscriptionPackages\Pages\CreateSubscriptionPackage;
 use App\Filament\Resources\SubscriptionPackages\Pages\EditSubscriptionPackage;
@@ -15,17 +16,17 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class SubscriptionPackageResource extends MainResource
 {
     protected static ?string $model = SubscriptionPackage::class;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Subscriptions Management');
-    }
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SUBSCRIPTIONS;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?int $navigationSort = 1;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Cities;
 
+use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Cities\Pages\CreateCity;
 use App\Filament\Resources\Cities\Pages\EditCity;
 use App\Filament\Resources\Cities\Pages\ListCities;
@@ -14,17 +15,15 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class CityResource extends MainResource
 {
     protected static ?string $model = City::class;
 
-    protected static ?int $navigationSort = 3;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('location_management');
-    }
+    protected static ?int $navigationSort = 3;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
 

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SupportTickets;
 
+use App\Enums\NavigationGroupEnum;
+use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\SupportTickets\Pages\CreateSupportTicket;
 use App\Filament\Resources\SupportTickets\Pages\EditSupportTicket;
@@ -13,18 +15,38 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class SupportTicketResource extends MainResource
 {
     protected static ?string $model = SupportTicket::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::OPERATIONS;
+
+    protected static ?int $navigationSort = 1;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function getNavigationGroup(): ?string
+    /**
+     * Number of new tickets nobody has picked up yet; hidden when there are none.
+     */
+    public static function getNavigationBadge(): ?string
     {
-        return __('Reports & Follow-ups');
+        $openTickets = SupportTicket::where('status', SupportTicketStatusEnum::OPEN)->count();
+
+        return $openTickets > 0 ? (string) $openTickets : null;
+    }
+
+    public static function getNavigationBadgeColor(): string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return __('Open tickets waiting for a reply');
     }
 
     public static function form(Schema $schema): Schema
