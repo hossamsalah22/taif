@@ -67,6 +67,23 @@ class SubscriptionsAdminTest extends TestCase
             ->assertCanNotSeeTableRecords([$runningLonger, $expired]);
     }
 
+    public function test_subscriptions_can_be_filtered_by_status_and_free_access(): void
+    {
+        $paid = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $free = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $free->update(['is_free' => true, 'amount_paid' => 0]);
+        $cancelled = $this->createSubscription(SubscriptionStatusEnum::CANCELLED, '2026-12-20');
+
+        Livewire::test(ListSubscriptions::class)
+            ->filterTable('status', SubscriptionStatusEnum::CANCELLED->value)
+            ->assertCanSeeTableRecords([$cancelled])
+            ->assertCanNotSeeTableRecords([$paid, $free])
+            ->resetTableFilters()
+            ->filterTable('is_free', true)
+            ->assertCanSeeTableRecords([$free])
+            ->assertCanNotSeeTableRecords([$paid, $cancelled]);
+    }
+
     public function test_ending_soon_link_opens_the_list_already_filtered(): void
     {
         $endingSoon = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-10-24');

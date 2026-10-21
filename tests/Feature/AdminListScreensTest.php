@@ -87,6 +87,24 @@ class AdminListScreensTest extends TestCase
             ->assertCanNotSeeTableRecords([$closed]);
     }
 
+    public function test_tickets_can_be_filtered_by_specialist(): void
+    {
+        $colleague = Admin::create([
+            'name' => 'Colleague',
+            'email' => 'colleague@example.com',
+            'phone' => '500000003',
+            'password' => 'password',
+            'is_active' => true,
+        ]);
+        $mine = SupportTicket::factory()->create(['assigned_admin_id' => $this->admin->id]);
+        $theirs = SupportTicket::factory()->create(['assigned_admin_id' => $colleague->id]);
+
+        Livewire::test(ListSupportTickets::class, ['activeTab' => 'all'])
+            ->filterTable('assigned_admin_id', $colleague->id)
+            ->assertCanSeeTableRecords([$theirs])
+            ->assertCanNotSeeTableRecords([$mine]);
+    }
+
     public function test_open_tickets_stand_out_and_closed_ones_do_not(): void
     {
         $this->assertSame('danger', SupportTicketStatusEnum::OPEN->getColor());
@@ -148,6 +166,18 @@ class AdminListScreensTest extends TestCase
             ->filterTable('is_visible_to_parent', false)
             ->assertCanSeeTableRecords([$hidden])
             ->assertCanNotSeeTableRecords([$shared]);
+    }
+
+    public function test_progress_reports_can_be_filtered_by_child(): void
+    {
+        $plan = $this->createPlan();
+        $ownReport = $this->createReport($child = Child::factory()->create(), $plan, visibleToParent: true);
+        $otherReport = $this->createReport(Child::factory()->create(), $plan, visibleToParent: true);
+
+        Livewire::test(ListClinicalProgressReports::class)
+            ->filterTable('child_id', $child->id)
+            ->assertCanSeeTableRecords([$ownReport])
+            ->assertCanNotSeeTableRecords([$otherReport]);
     }
 
     private function createPlan(): LearningPlan

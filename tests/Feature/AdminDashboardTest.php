@@ -31,6 +31,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -225,6 +226,25 @@ class AdminDashboardTest extends TestCase
             ->assertSee(__('All caught up'))
             ->assertSee(__('Every ticket has a specialist'))
             ->assertSee(__('Every child has a plan'));
+    }
+
+    public function test_needs_attention_shows_only_the_cards_an_admin_may_open(): void
+    {
+        $supportAgent = Admin::create([
+            'name' => 'Support Agent',
+            'email' => 'support@example.com',
+            'phone' => '500000002',
+            'password' => 'password',
+            'is_active' => true,
+        ]);
+        $supportAgent->givePermissionTo(Permission::findOrCreate('ViewAny:SupportTicket', 'web'));
+        $this->actingAs($supportAgent, 'web');
+
+        Livewire::test(NeedsAttentionOverview::class)
+            ->assertSee(__('Open support tickets'))
+            ->assertDontSee(__('Assessments to review'))
+            ->assertDontSee(__('Subscriptions ending soon'))
+            ->assertDontSee(__('Children without a learning plan'));
     }
 
     public function test_range_presets_fill_the_dates(): void
