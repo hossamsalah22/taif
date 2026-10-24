@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\AutismLevelEnum;
 use App\Enums\ChildLearningPlanStatusEnum;
 use App\Enums\SupportTicketStatusEnum;
+use App\Filament\Resources\ChildLearningPlans\ChildLearningPlanResource;
 use App\Filament\Resources\ChildLearningPlans\Pages\ListChildLearningPlans;
 use App\Filament\Resources\Children\Pages\ListChildren;
 use App\Filament\Resources\ClinicalProgressReports\Pages\ListClinicalProgressReports;
@@ -153,6 +154,19 @@ class AdminListScreensTest extends TestCase
             ->filterTable('autism_level', AutismLevelEnum::MILD->value)
             ->assertCanSeeTableRecords([$inProgress])
             ->assertCanNotSeeTableRecords([$completed]);
+    }
+
+    public function test_assigned_plan_page_shows_the_plan_in_arabic(): void
+    {
+        $assigned = $this->assignPlan(Child::factory()->create(['name' => 'سلمى']), $this->createPlan());
+        app()->setLocale('ar');
+
+        $this->get(ChildLearningPlanResource::getUrl('view', ['record' => $assigned]))
+            ->assertOk()
+            ->assertSee('سلمى — أساسيات التواصل')
+            ->assertSee(['اسم الطفل', 'عنوان الخطة المعينة', 'مواءمة الشدة', 'تاريخ التعيين'])
+            ->assertSee(ChildLearningPlanStatusEnum::label(ChildLearningPlanStatusEnum::InProgress))
+            ->assertDontSee(['Child id', 'Learning plan id', 'in_progress', 'Created at']);
     }
 
     public function test_progress_reports_can_be_filtered_by_visibility_to_parent(): void

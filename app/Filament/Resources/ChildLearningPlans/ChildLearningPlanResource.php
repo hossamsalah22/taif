@@ -17,6 +17,8 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 class ChildLearningPlanResource extends MainResource
@@ -30,6 +32,18 @@ class ChildLearningPlanResource extends MainResource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
     protected static ?string $recordTitleAttribute = 'id';
+
+    /**
+     * "Salma — Communication basics" in titles and breadcrumbs instead of the bare row id.
+     */
+    public static function getRecordTitle(?Model $record): string|Htmlable|null
+    {
+        if (! $record instanceof ChildLearningPlan) {
+            return parent::getRecordTitle($record);
+        }
+
+        return "{$record->child?->name} — {$record->learningPlan?->name}";
+    }
 
     public static function form(Schema $schema): Schema
     {
