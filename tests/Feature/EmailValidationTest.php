@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Pages\ManageGeneral;
 use App\Filament\Resources\Admins\Pages\CreateAdmin;
 use App\Models\Admin;
 use App\Models\User;
+use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,6 +29,7 @@ class EmailValidationTest extends TestCase
         return [
             'domain without a dot' => ['admin@appcom'],
             'single-label domain' => ['a@b'],
+            'same word on both sides' => ['admin@admin'],
             'missing at sign' => ['admin.app.com'],
         ];
     }
@@ -65,6 +68,29 @@ class EmailValidationTest extends TestCase
             ->fillForm(['email' => $email])
             ->call('create')
             ->assertHasFormErrors(['email']);
+    }
+
+    #[DataProvider('invalidEmails')]
+    public function test_general_settings_reject_an_invalid_email(string $email): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(ManageGeneral::class)
+            ->fillForm(['email' => $email])
+            ->call('save')
+            ->assertHasFormErrors(['email']);
+    }
+
+    public function test_general_settings_accept_a_valid_email(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(ManageGeneral::class)
+            ->fillForm(['email' => 'support@taifapp.com'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('support@taifapp.com', app(GeneralSettings::class)->refresh()->email);
     }
 
     #[DataProvider('invalidEmails')]
