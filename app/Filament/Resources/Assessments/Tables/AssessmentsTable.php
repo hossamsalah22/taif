@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Assessments\Tables;
 
 use App\Enums\AssessmentStatusEnum;
 use App\Enums\AutismLevelEnum;
+use App\Filament\Resources\Assessments\AssessmentResource;
 use App\Models\Assessment;
 use App\Models\Question;
 use App\Models\QuestionOption;
@@ -55,7 +56,7 @@ class AssessmentsTable
                 //
             ])
             ->recordActions([
-                ViewAction::make()->slideOver(),
+                ViewAction::make(),
                 Action::make('create_new_version')
                     ->label(__('Edit Template'))
                     ->icon('heroicon-o-pencil')
@@ -108,12 +109,12 @@ class AssessmentsTable
                             });
                         });
 
-                        return redirect(request()->header('referer').'/'.$newAssessment->id.'/edit');
+                        return redirect(AssessmentResource::getUrl('edit', ['record' => $newAssessment]));
                     }),
                 Action::make('edit_draft')
                     ->label(__('Continue Editing'))
                     ->icon('heroicon-o-pencil-square')
-                    ->url(fn (Assessment $record): string => request()->header('referer').'/'.$record->id.'/edit')
+                    ->url(fn (Assessment $record): string => AssessmentResource::getUrl('edit', ['record' => $record]))
                     ->visible(fn (Assessment $record) => $record->status === AssessmentStatusEnum::DRAFT),
             ])
             ->toolbarActions([

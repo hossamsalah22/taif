@@ -6,6 +6,7 @@ use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\Assessments\Pages\CreateAssessment;
 use App\Filament\Resources\Assessments\Pages\EditAssessment;
 use App\Filament\Resources\Assessments\Pages\ListAssessments;
+use App\Filament\Resources\Assessments\Pages\ViewAssessment;
 use App\Filament\Resources\Assessments\Schemas\AssessmentForm;
 use App\Filament\Resources\Assessments\Tables\AssessmentsTable;
 use App\Filament\Resources\MainResource;
@@ -48,6 +49,7 @@ class AssessmentResource extends MainResource
         return [
             'index' => ListAssessments::route('/'),
             'create' => CreateAssessment::route('/create'),
+            'view' => ViewAssessment::route('/{record}'),
             'edit' => EditAssessment::route('/{record}/edit'),
         ];
     }
