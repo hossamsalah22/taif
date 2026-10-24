@@ -24,22 +24,35 @@ class LearningPlanExecutionMap extends Component implements HasActions, HasForms
 
     public ChildLearningPlan $record;
 
-    public array $exerciseLogs = [];
+    /** @var array<int, int> */
+    public array $completedExerciseIds = [];
+
+    /** @var array<int, int> */
+    public array $attemptedExerciseIds = [];
 
     public function mount(ChildLearningPlan $record): void
     {
         $this->record = $record;
 
-        $this->exerciseLogs = ExerciseInteractionLog::where('child_id', $this->record->child_id)
-            ->get()
-            ->keyBy('learning_exercise_id')
-            ->toArray();
+        $this->completedExerciseIds = $record->child->completedExercises()->pluck('learning_exercises.id')->all();
+
+        $this->attemptedExerciseIds = ExerciseInteractionLog::where('child_id', $record->child_id)
+            ->distinct()
+            ->pluck('learning_exercise_id')
+            ->all();
     }
 
+    /**
+     * Completed once the app records it as completed; in progress once the child has tried it.
+     */
     public function getExerciseStatus(int $exerciseId): string
     {
-        if (isset($this->exerciseLogs[$exerciseId])) {
-            return $this->exerciseLogs[$exerciseId]['status'] ?? 'in_progress';
+        if (in_array($exerciseId, $this->completedExerciseIds)) {
+            return 'completed';
+        }
+
+        if (in_array($exerciseId, $this->attemptedExerciseIds)) {
+            return 'in_progress';
         }
 
         return 'locked';

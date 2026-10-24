@@ -5,18 +5,24 @@ namespace Tests\Feature;
 use App\Enums\AutismLevelEnum;
 use App\Enums\ChildLearningPlanStatusEnum;
 use App\Enums\ExerciseTypeEnum;
+use App\Exports\ChildPlanInteractionLogsExport;
 use App\Filament\Resources\ChildLearningPlans\Pages\ListChildLearningPlans;
+use App\Filament\Resources\ChildLearningPlans\Pages\ViewChildLearningPlanProgress;
+use App\Livewire\LearningPlanExecutionMap;
 use App\Models\Admin;
 use App\Models\Child;
 use App\Models\ChildLearningPlan;
+use App\Models\ExerciseInteractionLog;
 use App\Models\LearningExercise;
 use App\Models\LearningGoal;
 use App\Models\LearningLesson;
 use App\Models\LearningPlan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -127,6 +133,93 @@ class ChildLearningPlanProgressTest extends TestCase
             ->filter(fn (array $query): bool => str_contains($query['query'], 'child_completed_exercises'));
 
         $this->assertCount(1, $progressQueries);
+    }
+
+    public function test_export_logs_downloads_only_this_childs_attempts_on_this_plan(): void
+    {
+        Excel::fake();
+        Carbon::setTestNow('2026-10-20 09:30:00');
+        app()->setLocale('ar');
+
+        $plan = $this->createPlan();
+        [$first, $second] = $this->createExercises($plan, 2)->all();
+        $otherPlanExercise = $this->createExercises($this->createPlan(), 1)->first();
+        $child = Child::factory()->create();
+        $assignment = $this->assignPlan($child, $plan);
+
+        $success = $this->logAttempt($child, $first, ['is_successful' => true, 'trials_count' => 2, 'duration_seconds' => 40, 'interaction_type' => 'tap']);
+        $this->logAttempt($child, $second, ['is_successful' => false]);
+        $this->logAttempt($child, $otherPlanExercise);
+        $this->logAttempt(Child::factory()->create(), $first);
+
+        Livewire::test(ViewChildLearningPlanProgress::class, ['record' => $assignment->id])
+            ->callAction('export_logs')
+            ->assertNotNotified(__('No logs to export yet.'));
+
+        Excel::assertDownloaded("interaction-logs_{$assignment->id}_2026-10-20.xlsx", function (ChildPlanInteractionLogsExport $export) use ($success): bool {
+            $logs = $export->query()->get();
+
+            $this->assertCount(2, $logs);
+            $this->assertSame([__('Date'), 'مرحلة', 'درس', 'تدريب', 'نوع التفاعل', 'النتيجة', 'المحاولات', 'المدة (بالثواني)'], $export->headings());
+            $this->assertSame(
+                ['2026-10-20 09:30', 'التواصل البصري', 'انظر إلي', null, 'tap', 'ناجحة', 2, 40],
+                $export->map($logs->firstWhere('id', $success->id)),
+            );
+            $this->assertContains('غير ناجحة', $export->map($logs->firstWhere('id', '!=', $success->id)));
+
+            return true;
+        });
+    }
+
+    public function test_export_logs_explains_when_there_is_nothing_to_export(): void
+    {
+        Excel::fake();
+        $plan = $this->createPlan();
+        $this->createExercises($plan, 1);
+        $assignment = $this->assignPlan(Child::factory()->create(), $plan);
+
+        Livewire::test(ViewChildLearningPlanProgress::class, ['record' => $assignment->id])
+            ->callAction('export_logs')
+            ->assertNotified(__('No logs to export yet.'))
+            ->assertNoFileDownloaded();
+    }
+
+    public function test_execution_map_marks_completed_tried_and_untouched_exercises(): void
+    {
+        $plan = $this->createPlan();
+        [$completed, $tried, $untouched] = $this->createExercises($plan, 3)->all();
+        $child = Child::factory()->create();
+        $child->completedExercises()->attach($completed);
+        $this->logAttempt($child, $completed, ['is_successful' => true]);
+        $this->logAttempt($child, $tried);
+        $assignment = $this->assignPlan($child, $plan);
+
+        $map = Livewire::test(LearningPlanExecutionMap::class, ['record' => $assignment])->instance();
+
+        $this->assertSame('completed', $map->getExerciseStatus($completed->id));
+        $this->assertSame('in_progress', $map->getExerciseStatus($tried->id));
+        $this->assertSame('locked', $map->getExerciseStatus($untouched->id));
+
+        $lesson = $completed->lesson()->with('exercises')->first();
+        $this->assertSame('in_progress', $map->getLessonStatus($lesson));
+
+        $child->completedExercises()->attach([$tried->id, $untouched->id]);
+        $map = Livewire::test(LearningPlanExecutionMap::class, ['record' => $assignment->fresh()])->instance();
+
+        $this->assertSame('completed', $map->getLessonStatus($lesson));
+        $this->assertSame('completed', $map->getGoalStatus($lesson->goal()->with('lessons.exercises')->first()));
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    private function logAttempt(Child $child, LearningExercise $exercise, array $attributes = []): ExerciseInteractionLog
+    {
+        return ExerciseInteractionLog::create([
+            'child_id' => $child->id,
+            'learning_exercise_id' => $exercise->id,
+            ...$attributes,
+        ]);
     }
 
     private function createPlan(): LearningPlan

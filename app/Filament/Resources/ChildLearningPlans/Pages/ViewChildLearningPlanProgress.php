@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\ChildLearningPlans\Pages;
 
+use App\Exports\ChildPlanInteractionLogsExport;
 use App\Filament\Resources\ChildLearningPlans\ChildLearningPlanResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ViewChildLearningPlanProgress extends Page
 {
@@ -36,12 +38,19 @@ class ViewChildLearningPlanProgress extends Page
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary')
                 ->action(function () {
-                    return Notification::make()
-                        ->title(__('Logs exported successfully.'))
-                        ->success()
-                        ->send();
-                    // Note: Here you can integrate Maatwebsite/Laravel-Excel or similar for actual download.
-                    // return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\ExerciseInteractionLogExport($this->record->child_id), 'logs.xlsx');
+                    $export = new ChildPlanInteractionLogsExport($this->record);
+
+                    if (! $export->query()->exists()) {
+                        Notification::make()
+                            ->title(__('No logs to export yet.'))
+                            ->body(__('Logs appear once the child plays exercises from this plan in the app.'))
+                            ->warning()
+                            ->send();
+
+                        return null;
+                    }
+
+                    return Excel::download($export, "interaction-logs_{$this->record->getKey()}_".now()->format('Y-m-d').'.xlsx');
                 }),
         ];
     }

@@ -1084,5 +1084,12 @@
     "Lets the parent take the assessment again after using all attempts. Turns itself off once used.": "يتيح لولي الأمر إعادة التقييم بعد استنفاد كل المحاولات، ويُلغى تلقائيًا بعد استخدامه.",
     "Assessment Report": "تقرير التقييم",
     "Clinical Evaluation Report": "تقرير التقييم السريري",
-    "Not Graded": "لم يُقيَّم"
+    "Not Graded": "لم يُقيَّم",
+    "No logs to export yet.": "لا توجد سجلات للتصدير بعد.",
+    "Logs appear once the child plays exercises from this plan in the app.": "تظهر السجلات بعد أن يلعب الطفل تدريبات هذه الخطة في التطبيق.",
+    "Interaction Type": "نوع التفاعل",
+    "Result": "النتيجة",
+    "Attempts": "المحاولات",
+    "Duration (seconds)": "المدة (بالثواني)",
+    "Not successful": "غير ناجحة"
 }
