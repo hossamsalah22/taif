@@ -10,6 +10,16 @@ class EditAssessmentSubmission extends EditRecord
 {
     protected static string $resource = AssessmentSubmissionResource::class;
 
+    public function getTitle(): string
+    {
+        return __('Evaluate');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('Evaluate');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

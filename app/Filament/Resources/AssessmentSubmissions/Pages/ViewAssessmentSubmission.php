@@ -17,7 +17,9 @@ class ViewAssessmentSubmission extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
+            EditAction::make()
+                ->label(__('Evaluate'))
+                ->icon('heroicon-o-clipboard-document-check'),
             Action::make('publish')
                 ->label(__('Publish Report'))
                 ->icon('heroicon-o-check-circle')

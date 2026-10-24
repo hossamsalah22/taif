@@ -94,6 +94,7 @@ class AdminWorkflowTest extends TestCase
         $submission = $this->createSubmission('reviewed_with_report');
 
         Livewire::test(ViewAssessmentSubmission::class, ['record' => $submission->id])
+            ->assertActionHasLabel('edit', __('Evaluate'))
             ->callAction('publish')
             ->assertHasNoErrors()
             ->assertNotified(__('Report Published Successfully'));
@@ -142,6 +143,7 @@ class AdminWorkflowTest extends TestCase
         $submission = $this->createSubmission('pending_review');
 
         Livewire::test(EditAssessmentSubmission::class, ['record' => $submission->id])
+            ->assertSeeHtmlInOrder(['fi-header-heading', __('Evaluate'), '</h1>'])
             ->fillForm(['specialist_notes' => '<p>Notes from the edit page.</p>'])
             ->call('save')
             ->assertHasNoFormErrors()
