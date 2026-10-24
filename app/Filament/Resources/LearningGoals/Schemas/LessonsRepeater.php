@@ -2,195 +2,87 @@
 
 namespace App\Filament\Resources\LearningGoals\Schemas;
 
-use App\Enums\DifficultyLevel;
-use App\Enums\ExerciseTypeEnum;
-use App\Enums\PriorityEnum;
 use App\Enums\RewardTargetEnum;
+use App\Filament\Resources\LearningLessons\LearningLessonResource;
+use App\Models\LearningLesson;
 use App\Models\Reward;
-use Filament\Forms\Components\FileUpload;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Group;
-use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Grid;
+use Filament\Support\Icons\Heroicon;
 
 /**
- * Shared lessons -> exercises editor, used by the learning goal form.
+ * Lessons editor of the learning goal form. Exercises live inside each lesson and are edited from the lesson form.
  */
 class LessonsRepeater
 {
     public static function make(): Repeater
     {
         return Repeater::make('lessons')
-            ->label(__('Lessons'))
+            ->hiddenLabel()
             ->relationship('lessons')
+            ->orderColumn('display_priority')
+            ->reorderableWithButtons()
             ->schema([
                 TextInput::make('name')
                     ->label(__('Lesson Name'))
                     ->required()
                     ->translatableTabs(),
-                Toggle::make('is_locked')
-                    ->label(__('Locked'))
-                    ->helperText(__('Locked lessons open only after the previous lesson is completed.'))
-                    ->default(true),
-                Select::make('reward_id')
-                    ->label(__('Reward'))
-                    ->options(fn () => Reward::query()->where('target_type', RewardTargetEnum::LESSON->value)->get()->pluck('name', 'id'))
-                    ->searchable()
-                    ->placeholder(__('No reward'))
-                    ->helperText(__('Given to the child once every exercise in this lesson is completed.')),
-                Select::make('display_priority')
-                    ->label(__('Display Priority'))
-                    ->options(array_combine(range(1, 30), range(1, 30)))
-                    ->helperText(__('Order inside the goal: 1 comes first.')),
-                Repeater::make('exercises')
-                    ->label(__('Exercises'))
-                    ->relationship('exercises')
-                    ->schema([
-                        Select::make('difficulty_level')
-                            ->label(__('Difficulty Level'))
-                            ->options(DifficultyLevel::options())
-                            ->required(),
-                        Toggle::make('is_locked')
-                            ->label(__('Locked'))
-                            ->helperText(__('Locked exercises open only after the previous exercise is completed.'))
-                            ->default(true),
-                        TextInput::make('max_attempts')
-                            ->label(__('Max Attempts Bound'))
-                            ->numeric()
-                            ->default(3)
-                            ->minValue(1)
-                            ->maxValue(10)
-                            ->helperText(__('How many times the child can try this exercise (1 to 10).')),
-                        Select::make('display_priority')
-                            ->label(__('Display Priority'))
-                            ->options(PriorityEnum::options())
-                            ->helperText(__('Order inside the lesson: 1 comes first.')),
-                        TextInput::make('prompt')
-                            ->label(__('Instructional Prompt'))
-                            ->required()
-                            ->translatableTabs()
-                            ->columnSpanFull(),
-                        Select::make('type')
-                            ->label(__('Exercise Type'))
-                            ->options(ExerciseTypeEnum::options())
-                            ->required()
-                            ->live()
-                            ->helperText(fn (Get $get): string => match ($get('type') instanceof ExerciseTypeEnum ? $get('type')->value : $get('type')) {
-                                ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value => __('Add at least 2 picture cards and switch on "Is Correct Answer" for the right one(s).'),
-                                ExerciseTypeEnum::AUDIO_FLASHCARDS->value => __('Add at least 2 cards, each with a picture and an audio file; mark the correct one(s).'),
-                                ExerciseTypeEnum::MATCHING->value => __('Add at least 3 rows; the child matches each left picture with the right picture on the same row.'),
-                                ExerciseTypeEnum::ORDERING->value => __('Add at least 2 pictures in the correct order; the app shuffles them for the child.'),
-                                ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value => __('Add the video link and a thumbnail picture.'),
-                                default => __('Choose a type to see which content the exercise needs.'),
-                            }),
-                        Group::make()->statePath('configuration')->schema([
-                            Repeater::make('matchingPairs')
-                                ->label(__('Matching Matrix Rows Manager'))
-                                ->schema([
-                                    FileUpload::make('left_element')
-                                        ->disk('public')
-                                        ->directory('exercises/matching')
-                                        ->label(__('Left element'))
-                                        ->image()
-                                        ->helperText(__('Recommended size: 500x500'))
-                                        ->maxSize(5120)
-                                        ->required(),
-                                    FileUpload::make('right_element')
-                                        ->disk('public')
-                                        ->directory('exercises/matching')
-                                        ->label(__('Right element'))
-                                        ->image()
-                                        ->helperText(__('Recommended size: 500x500'))
-                                        ->maxSize(5120)
-                                        ->required(),
-                                ])
-                                ->columns(2)
-                                ->minItems(3)
-                                ->visible(fn (Get $get) => $get('../type') === ExerciseTypeEnum::MATCHING->value)
-                                ->required(fn (Get $get) => $get('../type') === ExerciseTypeEnum::MATCHING->value),
-
-                            Repeater::make('orderingSteps')
-                                ->label(__('Chronological Sequence Slider'))
-                                ->schema([
-                                    FileUpload::make('image')
-                                        ->disk('public')
-                                        ->directory('exercises/ordering')
-                                        ->label(__('Image'))
-                                        ->image()
-                                        ->helperText(__('Recommended size: 500x500'))
-                                        ->maxSize(5120)
-                                        ->required(),
-                                ])
-                                ->minItems(2)
-                                ->visible(fn (Get $get) => $get('../type') === ExerciseTypeEnum::ORDERING->value)
-                                ->required(fn (Get $get) => $get('../type') === ExerciseTypeEnum::ORDERING->value),
-
-                            Repeater::make('options')
-                                ->label(__('Options'))
-                                ->schema([
-                                    TextInput::make('title')
-                                        ->label(__('Card Title'))
-                                        ->required(),
-                                    FileUpload::make('image')
-                                        ->disk('public')
-                                        ->directory('exercises/options')
-                                        ->label(__('Card Image'))
-                                        ->image()
-                                        ->helperText(__('Recommended size: 500x500'))
-                                        ->maxSize(5120)
-                                        ->required(),
-                                    FileUpload::make('audio')
-                                        ->disk('public')
-                                        ->directory('exercises/audio')
-                                        ->label(__('Card Audio File'))
-                                        ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/m4a'])
-                                        ->maxSize(5120)
-                                        ->visible(fn (Get $get) => $get('../../type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
-                                        ->required(fn (Get $get) => $get('../../type') === ExerciseTypeEnum::AUDIO_FLASHCARDS->value),
-                                    Toggle::make('is_correct')
-                                        ->label(__('Is Correct Answer'))
-                                        ->default(false),
-                                ])
-                                ->minItems(2)
-                                ->columns(2)
-                                ->visible(fn (Get $get) => in_array($get('../type'), [ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value]))
-                                ->required(fn (Get $get) => in_array($get('../type'), [ExerciseTypeEnum::AUDIO_FLASHCARDS->value, ExerciseTypeEnum::IMAGE_SELECTION->value, ExerciseTypeEnum::DISTINGUISHING->value])),
-
-                            TextInput::make('video_url')
-                                ->label(__('Video URL'))
-                                ->url()
-                                ->maxLength(500)
-                                ->visible(fn (Get $get) => $get('../type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value)
-                                ->required(fn (Get $get) => $get('../type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
-                        ])->columnSpanFull(),
-
-                        SpatieMediaLibraryFileUpload::make('video_thumbnail')
-                            ->disk('public')
-                            ->collection('video_thumbnail')
-                            ->label(__('Video Thumbnail'))
-                            ->image()
-                            ->helperText(__('Recommended size: 1920x1080'))
-                            ->maxSize(5120)
-                            ->visible(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value)
-                            ->required(fn (Get $get) => $get('type') === ExerciseTypeEnum::INSTRUCTIONAL_VIDEO->value),
-                    ])
-                    ->columnSpanFull()
-                    ->addActionLabel(__('Add exercise'))
-                    ->collapsible()
-                    ->itemLabel(function (array $state): string {
-                        return match (true) {
-                            empty($state['type']) => __('New Exercise'),
-                            $state['type'] instanceof ExerciseTypeEnum => ExerciseTypeEnum::label($state['type']),
-                            default => ExerciseTypeEnum::from($state['type'])->value,
-                        };
-                    }),
+                Grid::make(2)->schema([
+                    Select::make('reward_id')
+                        ->label(__('Reward'))
+                        ->options(fn () => Reward::query()->where('target_type', RewardTargetEnum::LESSON->value)->get()->pluck('name', 'id'))
+                        ->searchable()
+                        ->placeholder(__('No reward'))
+                        ->helperText(__('Given to the child once every exercise in this lesson is completed.')),
+                    Toggle::make('is_locked')
+                        ->label(__('Locked'))
+                        ->helperText(__('Locked lessons open only after the previous lesson is completed.'))
+                        ->default(true)
+                        ->inline(false),
+                ]),
             ])
             ->columnSpanFull()
             ->addActionLabel(__('Add lesson'))
+            ->deleteAction(fn (Action $action): Action => $action->requiresConfirmation())
+            ->extraItemActions([
+                Action::make('manageExercises')
+                    ->label(__('Manage exercises'))
+                    ->tooltip(__('Manage exercises'))
+                    ->icon(Heroicon::OutlinedPuzzlePiece)
+                    ->url(fn (array $arguments, Repeater $component): ?string => ($lesson = self::lessonOf($arguments['item'], $component))
+                        ? LearningLessonResource::getUrl('edit', ['record' => $lesson])
+                        : null)
+                    ->openUrlInNewTab()
+                    ->visible(fn (array $arguments, Repeater $component): bool => self::lessonOf($arguments['item'], $component) !== null),
+            ])
             ->collapsible()
-            ->itemLabel(fn (array $state): ?string => $state['name'][app()->getLocale()] ?? null);
+            ->itemLabel(function (array $state, Repeater $component, string $key): string {
+                $name = $state['name'][app()->getLocale()] ?? null;
+                $lesson = self::lessonOf($key, $component);
+
+                if (! $lesson) {
+                    return $name ?: __('New lesson');
+                }
+
+                return ($name ?: __('Lesson')).' · '.trans_choice(':count exercise|:count exercises', $lesson->exercises_count, ['count' => $lesson->exercises_count]);
+            });
+    }
+
+    /**
+     * The saved lesson behind a repeater item, or null for an item that has not been saved yet.
+     */
+    private static function lessonOf(?string $itemKey, Repeater $component): ?LearningLesson
+    {
+        $lesson = $itemKey ? $component->getCachedExistingRecords()->get($itemKey) : null;
+
+        if ($lesson && ! isset($lesson->exercises_count)) {
+            $lesson->loadCount('exercises');
+        }
+
+        return $lesson;
     }
 }

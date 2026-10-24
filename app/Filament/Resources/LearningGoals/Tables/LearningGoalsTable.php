@@ -68,7 +68,7 @@ class LearningGoalsTable
                     ->preload(),
             ])
             ->emptyStateHeading(__('No learning goals yet'))
-            ->emptyStateDescription(__('Create a goal, add its lessons and exercises, then add it to one or more plans.'))
+            ->emptyStateDescription(__('Create a goal, add its lessons, then add it to one or more plans.'))
             ->recordActions([
                 // ViewAction::make(),
                 EditAction::make(),

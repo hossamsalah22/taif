@@ -24,7 +24,7 @@ class LearningGoalResource extends MainResource
 
     protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedViewfinderCircle;
 

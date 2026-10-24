@@ -19,6 +19,6 @@ class ListLearningLessons extends ListRecords
 
     public function getSubheading(): ?string
     {
-        return __('A lesson is one step of a goal. To add or edit its exercises, open the goal it belongs to.');
+        return __('A lesson is one step of a goal. Open a lesson to add and edit the exercises the child plays.');
     }
 }

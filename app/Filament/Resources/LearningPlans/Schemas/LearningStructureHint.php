@@ -14,8 +14,8 @@ class LearningStructureHint
     {
         $current = match ($level) {
             'plan' => __('You are editing a plan: the program assigned to a child. It groups goals and sets the daily limits.'),
-            'goal' => __('You are editing a goal: a skill to learn. It can belong to several plans and contains lessons with their exercises.'),
-            default => __('You are editing a lesson: one step of a goal. Its exercises are what the child actually plays.'),
+            'goal' => __('You are editing a goal: a skill to learn. It can belong to several plans and contains lessons.'),
+            default => __('You are editing a lesson: one step of a goal. It contains the exercises the child actually plays.'),
         };
 
         return Callout::make(__('How learning content is organized'))

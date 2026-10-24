@@ -58,10 +58,18 @@ class LearningGoalForm
                             ->helperText(__('Order inside the plan: 1 comes first.')),
                     ]),
 
-                Section::make(__('Content & Settings'))
-                    ->description(__('Add the lessons of this goal, and inside each lesson the exercises the child plays.'))
-                    ->icon('heroicon-o-adjustments-horizontal')
-                    ->columns(2)
+                Section::make(__('Lessons'))
+                    ->description(__('Add the lessons of this goal and drag them into the order the child follows. Exercises are added inside each lesson: save the goal, then use "Manage exercises" on a lesson.'))
+                    ->icon('heroicon-o-play-circle')
+                    ->columnSpanFull()
+                    ->schema([
+                        LessonsRepeater::make(),
+                    ]),
+
+                Section::make(__('Assessment Questions'))
+                    ->icon('heroicon-o-question-mark-circle')
+                    ->collapsible()
+                    ->collapsed()
                     ->columnSpanFull()
                     ->schema([
                         Select::make('questions')
@@ -71,10 +79,7 @@ class LearningGoalForm
                             ->multiple()
                             ->searchable(false)
                             ->preload()
-                            ->helperText(__('Optional. Assessment questions linked to this goal.'))
-                            ->columnSpanFull(),
-                        LessonsRepeater::make()
-                            ->columnSpanFull(),
+                            ->helperText(__('Optional. Assessment questions linked to this goal.')),
                     ]),
 
                 Section::make(__('Access & Reward'))

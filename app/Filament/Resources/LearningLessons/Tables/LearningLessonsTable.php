@@ -31,7 +31,7 @@ class LearningLessonsTable
                     ->counts('exercises')
                     ->badge()
                     ->color(fn (int $state): string => $state > 0 ? 'info' : 'danger')
-                    ->tooltip(fn (int $state): ?string => $state > 0 ? null : __('This lesson has no exercises yet. Add them from its goal.'))
+                    ->tooltip(fn (int $state): ?string => $state > 0 ? null : __('This lesson has no exercises yet. Open the lesson to add them.'))
                     ->sortable(),
                 TextColumn::make('reward.name')
                     ->label(__('Reward'))
@@ -62,7 +62,7 @@ class LearningLessonsTable
                     ->preload(),
             ])
             ->emptyStateHeading(__('No lessons yet'))
-            ->emptyStateDescription(__('Lessons belong to a goal. The easiest way to add them with their exercises is from the goal form.'))
+            ->emptyStateDescription(__('Lessons belong to a goal. Create a lesson, pick its goal, then add its exercises.'))
             ->recordActions([
                 // ViewAction::make(),
                 EditAction::make(),

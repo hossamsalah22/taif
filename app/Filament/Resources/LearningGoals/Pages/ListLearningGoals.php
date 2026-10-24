@@ -19,6 +19,6 @@ class ListLearningGoals extends ListRecords
 
     public function getSubheading(): ?string
     {
-        return __('A goal is a skill the child learns. Its lessons and exercises are added inside the goal form, and one goal can be shared by several plans.');
+        return __('A goal is a skill the child learns. Its lessons are added inside the goal form, and one goal can be shared by several plans.');
     }
 }

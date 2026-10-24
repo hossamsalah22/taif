@@ -12,8 +12,10 @@ class LearningGoalInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('plan.name')
-                    ->label(__('Learning Plan')),
+                TextEntry::make('plans.name')
+                    ->label(__('Learning Plans'))
+                    ->badge()
+                    ->placeholder(__('No plan')),
                 TextEntry::make('name')
                     ->label(__('Goal Name')),
                 TextEntry::make('description')

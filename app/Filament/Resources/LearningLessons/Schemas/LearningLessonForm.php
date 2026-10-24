@@ -35,7 +35,7 @@ class LearningLessonForm
                             ->relationship('goal', 'name')
                             ->searchable()
                             ->preload()
-                            ->helperText(__('The goal this lesson belongs to. Its exercises are edited from that goal.'))
+                            ->helperText(__('The goal this lesson belongs to.'))
                             ->required(),
                         Select::make('display_priority')
                             ->label(__('Display priority'))
@@ -65,6 +65,14 @@ class LearningLessonForm
                             ->helperText(__('Locked lessons open only after the previous lesson is completed.'))
                             ->default(true)
                             ->inline(false),
+                    ]),
+
+                Section::make(__('Exercises'))
+                    ->description(__('The exercises the child plays in this lesson. Drag them into the order the child follows.'))
+                    ->icon('heroicon-o-puzzle-piece')
+                    ->columnSpanFull()
+                    ->schema([
+                        ExercisesRepeater::make(),
                     ]),
             ]);
     }
