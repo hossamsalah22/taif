@@ -28,7 +28,7 @@ class RegisterRequest extends FormRequest
             'name' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[a-zA-Z ]+$/'],
             'country_code' => ['required', 'string', 'max:10'],
             'phone' => ['required', 'string', 'phone_number', 'unique:users,phone'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['required', 'email:rfc,filter', 'unique:users,email'],
             'terms_and_conditions' => ['required', 'accepted'],
         ];
     }

@@ -154,6 +154,7 @@ class ManageGeneral extends SettingsPage
                 TextInput::make('email')
                     ->label(__('email'))
                     ->email()
+                    ->rule('email:rfc,filter')
                     ->nullable()
                     ->placeholder(__('email_placeholder'))
                     ->helperText(__('general_email_help'))

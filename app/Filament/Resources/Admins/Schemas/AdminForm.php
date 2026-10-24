@@ -23,7 +23,7 @@ class AdminForm
                         ->rule(['required', 'max:255']),
                     TextInput::make('email')
                         ->label(__('email'))
-                        ->rule(['required', 'max:255', 'email'])
+                        ->rule(['required', 'max:255', 'email:rfc,filter'])
                         ->unique(ignoreRecord: true),
                     Select::make('country_code')
                         ->label(__('country_code'))

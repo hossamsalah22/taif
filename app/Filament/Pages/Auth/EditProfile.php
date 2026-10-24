@@ -55,6 +55,8 @@ class EditProfile extends BaseEditProfile
                             ->placeholder('user@example.com')
                             ->prefixIcon('heroicon-o-envelope')
                             ->email()
+                            // "filter" also rejects domains without a dot, such as admin@appcom.
+                            ->rule('email:rfc,filter')
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
@@ -84,4 +86,3 @@ class EditProfile extends BaseEditProfile
             ]);
     }
 }
-
