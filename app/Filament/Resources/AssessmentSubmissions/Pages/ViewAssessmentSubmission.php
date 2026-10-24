@@ -5,7 +5,6 @@ namespace App\Filament\Resources\AssessmentSubmissions\Pages;
 use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
 use App\Models\AssessmentSubmission;
-use App\Notifications\ReportPublishedNotification;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -26,11 +25,7 @@ class ViewAssessmentSubmission extends ViewRecord
                 ->requiresConfirmation()
                 ->visible(fn (AssessmentSubmission $record) => $record->status !== AssessmentSubmissionStatusEnum::PUBLISHED)
                 ->action(function (AssessmentSubmission $record) {
-                    $record->update([
-                        'status' => AssessmentSubmissionStatusEnum::PUBLISHED,
-                        'report_published_at' => now(),
-                    ]);
-                    $record->child->parent->notify(new ReportPublishedNotification($record));
+                    $record->publish();
                     Notification::make()->title(__('Report Published Successfully'))->success()->send();
                 }),
         ];

@@ -9,6 +9,7 @@ use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
 use App\Filament\Resources\AssessmentSubmissions\Pages\EditAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ListAssessmentSubmissions;
+use App\Filament\Resources\AssessmentSubmissions\Pages\ViewAssessmentSubmission;
 use App\Filament\Resources\SupportTickets\Pages\ListSupportTickets;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\Admin;
@@ -86,6 +87,39 @@ class AdminWorkflowTest extends TestCase
         $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $submission->status);
         $this->assertNotNull($submission->report_published_at);
         Notification::assertSentTo($submission->child->parent, ReportPublishedNotification::class);
+    }
+
+    public function test_publishing_from_the_view_page_notifies_the_parent(): void
+    {
+        $submission = $this->createSubmission('reviewed_with_report');
+
+        Livewire::test(ViewAssessmentSubmission::class, ['record' => $submission->id])
+            ->callAction('publish')
+            ->assertHasNoErrors()
+            ->assertNotified(__('Report Published Successfully'));
+
+        $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $submission->refresh()->status);
+    }
+
+    public function test_publishing_for_a_parent_who_deleted_their_account_does_not_fail(): void
+    {
+        Notification::fake();
+        $fromView = $this->createSubmission('reviewed_with_report');
+        $fromList = $this->createSubmission('reviewed_with_report');
+        $fromView->child->parent->delete();
+        $fromList->child->parent->delete();
+
+        Livewire::test(ViewAssessmentSubmission::class, ['record' => $fromView->id])
+            ->callAction('publish')
+            ->assertNotified(__('Report Published Successfully'));
+
+        Livewire::test(ListAssessmentSubmissions::class, ['activeTab' => 'reviewed'])
+            ->callAction(TestAction::make('publish')->table($fromList))
+            ->assertNotified(__('Report Published Successfully'));
+
+        $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $fromView->refresh()->status);
+        $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $fromList->refresh()->status);
+        Notification::assertNothingSent();
     }
 
     public function test_re_evaluating_a_published_report_keeps_it_published(): void

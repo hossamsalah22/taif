@@ -6,7 +6,6 @@ use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\AutismLevelEnum;
 use App\Models\Assessment;
 use App\Models\AssessmentSubmission;
-use App\Notifications\ReportPublishedNotification;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -80,11 +79,7 @@ class AssessmentSubmissionsTable
                     ->requiresConfirmation()
                     ->visible(fn (AssessmentSubmission $record) => $record->status !== AssessmentSubmissionStatusEnum::PUBLISHED)
                     ->action(function (AssessmentSubmission $record) {
-                        $record->update([
-                            'status' => AssessmentSubmissionStatusEnum::PUBLISHED,
-                            'report_published_at' => now(),
-                        ]);
-                        $record->child->parent->notify(new ReportPublishedNotification($record));
+                        $record->publish();
                         Notification::make()->title(__('Report Published Successfully'))->success()->send();
                     }),
                 ActionGroup::make([

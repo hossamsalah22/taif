@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AssessmentSubmissionStatusEnum;
+use App\Notifications\ReportPublishedNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -35,6 +36,19 @@ class AssessmentSubmission extends Model implements HasMedia
     /**
      * A specialist's evaluation moves the submission to "reviewed"; a published report stays published.
      */
+    /**
+     * Makes the report visible to the parent and tells them, unless they have deleted their account.
+     */
+    public function publish(): void
+    {
+        $this->update([
+            'status' => AssessmentSubmissionStatusEnum::PUBLISHED,
+            'report_published_at' => now(),
+        ]);
+
+        $this->child?->parent?->notify(new ReportPublishedNotification($this));
+    }
+
     public function statusAfterEvaluation(): AssessmentSubmissionStatusEnum
     {
         return $this->status === AssessmentSubmissionStatusEnum::PUBLISHED
