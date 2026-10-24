@@ -127,6 +127,7 @@ class ManageGeneral extends SettingsPage
 
                                 return $rules;
                             })
+                            ->validationMessages(['phone_number' => __('Enter a Saudi number, such as 0501234567 or +966501234567.')])
                             ->dehydrateStateUsing(
                                 fn ($state, Get $get) => $get('phone') ? prepare_phone($state, 'SA') : $state
                             ),
@@ -146,6 +147,7 @@ class ManageGeneral extends SettingsPage
 
                                 return $rules;
                             })
+                            ->validationMessages(['phone_number' => __('Enter a Saudi number, such as 0501234567 or +966501234567.')])
                             ->dehydrateStateUsing(
                                 fn ($state, Get $get) => $get('whatsapp') ? prepare_phone($state, 'SA') : $state
                             ),
