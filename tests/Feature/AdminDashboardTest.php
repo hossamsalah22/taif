@@ -301,6 +301,8 @@ class AdminDashboardTest extends TestCase
         $this->assertStringContainsString('dir="rtl"', $html);
         $this->assertStringContainsString("font-family: 'Tajawal'", $html);
         $this->assertStringNotContainsString('dejavu', $html);
+        $this->assertStringContainsString('<h1>تقرير لوحة تحكم مشروع طيف</h1>', $html);
+        $this->assertStringContainsString('تم الإنشاء بواسطة طيف', $html);
     }
 
     public function test_packages_chart_gives_every_package_a_colour(): void
