@@ -142,6 +142,11 @@ class AdminWorkflowTest extends TestCase
     {
         $submission = $this->createSubmission('pending_review');
 
+        $this->assertStringEndsWith(
+            "/assessment-submissions/{$submission->id}/evaluate",
+            AssessmentSubmissionResource::getUrl('edit', ['record' => $submission]),
+        );
+
         Livewire::test(EditAssessmentSubmission::class, ['record' => $submission->id])
             ->assertSeeHtmlInOrder(['fi-header-heading', __('Evaluate'), '</h1>'])
             ->fillForm(['specialist_notes' => '<p>Notes from the edit page.</p>'])

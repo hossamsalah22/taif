@@ -81,7 +81,8 @@ class AssessmentSubmissionResource extends MainResource
         return [
             'index' => ListAssessmentSubmissions::route('/'),
             'view' => ViewAssessmentSubmission::route('/{record}'),
-            'edit' => EditAssessmentSubmission::route('/{record}/edit'),
+            // Editing a submission is the specialist's evaluation, so the URL says so.
+            'edit' => EditAssessmentSubmission::route('/{record}/evaluate'),
         ];
     }
 
