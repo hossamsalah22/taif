@@ -33,7 +33,7 @@ class AdminTranslationsTest extends TestCase
      */
     private function untranslatedKeys(string $locale, callable $shouldCheck): array
     {
-        $files = collect([app_path('Filament'), app_path('Enums'), resource_path('views/pdf')])
+        $files = collect([app_path('Filament'), app_path('Enums'), resource_path('views/pdf'), resource_path('views/assessments'), resource_path('views/reports')])
             ->flatMap(fn (string $directory): array => File::allFiles($directory))
             ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'php');
 

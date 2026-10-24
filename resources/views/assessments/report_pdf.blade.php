@@ -23,17 +23,14 @@
             font-size: 28px;
         }
         .info-grid {
-            display: table;
             width: 100%;
             margin-bottom: 30px;
-        }
-        .info-row {
-            display: table-row;
+            border-collapse: collapse;
         }
         .info-cell {
-            display: table-cell;
             padding: 10px;
             border-bottom: 1px solid #eee;
+            text-align: right;
         }
         .info-label {
             font-weight: bold;
@@ -66,24 +63,25 @@
         <p>{{ __('Submission ID') }}: SUB-ASM-{{ $record->id }}</p>
     </div>
 
-    <div class="info-grid">
-        <div class="info-row">
-            <div class="info-cell info-label">{{ __('Child Profile') }}</div>
-            <div class="info-cell">{{ $record->child->name }}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-cell info-label">{{ __('Assigned Severity') }}</div>
-            <div class="info-cell">{{ \App\Enums\AutismLevelEnum::label($record->assessment->autism_level) }}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-cell info-label">{{ __('Submission Time') }}</div>
-            <div class="info-cell">{{ $record->created_at->format('Y-m-d H:i') }}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-cell info-label">{{ __('Performance Accuracy') }}</div>
-            <div class="info-cell">{{ $record->performance_accuracy ? $record->performance_accuracy . '%' : __('Not Graded') }}</div>
-        </div>
-    </div>
+    {{-- A real table: mPDF ignores display: table on divs. --}}
+    <table class="info-grid">
+        <tr>
+            <td class="info-cell info-label">{{ __('Child Profile') }}</td>
+            <td class="info-cell">{{ $record->child->name }}</td>
+        </tr>
+        <tr>
+            <td class="info-cell info-label">{{ __('Assigned Severity') }}</td>
+            <td class="info-cell">{{ \App\Enums\AutismLevelEnum::label($record->assessment->autism_level) }}</td>
+        </tr>
+        <tr>
+            <td class="info-cell info-label">{{ __('Submission Time') }}</td>
+            <td class="info-cell">&#x202A;{{ $record->created_at->format('Y-m-d H:i') }}&#x202C;</td>
+        </tr>
+        <tr>
+            <td class="info-cell info-label">{{ __('Performance Accuracy') }}</td>
+            <td class="info-cell">{{ $record->performance_accuracy ? $record->performance_accuracy . '%' : __('Not Graded') }}</td>
+        </tr>
+    </table>
 
     @if($record->specialist_notes)
     <div class="section">

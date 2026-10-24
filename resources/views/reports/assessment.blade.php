@@ -27,21 +27,16 @@
             margin-top: 5px;
         }
         .info-grid {
-            display: table;
             width: 100%;
             margin-bottom: 30px;
             background: #f9fafb;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .info-row {
-            display: table-row;
+            border-collapse: collapse;
         }
         .info-cell {
-            display: table-cell;
             padding: 12px 20px;
             border-bottom: 1px solid #e5e7eb;
             vertical-align: middle;
+            text-align: right;
         }
         .info-label {
             font-weight: bold;
@@ -89,36 +84,37 @@
         <p>رقم التقرير / Report ID: #{{ $submission->id }}</p>
     </div>
 
-    <div class="info-grid">
-        <div class="info-row">
-            <div class="info-cell info-label">
-                ملف الطفل
+    {{-- A real table: mPDF ignores display: table on divs. --}}
+    <table class="info-grid">
+        <tr>
+            <td class="info-cell info-label">
+                ملف الطفل<br>
                 <span class="en">Child Profile</span>
-            </div>
-            <div class="info-cell">{{ $submission->child->name }}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-cell info-label">
-                مستوى الشدة المبدئي
+            </td>
+            <td class="info-cell">{{ $submission->child->name }}</td>
+        </tr>
+        <tr>
+            <td class="info-cell info-label">
+                مستوى الشدة المبدئي<br>
                 <span class="en">Baseline Severity Level</span>
-            </div>
-            <div class="info-cell">{{ $submission->child->autism_level->value ?? 'N/A' }}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-cell info-label">
-                مستوى الشدة المشخص
+            </td>
+            <td class="info-cell">{{ $submission->child->autism_level->value ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td class="info-cell info-label">
+                مستوى الشدة المشخص<br>
                 <span class="en">Diagnosed Severity Level</span>
-            </div>
-            <div class="info-cell">{{ $submission->diagnosed_severity_level ?? 'N/A' }}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-cell info-label">
-                تاريخ النشر
+            </td>
+            <td class="info-cell">{{ $submission->diagnosed_severity_level ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td class="info-cell info-label">
+                تاريخ النشر<br>
                 <span class="en">Date Published</span>
-            </div>
-            <div class="info-cell">{{ $submission->report_published_at ? $submission->report_published_at->format('Y-m-d H:i') : 'N/A' }}</div>
-        </div>
-    </div>
+            </td>
+            <td class="info-cell">&#x202A;{{ $submission->report_published_at ? $submission->report_published_at->format('Y-m-d H:i') : 'N/A' }}&#x202C;</td>
+        </tr>
+    </table>
 
     @if($submission->specialist_notes)
     <div class="section">

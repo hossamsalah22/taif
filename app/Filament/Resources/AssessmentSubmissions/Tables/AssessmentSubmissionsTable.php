@@ -6,6 +6,7 @@ use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\AutismLevelEnum;
 use App\Models\Assessment;
 use App\Models\AssessmentSubmission;
+use App\Services\PdfRenderer;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -16,7 +17,6 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Spatie\Browsershot\Browsershot;
 
 class AssessmentSubmissionsTable
 {
@@ -88,13 +88,7 @@ class AssessmentSubmissionsTable
                         ->icon('heroicon-o-document-arrow-down')
                         ->color('info')
                         ->action(function (AssessmentSubmission $record) {
-                            $html = view('assessments.report_pdf', ['record' => $record])->render();
-                            $pdf = Browsershot::html($html)
-                                ->format('A4')
-                                ->margins(10, 10, 10, 10)
-                                ->showBackground()
-                                ->noSandbox()
-                                ->pdf();
+                            $pdf = PdfRenderer::fromView('assessments.report_pdf', ['record' => $record]);
 
                             return response()->streamDownload(fn () => print ($pdf), "report-{$record->id}.pdf");
                         }),

@@ -123,6 +123,30 @@ class AdminWorkflowTest extends TestCase
         Notification::assertNothingSent();
     }
 
+    public function test_report_can_be_exported_as_pdf(): void
+    {
+        $submission = $this->createSubmission('published');
+        $submission->update(['specialist_notes' => '<p>ملاحظات الأخصائي على أداء الطفل.</p>', 'strengths' => 'التواصل البصري']);
+
+        Livewire::test(ListAssessmentSubmissions::class, ['activeTab' => 'all'])
+            ->callAction(TestAction::make('export_pdf')->table($submission))
+            ->assertFileDownloaded("report-{$submission->id}.pdf");
+    }
+
+    public function test_parent_can_download_the_published_report_as_pdf(): void
+    {
+        $submission = $this->createSubmission('published');
+        $submission->update(['specialist_notes' => '<p>ملاحظات الأخصائي على أداء الطفل.</p>']);
+        $child = $submission->child;
+
+        $response = $this->actingAs($child->parent, 'user')
+            ->get(route('api.reports.download', ['child' => $child, 'submission' => $submission]))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
+
+        $this->assertStringStartsWith('%PDF', $response->getContent());
+    }
+
     public function test_re_evaluating_a_published_report_keeps_it_published(): void
     {
         $published = $this->createSubmission('published');

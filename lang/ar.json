@@ -1081,5 +1081,8 @@
     "Speech Status": "حالة النطق",
     "Educational Status": "الحالة التعليمية",
     "Allow one more assessment attempt": "السماح بمحاولة تقييم إضافية",
-    "Lets the parent take the assessment again after using all attempts. Turns itself off once used.": "يتيح لولي الأمر إعادة التقييم بعد استنفاد كل المحاولات، ويُلغى تلقائيًا بعد استخدامه."
+    "Lets the parent take the assessment again after using all attempts. Turns itself off once used.": "يتيح لولي الأمر إعادة التقييم بعد استنفاد كل المحاولات، ويُلغى تلقائيًا بعد استخدامه.",
+    "Assessment Report": "تقرير التقييم",
+    "Clinical Evaluation Report": "تقرير التقييم السريري",
+    "Not Graded": "لم يُقيَّم"
 }

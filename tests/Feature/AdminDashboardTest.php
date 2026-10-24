@@ -282,7 +282,7 @@ class AdminDashboardTest extends TestCase
         Excel::assertDownloaded('analytics_2026-10-14_to_2026-10-20.xlsx');
     }
 
-    public function test_pdf_export_is_rendered_by_chromium_with_the_selected_range(): void
+    public function test_pdf_export_downloads_with_the_selected_range(): void
     {
         $this->actingAs($this->createSuperAdmin(), 'web');
 
@@ -299,8 +299,9 @@ class AdminDashboardTest extends TestCase
         $html = view('pdf.analytics', ['data' => AnalyticsService::getDashboardKpis(now()->subMonth(), now())])->render();
 
         $this->assertStringContainsString('dir="rtl"', $html);
-        $this->assertStringContainsString("font-family: 'Tajawal'", $html);
-        $this->assertStringNotContainsString('dejavu', $html);
+        // DejaVu Sans ships with mPDF and covers Arabic; a remote font would be fetched on every export.
+        $this->assertStringContainsString("font-family: 'dejavusans'", $html);
+        $this->assertStringNotContainsString('fonts.googleapis.com', $html);
         $this->assertStringContainsString('<h1>تقرير لوحة تحكم مشروع طيف</h1>', $html);
         $this->assertStringContainsString('تم الإنشاء بواسطة طيف', $html);
     }

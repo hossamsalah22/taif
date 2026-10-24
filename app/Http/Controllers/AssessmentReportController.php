@@ -6,8 +6,8 @@ use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Http\Resources\AssessmentReportResource;
 use App\Models\AssessmentSubmission;
 use App\Models\Child;
+use App\Services\PdfRenderer;
 use Illuminate\Http\Request;
-use Spatie\Browsershot\Browsershot;
 
 class AssessmentReportController extends Controller
 {
@@ -41,12 +41,7 @@ class AssessmentReportController extends Controller
             abort(400, 'Report is not published yet.');
         }
 
-        $html = view('reports.assessment', ['submission' => $submission])->render();
-
-        $pdf = Browsershot::html($html)
-            ->format('A4')
-            ->margins(10, 10, 10, 10)
-            ->pdf();
+        $pdf = PdfRenderer::fromView('reports.assessment', ['submission' => $submission]);
 
         return response($pdf)
             ->header('Content-Type', 'application/pdf')
