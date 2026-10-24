@@ -28,4 +28,26 @@ class ReplySupportTicketRequest extends FormRequest
             ...SupportTicketAttachment::validationRules(),
         ];
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'reply_text.required_without' => __('Write a reply or attach a file.'),
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'reply_text' => __('Reply'),
+            'attachments' => __('Attachments'),
+            'attachments.*' => __('Attachments'),
+        ];
+    }
 }

@@ -148,9 +148,9 @@ class SupportTicketAttachmentTest extends TestCase
         $ticket = SupportTicket::factory()->create();
 
         $this->actingAs($ticket->user, 'user')
-            ->postJson("/api/user/support-tickets/{$ticket->id}/reply", [])
+            ->postJson("/api/user/support-tickets/{$ticket->id}/reply", [], ['Accept-Language' => 'ar'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('reply_text');
+            ->assertJsonValidationErrors(['reply_text' => 'اكتب ردًا أو أرفق ملفًا.']);
 
         Event::assertNotDispatched(SupportTicketReplyCreated::class);
     }
@@ -249,9 +249,13 @@ class SupportTicketAttachmentTest extends TestCase
 
         $this->actingAs($this->createAdmin(), 'web');
 
+        app()->setLocale('ar');
+
         Livewire::test(SupportTicketChat::class, ['ticket' => $ticket])
             ->call('sendReply')
-            ->assertHasErrors(['replyText' => 'required_without']);
+            ->assertHasErrors(['replyText' => 'required_without'])
+            ->assertSee('اكتب ردًا أو أرفق ملفًا.')
+            ->assertDontSee('reply text');
 
         $this->assertDatabaseCount('support_ticket_replies', 0);
     }

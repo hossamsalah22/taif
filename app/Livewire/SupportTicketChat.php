@@ -28,10 +28,14 @@ class SupportTicketChat extends Component
 
     public function sendReply()
     {
-        $this->validate([
-            'replyText' => ['required_without:attachments', 'nullable', 'string', 'max:2000'],
-            ...SupportTicketAttachment::validationRules(),
-        ]);
+        $this->validate(
+            [
+                'replyText' => ['required_without:attachments', 'nullable', 'string', 'max:2000'],
+                ...SupportTicketAttachment::validationRules(),
+            ],
+            ['replyText.required_without' => __('Write a reply or attach a file.')],
+            ['replyText' => __('Reply'), 'attachments' => __('Attachments'), 'attachments.*' => __('Attachments')],
+        );
 
         if ($this->ticket->status === SupportTicketStatusEnum::CLOSED) {
             Notification::make()->title(__('This ticket is closed and cannot be replied to.'))->danger()->send();
