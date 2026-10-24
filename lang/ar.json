@@ -1094,5 +1094,10 @@
     "Not successful": "غير ناجحة",
     "Sound File": "الملف الصوتي",
     "Deleted At": "تاريخ الحذف",
-    "Enter a Saudi number, such as 0501234567 or +966501234567.": "أدخل رقمًا سعوديًا، مثل 0501234567 أو ‎+966501234567."
+    "Enter a Saudi number, such as 0501234567 or +966501234567.": "أدخل رقمًا سعوديًا، مثل 0501234567 أو ‎+966501234567.",
+    "A super admin can do everything in the panel.": "يمكن للمشرف العام القيام بكل شيء في اللوحة.",
+    "This admin has no permissions yet. Give them a role to grant some.": "لا يملك هذا المشرف أي صلاحيات بعد. امنحه دورًا لإعطائه صلاحيات.",
+    "Section": "القسم",
+    "Allowed Actions": "الإجراءات المسموحة",
+    "Export": "تصدير"
 }
