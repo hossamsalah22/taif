@@ -10,7 +10,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Actions;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Maatwebsite\Excel\Facades\Excel;
@@ -73,42 +73,39 @@ class Dashboard extends BaseDashboard
                                 ->action(fn () => $this->applyPreset($key)))
                             ->values()
                             ->all()),
-                        Grid::make(['default' => 12])
-                            // Buttons sit on the same line as the inputs, not next to their labels.
-                            ->extraAttributes(['style' => 'align-items: end;'])
-                            ->schema([
-                                DatePicker::make('startDate')
-                                    ->label(__('Start Date'))
-                                    ->default(now()->subMonth()->format('Y-m-d'))
-                                    ->maxDate(now())
-                                    ->columnSpan(['default' => 12, 'md' => 5]),
-                                DatePicker::make('endDate')
-                                    ->label(__('End Date'))
-                                    ->default(now()->format('Y-m-d'))
-                                    ->maxDate(now())
-                                    ->afterOrEqual('startDate')
-                                    ->validationMessages([
-                                        'after_or_equal' => __('The end date cannot be before the start date.'),
-                                    ])
-                                    ->columnSpan(['default' => 12, 'md' => 4]),
-                                Actions::make([
-                                    Action::make('filter')
-                                        ->label(__('Filter'))
-                                        ->icon('heroicon-m-funnel')
-                                        ->action(fn () => $this->applyFilters()),
-                                    Action::make('reset')
-                                        ->label(__('Reset'))
-                                        ->icon('heroicon-m-x-mark')
-                                        ->color('gray')
-                                        ->outlined()
-                                        ->action(function (): void {
-                                            $this->filters = $this->getDefaultFilters();
-                                            $this->getFiltersForm()->fill($this->filters);
-                                        }),
-                                ])
-                                    ->columnSpan(['default' => 12, 'md' => 3])
-                                    ->alignStart(),
-                            ]),
+                        // Bottom-aligned so the buttons sit on the same line as the inputs, not next to their labels.
+                        Flex::make([
+                            DatePicker::make('startDate')
+                                ->label(__('Start Date'))
+                                ->default(now()->subMonth()->format('Y-m-d'))
+                                ->maxDate(now()),
+                            DatePicker::make('endDate')
+                                ->label(__('End Date'))
+                                ->default(now()->format('Y-m-d'))
+                                ->maxDate(now())
+                                ->afterOrEqual('startDate')
+                                ->validationMessages([
+                                    'after_or_equal' => __('The end date cannot be before the start date.'),
+                                ]),
+                            Actions::make([
+                                Action::make('filter')
+                                    ->label(__('Filter'))
+                                    ->icon('heroicon-m-funnel')
+                                    ->action(fn () => $this->applyFilters()),
+                                Action::make('reset')
+                                    ->label(__('Reset'))
+                                    ->icon('heroicon-m-x-mark')
+                                    ->color('gray')
+                                    ->outlined()
+                                    ->action(function (): void {
+                                        $this->filters = $this->getDefaultFilters();
+                                        $this->getFiltersForm()->fill($this->filters);
+                                    }),
+                            ])
+                                ->grow(false),
+                        ])
+                            ->from('md')
+                            ->verticallyAlignEnd(),
                     ])
                     ->columnSpanFull(),
             ]);
