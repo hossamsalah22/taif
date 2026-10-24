@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\SupportTicketReplyCreated;
+use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Livewire\SupportTicketChat;
 use App\Models\Admin;
 use App\Models\SupportTicket;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SupportTicketAttachmentTest extends TestCase
@@ -241,6 +243,26 @@ class SupportTicketAttachmentTest extends TestCase
         $this->assertCount(1, $reply->attachments);
         $this->assertSame('answer.png', $reply->attachments->first()->original_name);
         Storage::disk(SupportTicketAttachment::DISK)->assertExists($reply->attachments->first()->path);
+    }
+
+    public function test_ticket_opens_as_view_and_manage_at_its_own_url(): void
+    {
+        $ticket = SupportTicket::factory()->create();
+        $admin = $this->createAdmin();
+        $admin->update(['is_active' => true]);
+        $admin->assignRole(Role::findOrCreate('Super Admin', 'web'));
+
+        $url = SupportTicketResource::getUrl('edit', ['record' => $ticket]);
+
+        $this->assertStringEndsWith("/support-tickets/{$ticket->id}", $url);
+
+        app()->setLocale('ar');
+
+        $this->actingAs($admin, 'web')
+            ->get($url)
+            ->assertOk()
+            ->assertSeeInOrder(['<h1', 'عرض وإدارة', '</h1>'], false)
+            ->assertDontSee('<h1 class="fi-header-heading">'.__('Edit'), false);
     }
 
     public function test_admin_chat_requires_text_or_attachments(): void

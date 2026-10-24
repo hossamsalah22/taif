@@ -15,6 +15,16 @@ class EditSupportTicket extends EditRecord
 {
     protected static string $resource = SupportTicketResource::class;
 
+    public function getTitle(): string
+    {
+        return __('View & Manage');
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return __('View & Manage');
+    }
+
     protected function getHeaderActions(): array
     {
         return [

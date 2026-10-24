@@ -71,7 +71,8 @@ class SupportTicketResource extends MainResource
         return [
             'index' => ListSupportTickets::route('/'),
             // 'create' => CreateSupportTicket::route('/create'),
-            'edit' => EditSupportTicket::route('/{record}/edit'),
+            // Opening a ticket is mostly reading and replying, so its URL is the ticket itself, not ".../edit".
+            'edit' => EditSupportTicket::route('/{record}'),
         ];
     }
 }
