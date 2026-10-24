@@ -28,6 +28,47 @@ class AdminTranslationsTest extends TestCase
     }
 
     /**
+     * Without ->label() Filament shows the column name in English ("Sound", "Created at"), so every
+     * field, entry and column needs one. Relation managers no resource registers never appear and are skipped.
+     */
+    public function test_every_admin_panel_field_has_a_label(): void
+    {
+        $components = 'TextInput|Textarea|Select|Toggle|Checkbox|DatePicker|DateTimePicker|FileUpload|SpatieMediaLibraryFileUpload'
+            .'|RichEditor|Repeater|KeyValue|ColorPicker|TagsInput|Radio|CheckboxList|TextEntry|IconEntry|ImageEntry'
+            .'|SpatieMediaLibraryImageEntry|RepeatableEntry|ViewEntry|TextColumn|IconColumn|ImageColumn|ToggleColumn'
+            .'|SpatieMediaLibraryImageColumn|SelectFilter|TernaryFilter';
+
+        $files = collect(File::allFiles(app_path('Filament')))
+            ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'php');
+        $allSource = $files->map(fn (SplFileInfo $file): string => $file->getContents())->implode("\n");
+
+        $unlabeled = [];
+
+        foreach ($files as $file) {
+            $source = $file->getContents();
+            $class = $file->getBasename('.php');
+
+            if (str_contains($file->getRelativePath(), 'RelationManagers') && substr_count($allSource, "{$class}::class") === 0) {
+                continue;
+            }
+
+            preg_match_all("/\b(?:{$components})::make\('([^']+)'\)/", $source, $matches, PREG_OFFSET_CAPTURE);
+
+            foreach ($matches[0] as $index => [$call, $offset]) {
+                // The component's chain runs until the next component is made.
+                $rest = substr($source, $offset + strlen($call));
+                $chain = preg_match('/\b[A-Z]\w+::make\(/', $rest, $next, PREG_OFFSET_CAPTURE) ? substr($rest, 0, $next[0][1]) : $rest;
+
+                if (! str_contains($chain, '->label(') && ! str_contains($chain, '->hiddenLabel(')) {
+                    $unlabeled[] = $file->getRelativePathname().": {$matches[1][$index][0]}";
+                }
+            }
+        }
+
+        $this->assertSame([], $unlabeled, 'Give these a translated ->label(): '.implode(' | ', $unlabeled));
+    }
+
+    /**
      * @param  callable(string): bool  $shouldCheck
      * @return array<string, array<int, string>> key => files using it
      */

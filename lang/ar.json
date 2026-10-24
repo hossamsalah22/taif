@@ -1091,5 +1091,7 @@
     "Result": "النتيجة",
     "Attempts": "المحاولات",
     "Duration (seconds)": "المدة (بالثواني)",
-    "Not successful": "غير ناجحة"
+    "Not successful": "غير ناجحة",
+    "Sound File": "الملف الصوتي",
+    "Deleted At": "تاريخ الحذف"
 }

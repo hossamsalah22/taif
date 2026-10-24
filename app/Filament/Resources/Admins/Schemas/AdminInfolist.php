@@ -43,6 +43,7 @@ class AdminInfolist
                                 Tab::make(__('permissions'))
                                     ->schema([
                                         ViewEntry::make('permissions')
+                                            ->hiddenLabel()
                                             ->view('filament.infolists.admin-permissions-table'),
                                     ]),
                             ])

@@ -26,9 +26,11 @@ class LearningLessonInfolist
                     ->label(__('Display Priority'))
                     ->numeric(),
                 TextEntry::make('created_at')
+                    ->label(__('Created At'))
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
+                    ->label(__('Updated At'))
                     ->dateTime()
                     ->placeholder('-'),
             ]);

@@ -71,6 +71,7 @@ class RewardForm
                     ->columnSpanFull()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('sound')
+                            ->label(__('Sound File'))
                             ->disk('public')
                             ->collection('rewards')
                             ->acceptedFileTypes(['audio/*'])

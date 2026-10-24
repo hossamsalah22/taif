@@ -24,6 +24,7 @@ class ChildrenRelationManager extends MainRelationManager
         return $schema
             ->schema([
                 TextInput::make('name')
+                    ->label(__('Child Name'))
                     ->required()
                     ->maxLength(255),
             ]);
