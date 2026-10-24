@@ -32,6 +32,16 @@ class AssessmentSubmission extends Model implements HasMedia
         'status' => AssessmentSubmissionStatusEnum::class,
     ];
 
+    /**
+     * A specialist's evaluation moves the submission to "reviewed"; a published report stays published.
+     */
+    public function statusAfterEvaluation(): AssessmentSubmissionStatusEnum
+    {
+        return $this->status === AssessmentSubmissionStatusEnum::PUBLISHED
+            ? AssessmentSubmissionStatusEnum::PUBLISHED
+            : AssessmentSubmissionStatusEnum::REVIEWED;
+    }
+
     public function child()
     {
         return $this->belongsTo(Child::class);

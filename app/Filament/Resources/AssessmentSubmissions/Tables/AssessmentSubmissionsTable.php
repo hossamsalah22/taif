@@ -69,9 +69,7 @@ class AssessmentSubmissionsTable
                     ->icon('heroicon-o-clipboard-document-check')
                     ->slideOver()
                     ->mutateFormDataUsing(function (array $data, AssessmentSubmission $record): array {
-                        $data['status'] = $record->status === AssessmentSubmissionStatusEnum::PUBLISHED
-                            ? AssessmentSubmissionStatusEnum::PUBLISHED
-                            : AssessmentSubmissionStatusEnum::REVIEWED;
+                        $data['status'] = $record->statusAfterEvaluation();
 
                         return $data;
                     }),

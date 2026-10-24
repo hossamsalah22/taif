@@ -7,6 +7,7 @@ use App\Enums\AutismLevelEnum;
 use App\Enums\SubscriptionStatusEnum;
 use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
+use App\Filament\Resources\AssessmentSubmissions\Pages\EditAssessmentSubmission;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ListAssessmentSubmissions;
 use App\Filament\Resources\SupportTickets\Pages\ListSupportTickets;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -100,6 +101,33 @@ class AdminWorkflowTest extends TestCase
 
         $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $published->refresh()->status);
         $this->assertSame(AssessmentSubmissionStatusEnum::REVIEWED, $waiting->refresh()->status);
+    }
+
+    public function test_saving_the_edit_page_returns_to_the_edited_submission(): void
+    {
+        $submission = $this->createSubmission('pending_review');
+
+        Livewire::test(EditAssessmentSubmission::class, ['record' => $submission->id])
+            ->fillForm(['specialist_notes' => '<p>Notes from the edit page.</p>'])
+            ->call('save')
+            ->assertHasNoFormErrors()
+            ->assertRedirect(AssessmentSubmissionResource::getUrl('view', ['record' => $submission]));
+
+        $submission->refresh();
+        $this->assertSame('<p>Notes from the edit page.</p>', $submission->specialist_notes);
+        $this->assertSame(AssessmentSubmissionStatusEnum::REVIEWED, $submission->status);
+    }
+
+    public function test_editing_a_published_submission_on_the_edit_page_keeps_it_published(): void
+    {
+        $published = $this->createSubmission('published');
+
+        Livewire::test(EditAssessmentSubmission::class, ['record' => $published->id])
+            ->fillForm(['specialist_notes' => '<p>Follow-up notes after the next session.</p>'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $published->refresh()->status);
     }
 
     public function test_parent_app_still_receives_the_status_as_a_string(): void
