@@ -68,23 +68,24 @@ class SubscriptionPackagesTable
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make()
-                    ->before(function ($record, DeleteAction $action) {
-                        $activeCount = $record->subscriptions()->where('status', 'active')->count();
-                        if ($activeCount > 0) {
+                    ->before(function (SubscriptionPackage $record, DeleteAction $action) {
+                        if ($record->hasActiveSubscribers()) {
                             Notification::make()
                                 ->warning()
-                                ->title('Action Blocked')
-                                ->body('This package is linked to active subscribers and cannot be deleted.')
+                                ->title(__('Action Blocked'))
+                                ->body(__('This package is linked to active subscribers and cannot be deleted.'))
                                 ->send();
 
                             $action->halt();
                         }
                     })
-                    ->hidden(fn (SubscriptionPackage $record) => $record->subscriptions()->where('status', 'active')->count() > 0),
+                    ->hidden(fn (SubscriptionPackage $record) => $record->hasActiveSubscribers()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    // Checked per package, not by permission: the Super Admin passes every policy.
+                    DeleteBulkAction::make()
+                        ->authorizeIndividualRecords(fn (SubscriptionPackage $record): bool => ! $record->hasActiveSubscribers()),
                 ]),
             ]);
     }

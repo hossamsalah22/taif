@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BillingCycleEnum;
+use App\Enums\SubscriptionStatusEnum;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,5 +27,13 @@ class SubscriptionPackage extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * A package that parents are subscribed to right now must not be deleted.
+     */
+    public function hasActiveSubscribers(): bool
+    {
+        return $this->subscriptions()->where('status', SubscriptionStatusEnum::ACTIVE)->exists();
     }
 }
