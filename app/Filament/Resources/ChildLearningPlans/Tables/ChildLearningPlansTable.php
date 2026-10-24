@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ChildLearningPlans\Tables;
 use App\Enums\AutismLevelEnum;
 use App\Enums\ChildLearningPlanStatusEnum;
 use App\Filament\Resources\ChildLearningPlans\ChildLearningPlanResource;
+use App\Models\ChildLearningPlan;
 use App\Models\LearningPlan;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +22,7 @@ class ChildLearningPlansTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withExerciseProgress())
             ->columns([
                 TextColumn::make('child.name')
                     ->label(__('Child Name'))
@@ -37,6 +39,7 @@ class ChildLearningPlansTable
                     ->badge(),
                 ViewColumn::make('progress')
                     ->label(__('Execution Progress'))
+                    ->state(fn (ChildLearningPlan $record): int => $record->progressPercentage())
                     ->view('filament.tables.columns.progress-bar'),
                 TextColumn::make('status')
                     ->label(__('Status'))
