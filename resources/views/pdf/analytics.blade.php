@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ __('Analytics Report') }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'dejavu sans', sans-serif; font-size: 14px; color: #333; }
+        body { font-family: 'Tajawal', Tahoma, 'Segoe UI', sans-serif; font-size: 14px; color: #333; }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { margin: 0; font-size: 24px; color: #1e3a8a; }
         .header p { color: #6b7280; font-size: 12px; }
@@ -17,7 +18,7 @@
 <body>
     <div class="header">
         <h1>{{ __('Dashboard Analytics Report') }}</h1>
-        <p>{{ __('Period') }}: {{ $data['period'] }} | {{ __('Date') }}: {{ now()->format('Y-m-d H:i') }}</p>
+        <p>{{ __('Period') }}: <bdi dir="ltr">{{ $data['period'] }}</bdi> | {{ __('Date') }}: <bdi dir="ltr">{{ now()->format('Y-m-d H:i') }}</bdi></p>
     </div>
 
     <table>

@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Exports\DashboardAnalyticsExport;
 use App\Services\AnalyticsService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -15,6 +14,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Browsershot\Browsershot;
 
 class Dashboard extends BaseDashboard
 {
@@ -167,11 +167,18 @@ class Dashboard extends BaseDashboard
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('danger')
                 ->action(function () {
-                    $data = $this->dashboardKpis();
+                    $html = view('pdf.analytics', ['data' => $this->dashboardKpis()])->render();
 
-                    $pdf = Pdf::loadView('pdf.analytics', ['data' => $data]);
+                    // Chromium rather than DomPDF: DomPDF can't join Arabic letters or lay out RTL text.
+                    $pdf = Browsershot::html($html)
+                        ->format('A4')
+                        ->margins(10, 10, 10, 10)
+                        ->showBackground()
+                        ->waitUntilNetworkIdle()
+                        ->noSandbox()
+                        ->pdf();
 
-                    return response()->streamDownload(fn () => print ($pdf->output()), $this->exportFileName('pdf'));
+                    return response()->streamDownload(fn () => print ($pdf), $this->exportFileName('pdf'));
                 }),
             Action::make('exportExcel')
                 ->label(__('Export Excel'))

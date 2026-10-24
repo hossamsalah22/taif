@@ -282,6 +282,27 @@ class AdminDashboardTest extends TestCase
         Excel::assertDownloaded('analytics_2026-10-14_to_2026-10-20.xlsx');
     }
 
+    public function test_pdf_export_is_rendered_by_chromium_with_the_selected_range(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        Livewire::test(Dashboard::class)
+            ->call('applyPreset', 'last7Days')
+            ->callAction('exportPdf')
+            ->assertFileDownloaded('analytics_2026-10-14_to_2026-10-20.pdf');
+    }
+
+    public function test_pdf_report_is_laid_out_right_to_left_in_an_arabic_font(): void
+    {
+        app()->setLocale('ar');
+
+        $html = view('pdf.analytics', ['data' => AnalyticsService::getDashboardKpis(now()->subMonth(), now())])->render();
+
+        $this->assertStringContainsString('dir="rtl"', $html);
+        $this->assertStringContainsString("font-family: 'Tajawal'", $html);
+        $this->assertStringNotContainsString('dejavu', $html);
+    }
+
     public function test_packages_chart_gives_every_package_a_colour(): void
     {
         $this->actingAs($this->createSuperAdmin(), 'web');
