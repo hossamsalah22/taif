@@ -150,6 +150,89 @@ class LearningContentAdminTest extends TestCase
         $this->assertCount(2, $exercise->configuration['orderingSteps']);
     }
 
+    public function test_audio_flashcard_cards_save_their_audio_files(): void
+    {
+        Storage::fake('public');
+        $goal = $this->createGoal('Sounds');
+        $undoRepeaterFake = Repeater::fake();
+
+        Livewire::test(CreateLearningLesson::class)
+            ->fillForm([
+                'name' => ['en' => 'Animals', 'ar' => 'Animals'],
+                'learning_goal_id' => $goal->id,
+                'display_priority' => 1,
+                'exercises' => [
+                    [
+                        'type' => ExerciseTypeEnum::AUDIO_FLASHCARDS->value,
+                        'prompt' => ['en' => 'Which animal says meow?', 'ar' => 'Which animal says meow?'],
+                        'difficulty_level' => DifficultyLevel::LOW->value,
+                        'max_attempts' => 3,
+                        'is_locked' => true,
+                        'configuration' => [
+                            'options' => [
+                                [
+                                    'title' => 'Cat',
+                                    'is_correct' => true,
+                                    'image' => UploadedFile::fake()->image('cat.png'),
+                                    'audio' => UploadedFile::fake()->create('cat.mp3', 10, 'audio/mpeg'),
+                                ],
+                                [
+                                    'title' => 'Dog',
+                                    'is_correct' => false,
+                                    'image' => UploadedFile::fake()->image('dog.png'),
+                                    'audio' => UploadedFile::fake()->create('dog.mp3', 10, 'audio/mpeg'),
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $undoRepeaterFake();
+
+        $options = LearningLesson::firstOrFail()->exercises()->firstOrFail()->configuration['options'];
+
+        $this->assertCount(2, $options);
+        foreach ($options as $option) {
+            $this->assertNotEmpty($option['audio'] ?? null);
+            Storage::disk('public')->assertExists($option['audio']);
+        }
+    }
+
+    public function test_audio_flashcard_cards_need_an_audio_file(): void
+    {
+        $goal = $this->createGoal('Sounds');
+        $undoRepeaterFake = Repeater::fake();
+
+        Livewire::test(CreateLearningLesson::class)
+            ->fillForm([
+                'name' => ['en' => 'Animals', 'ar' => 'Animals'],
+                'learning_goal_id' => $goal->id,
+                'display_priority' => 1,
+                'exercises' => [
+                    [
+                        'type' => ExerciseTypeEnum::AUDIO_FLASHCARDS->value,
+                        'prompt' => ['en' => 'Which animal says meow?', 'ar' => 'Which animal says meow?'],
+                        'difficulty_level' => DifficultyLevel::LOW->value,
+                        'configuration' => [
+                            'options' => [
+                                ['title' => 'Cat', 'is_correct' => true, 'image' => UploadedFile::fake()->image('cat.png')],
+                                ['title' => 'Dog', 'is_correct' => false, 'image' => UploadedFile::fake()->image('dog.png')],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['exercises.0.configuration.options.0.audio' => 'required']);
+
+        $undoRepeaterFake();
+
+        $this->assertSame(0, LearningLesson::count());
+    }
+
     public function test_ordering_exercise_needs_at_least_two_pictures(): void
     {
         $goal = $this->createGoal('Daily routine');

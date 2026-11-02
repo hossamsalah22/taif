@@ -146,8 +146,9 @@ class ExercisesRepeater
                                 ->label(__('Card Audio File'))
                                 ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/m4a'])
                                 ->maxSize(5120)
-                                ->visible(fn (Get $get): bool => self::typeOf($get('../../type')) === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
-                                ->required(fn (Get $get): bool => self::typeOf($get('../../type')) === ExerciseTypeEnum::AUDIO_FLASHCARDS->value),
+                                // The card sits inside the "configuration" group, one level deeper than the exercise type.
+                                ->visible(fn (Get $get): bool => self::typeOf($get('../../../type')) === ExerciseTypeEnum::AUDIO_FLASHCARDS->value)
+                                ->required(fn (Get $get): bool => self::typeOf($get('../../../type')) === ExerciseTypeEnum::AUDIO_FLASHCARDS->value),
                         ])
                         ->columns(2)
                         ->grid(2)
