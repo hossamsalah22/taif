@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\AssessmentSubmissionStatusEnum;
 use App\Enums\AutismLevelEnum;
+use App\Enums\ExerciseTypeEnum;
 use App\Enums\SubscriptionStatusEnum;
 use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
@@ -16,6 +17,7 @@ use App\Models\Admin;
 use App\Models\Assessment;
 use App\Models\AssessmentSubmission;
 use App\Models\Child;
+use App\Models\Question;
 use App\Models\SupportTicket;
 use App\Models\User;
 use App\Notifications\ReportPublishedNotification;
@@ -100,6 +102,27 @@ class AdminWorkflowTest extends TestCase
             ->assertNotified(__('Report Published Successfully'));
 
         $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $submission->refresh()->status);
+    }
+
+    public function test_view_page_with_answers_survives_a_livewire_update(): void
+    {
+        $submission = $this->createSubmission('reviewed_with_report');
+
+        // Lazy loading is only flagged on models fetched in a batch, so the submission needs more than one answer.
+        foreach (['اختر التفاحة', 'اختر الموزة'] as $prompt) {
+            $question = Question::create([
+                'assessment_id' => $submission->assessment_id,
+                'prompt' => ['en' => $prompt, 'ar' => $prompt],
+                'exercise_type' => ExerciseTypeEnum::IMAGE_SELECTION,
+            ]);
+            $submission->answers()->create(['question_id' => $question->id, 'answer_data' => []]);
+        }
+
+        Livewire::test(ViewAssessmentSubmission::class, ['record' => $submission->id])
+            ->assertSee('اختر الموزة')
+            ->call('$refresh')
+            ->assertSee('اختر الموزة')
+            ->assertHasNoErrors();
     }
 
     public function test_publishing_for_a_parent_who_deleted_their_account_does_not_fail(): void

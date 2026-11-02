@@ -14,6 +14,14 @@ class ViewAssessmentSubmission extends ViewRecord
 {
     protected static string $resource = AssessmentSubmissionResource::class;
 
+    /**
+     * Livewire restores the record without the resource's eager loads on every update, so load them again.
+     */
+    public function hydrate(): void
+    {
+        $this->getRecord()->loadMissing(AssessmentSubmissionResource::getAnswerRelations());
+    }
+
     protected function getHeaderActions(): array
     {
         return [

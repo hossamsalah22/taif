@@ -89,10 +89,20 @@ class AssessmentSubmissionResource extends MainResource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with([
-                'answers.question.options.media',
-                'answers.question.matchingPairs.media',
-                'answers.question.orderingSteps.media',
-            ]);
+            ->with(static::getAnswerRelations());
+    }
+
+    /**
+     * Everything the answers section renders, so it never lazy loads.
+     *
+     * @return array<int, string>
+     */
+    public static function getAnswerRelations(): array
+    {
+        return [
+            'answers.question.options.media',
+            'answers.question.matchingPairs.media',
+            'answers.question.orderingSteps.media',
+        ];
     }
 }
