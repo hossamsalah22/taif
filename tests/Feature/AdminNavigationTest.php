@@ -9,7 +9,13 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
 use App\Filament\Resources\ChildLearningPlans\ChildLearningPlanResource;
 use App\Filament\Resources\Children\ChildResource;
+use App\Filament\Resources\Cities\CityResource;
+use App\Filament\Resources\Countries\CountryResource;
+use App\Filament\Resources\Districts\DistrictResource;
+use App\Filament\Resources\Faqs\FaqResource;
 use App\Filament\Resources\Permissions\PermissionResource;
+use App\Filament\Resources\Regions\RegionResource;
+use App\Filament\Resources\Sliders\SliderResource;
 use App\Filament\Resources\SubscriptionPackages\SubscriptionPackageResource;
 use App\Filament\Resources\SupportTickets\SupportTicketResource;
 use App\Models\Admin;
@@ -30,11 +36,14 @@ class AdminNavigationTest extends TestCase
     {
         $this->actingAs($this->createSuperAdmin(), 'web');
 
+        // Locations has no entries while its resources are hidden, so the group does not show.
+        $shownGroups = array_filter(NavigationGroupEnum::cases(), fn (NavigationGroupEnum $group): bool => $group !== NavigationGroupEnum::LOCATIONS);
+
         $this->get(Dashboard::getUrl())
             ->assertOk()
             ->assertSeeInOrder(array_map(
                 fn (NavigationGroupEnum $group): string => $group->getLabel(),
-                NavigationGroupEnum::cases(),
+                array_values($shownGroups),
             ));
     }
 
@@ -62,6 +71,37 @@ class AdminNavigationTest extends TestCase
         $this->assertSame(NavigationGroupEnum::FAMILIES, ChildLearningPlanResource::getNavigationGroup());
         $this->assertSame(NavigationGroupEnum::OPERATIONS, SupportTicketResource::getNavigationGroup());
         $this->assertSame(NavigationGroupEnum::SETTINGS->getLabel(), PermissionResource::getNavigationGroup());
+    }
+
+    public function test_sliders_and_faqs_are_hidden_from_the_sidebar(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        $this->assertFalse(SliderResource::shouldRegisterNavigation());
+        $this->assertFalse(FaqResource::shouldRegisterNavigation());
+
+        $this->get(Dashboard::getUrl())
+            ->assertOk()
+            ->assertDontSee(SliderResource::getUrl('index'))
+            ->assertDontSee(FaqResource::getUrl('index'));
+
+        $this->get(SliderResource::getUrl('index'))->assertOk();
+        $this->get(FaqResource::getUrl('index'))->assertOk();
+    }
+
+    public function test_location_resources_are_hidden_from_the_sidebar(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+
+        $dashboard = $this->get(Dashboard::getUrl())->assertOk();
+
+        foreach ([CountryResource::class, RegionResource::class, CityResource::class, DistrictResource::class] as $resource) {
+            $this->assertFalse($resource::shouldRegisterNavigation());
+            $dashboard->assertDontSee($resource::getUrl('index'));
+            $this->get($resource::getUrl('index'))->assertOk();
+        }
+
+        $dashboard->assertDontSee(NavigationGroupEnum::LOCATIONS->getLabel());
     }
 
     public function test_only_setup_groups_start_collapsed(): void

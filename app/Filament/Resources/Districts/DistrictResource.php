@@ -24,6 +24,11 @@ class DistrictResource extends MainResource
 
     protected static ?int $navigationSort = 4;
 
+    /**
+     * Hidden from the sidebar for now; the pages still work by URL.
+     */
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
 
     public static function form(Schema $schema): Schema

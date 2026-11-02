@@ -24,6 +24,11 @@ class SliderResource extends MainResource
 
     protected static ?int $navigationSort = 1;
 
+    /**
+     * Hidden from the sidebar for now; the pages still work by URL.
+     */
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
     public static function getPermissionPrefixes(): array

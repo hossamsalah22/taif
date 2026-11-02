@@ -24,6 +24,11 @@ class FaqResource extends MainResource
 
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Hidden from the sidebar for now; the pages still work by URL.
+     */
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getPermissionPrefixes(): array
     {
         return array_merge(parent::getPermissionPrefixes(), [

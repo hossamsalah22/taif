@@ -25,6 +25,11 @@ class RegionResource extends MainResource
 
     protected static ?int $navigationSort = 2;
 
+    /**
+     * Hidden from the sidebar for now; the pages still work by URL.
+     */
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMap;
 
     public static function form(Schema $schema): Schema
