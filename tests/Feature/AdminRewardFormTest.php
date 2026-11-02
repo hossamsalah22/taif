@@ -28,6 +28,21 @@ class AdminRewardFormTest extends TestCase
             ->assertDontSee('Sound');
     }
 
+    public function test_each_reward_type_explains_itself_in_arabic(): void
+    {
+        $this->actingAs($this->createSuperAdmin(), 'web');
+        app()->setLocale('ar');
+
+        Livewire::test(CreateReward::class)
+            ->assertSee('اختر النوع لمعرفة ما سيحصل عليه الطفل والملفات المطلوبة.')
+            ->fillForm(['type' => RewardTypeEnum::GIF->value])
+            ->assertSee('صورة متحركة تظهر للطفل عند حصوله على المكافأة.', escape: false)
+            ->fillForm(['type' => RewardTypeEnum::PARTICLE->value])
+            ->assertSee('مؤثر احتفالي يظهر على الشاشة', escape: false)
+            ->fillForm(['type' => RewardTypeEnum::SOUND->value])
+            ->assertSee('صوت تشجيعي قصير يسمعه الطفل بدون صورة.', escape: false);
+    }
+
     private function createSuperAdmin(): Admin
     {
         $admin = Admin::create([

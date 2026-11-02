@@ -618,5 +618,9 @@
     "change_silder_order": "Change slide order",
     "change_silder_order_description": "Please choose a new position for this slide.",
     "Subscription ID": "Subscription ID",
-    "Payment Status": "Payment Status"
+    "Payment Status": "Payment Status",
+    "An animated picture shown to the child when they earn the reward. Upload the GIF as the image and a small icon for the rewards list.": "An animated picture shown to the child when they earn the reward. Upload the GIF as the image and a small icon for the rewards list.",
+    "A celebration effect played over the screen, like stars or confetti. Upload the effect as an image or an animation (JSON) file, plus a small icon.": "A celebration effect played over the screen, like stars or confetti. Upload the effect as an image or an animation (JSON) file, plus a small icon.",
+    "A short encouraging sound played to the child, with no picture. Upload the sound file only.": "A short encouraging sound played to the child, with no picture. Upload the sound file only.",
+    "Choose a type to see what the child gets and which files are needed.": "Choose a type to see what the child gets and which files are needed."
 }

@@ -62,7 +62,13 @@ class RewardForm
                             ->label(__('Reinforcement Type'))
                             ->options(RewardTypeEnum::options())
                             ->required()
-                            ->live(),
+                            ->live()
+                            ->helperText(fn (Get $get): string => match ($get('type')) {
+                                RewardTypeEnum::GIF->value => __('An animated picture shown to the child when they earn the reward. Upload the GIF as the image and a small icon for the rewards list.'),
+                                RewardTypeEnum::PARTICLE->value => __('A celebration effect played over the screen, like stars or confetti. Upload the effect as an image or an animation (JSON) file, plus a small icon.'),
+                                RewardTypeEnum::SOUND->value => __('A short encouraging sound played to the child, with no picture. Upload the sound file only.'),
+                                default => __('Choose a type to see what the child gets and which files are needed.'),
+                            }),
                     ]),
 
                 Section::make(__('Media Assets'))
