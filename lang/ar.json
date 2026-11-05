@@ -1116,5 +1116,22 @@
     "Payment not completed yet": "لم تكتمل عملية الدفع بعد",
     "Return to the app to check your payment status.": "عد إلى التطبيق للتحقق من حالة الدفع.",
     "Payment failed": "فشلت عملية الدفع",
-    "The payment was not completed. You can return to the app and try again.": "لم تكتمل عملية الدفع. يمكنك العودة إلى التطبيق والمحاولة مرة أخرى."
+    "The payment was not completed. You can return to the app and try again.": "لم تكتمل عملية الدفع. يمكنك العودة إلى التطبيق والمحاولة مرة أخرى.",
+    "Invoice": "الفاتورة",
+    "View invoice": "عرض الفاتورة",
+    "Phone": "رقم الجوال",
+    "Amount": "المبلغ",
+    "Gateway Fee": "رسوم بوابة الدفع",
+    "Paid At": "تاريخ الدفع",
+    "Payment Gateway": "بوابة الدفع",
+    "Invoice ID": "رقم الفاتورة",
+    "Transaction ID": "رقم العملية",
+    "Payment Method": "وسيلة الدفع",
+    "Card Holder": "اسم حامل البطاقة",
+    "Card Number": "رقم البطاقة",
+    "Card Type": "نوع البطاقة",
+    "Issuer": "الجهة المصدرة",
+    "Gateway Message": "رسالة البوابة",
+    "Reference Number": "الرقم المرجعي",
+    "Authorization Code": "رمز التفويض"
 }

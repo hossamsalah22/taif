@@ -63,6 +63,19 @@ class Payment extends Model
     }
 
     /**
+     * The successful attempt on the invoice as Moyasar returned it (card source, fee, ...).
+     *
+     * @return array<string, mixed>|null
+     */
+    public function paidAttempt(): ?array
+    {
+        $attempts = collect($this->gateway_response['payments'] ?? []);
+
+        return $attempts->firstWhere('id', $this->gateway_payment_id)
+            ?? $attempts->first(fn (array $attempt): bool => in_array($attempt['status'] ?? null, ['paid', 'captured'], true));
+    }
+
+    /**
      * The amount in the main currency unit (e.g. 115.00 SAR for 11500 halalas).
      */
     public function amountInMainUnit(): float

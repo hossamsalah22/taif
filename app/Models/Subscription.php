@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Guarded(['id'])]
 class Subscription extends Model
@@ -23,6 +24,14 @@ class Subscription extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(User::class, 'parent_id');
+    }
+
+    /**
+     * The gateway payment that bought this subscription (none for free ones).
+     */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
     }
 
     /**

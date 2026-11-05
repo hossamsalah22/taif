@@ -16,6 +16,7 @@ use App\Models\AssessmentSubmission;
 use App\Models\Child;
 use App\Models\ChildLearningPlan;
 use App\Models\LearningPlan;
+use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\SupportTicket;
 use App\Models\User;
@@ -45,7 +46,7 @@ class SubscriptionsAdminTest extends TestCase
         $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-11-20');
 
         $this->assertFalse(SubscriptionResource::canCreate());
-        $this->assertSame(['index'], array_keys(SubscriptionResource::getPages()));
+        $this->assertSame(['index', 'view'], array_keys(SubscriptionResource::getPages()));
 
         $this->get(SubscriptionResource::getUrl('index'))->assertOk();
     }
@@ -65,6 +66,75 @@ class SubscriptionsAdminTest extends TestCase
             ->filterTable('ending_soon', true)
             ->assertCanSeeTableRecords([$endingSoon])
             ->assertCanNotSeeTableRecords([$runningLonger, $expired]);
+    }
+
+    public function test_paid_subscriptions_link_to_their_moyasar_invoice(): void
+    {
+        $paid = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $free = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $payment = Payment::factory()->paid()->create([
+            'parent_id' => $paid->parent_id,
+            'subscription_id' => $paid->id,
+            'payment_url' => 'https://checkout.moyasar.com/invoices/inv_1',
+        ]);
+
+        Livewire::test(ListSubscriptions::class)
+            ->assertCanSeeTableRecords([$paid, $free])
+            ->assertTableColumnStateSet('payment.payment_url', $payment->payment_url, $paid)
+            ->assertTableColumnStateNotSet('payment.payment_url', $payment->payment_url, $free)
+            ->assertTableActionExists('view');
+    }
+
+    public function test_viewing_a_paid_subscription_shows_the_payment_and_card_details(): void
+    {
+        $subscription = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        Payment::factory()->paid()->create([
+            'parent_id' => $subscription->parent_id,
+            'subscription_id' => $subscription->id,
+            'gateway_invoice_id' => 'inv_1',
+            'gateway_payment_id' => 'pay_1',
+            'payment_url' => 'https://checkout.moyasar.com/invoices/inv_1',
+            'gateway_response' => [
+                'id' => 'inv_1',
+                'status' => 'paid',
+                'payments' => [[
+                    'id' => 'pay_1',
+                    'status' => 'paid',
+                    'fee' => 2755,
+                    'source' => [
+                        'name' => 'Card Holder Name',
+                        'number' => '4111-11XX-XXXX-1111',
+                        'company' => 'visa',
+                        'issuer_name' => 'MOYASAR PAY SANDBOX',
+                        'message' => 'APPROVED',
+                        'reference_number' => '992630968450',
+                        'authorization_code' => '004792',
+                    ],
+                ]],
+            ],
+        ]);
+
+        $this->get(SubscriptionResource::getUrl('view', ['record' => $subscription]))
+            ->assertOk()
+            ->assertSee($subscription->parent->name)
+            ->assertSee('inv_1')
+            ->assertSee('pay_1')
+            ->assertSee('https://checkout.moyasar.com/invoices/inv_1', false)
+            ->assertSee('Card Holder Name')
+            ->assertSee('4111-11XX-XXXX-1111')
+            ->assertSee('992630968450');
+    }
+
+    public function test_viewing_a_free_subscription_hides_the_payment_sections(): void
+    {
+        $subscription = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $subscription->update(['is_free' => true, 'amount_paid' => 0]);
+
+        $this->get(SubscriptionResource::getUrl('view', ['record' => $subscription]))
+            ->assertOk()
+            ->assertSee($subscription->parent->name)
+            ->assertDontSee(__('Transaction ID'))
+            ->assertDontSee(__('Card Number'));
     }
 
     public function test_subscriptions_can_be_filtered_by_status_and_free_access(): void

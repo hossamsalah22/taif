@@ -5,9 +5,12 @@ namespace App\Filament\Resources\Subscriptions;
 use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\Subscriptions\Pages\ListSubscriptions;
+use App\Filament\Resources\Subscriptions\Pages\ViewSubscription;
+use App\Filament\Resources\Subscriptions\Schemas\SubscriptionInfolist;
 use App\Filament\Resources\Subscriptions\Tables\SubscriptionsTable;
 use App\Models\Subscription;
 use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -44,10 +47,16 @@ class SubscriptionResource extends MainResource
         return SubscriptionsTable::configure($table);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return SubscriptionInfolist::configure($schema);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListSubscriptions::route('/'),
+            'view' => ViewSubscription::route('/{record}'),
         ];
     }
 }

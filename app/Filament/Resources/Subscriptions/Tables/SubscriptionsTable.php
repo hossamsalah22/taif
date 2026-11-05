@@ -6,6 +6,8 @@ use App\Enums\SubscriptionStatusEnum;
 use App\Models\Subscription;
 use App\Models\SubscriptionPackage;
 use Carbon\Carbon;
+use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -50,11 +52,22 @@ class SubscriptionsTable
                     ->sortable()
                     ->description(fn (Subscription $record): ?string => self::remainingTime($record))
                     ->color(fn (Subscription $record): ?string => self::isEndingSoon($record) ? 'danger' : null),
+                TextColumn::make('payment.payment_url')
+                    ->label(__('Invoice'))
+                    ->formatStateUsing(fn (): string => __('View invoice'))
+                    ->url(fn (Subscription $record): ?string => $record->payment?->payment_url)
+                    ->openUrlInNewTab()
+                    ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                    ->color('primary')
+                    ->placeholder('—'),
                 TextColumn::make('created_at')
                     ->label(__('Created At'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->recordActions([
+                ViewAction::make(),
             ])
             ->filters([
                 Filter::make('running_now')
