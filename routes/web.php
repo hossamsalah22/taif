@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Payment\MoyasarController;
 use App\Http\Controllers\Web\UserController;
 use App\Http\Controllers\Web\WebPageController;
 use Illuminate\Support\Facades\Route;
@@ -21,9 +22,7 @@ Route::get('set-language/{locale}', function ($locale) {
 // Route::post('delete-account/request-code', [UserController::class, 'requestDeleteCode'])->name('account.request-delete-code');
 // Route::delete('delete-account', [UserController::class, 'destroy'])->name('account.destroy');
 
-// Route::get('/handle-payment/success', [TelrController::class, 'onSuccess'])->name('telr.success');
-// Route::get('/handle-payment/declined', [TelrController::class, 'onDeclined'])->name('telr.declined');
-// Route::get('/handle-payment/cancel', [TelrController::class, 'onCancel'])->name('telr.cancel');
+Route::get('payments/moyasar/{payment}/return', [MoyasarController::class, 'return'])->name('payments.moyasar.return');
 
 // Route::get('/privacy-policy', [WebPageController::class, 'privacyPolicy'])->name('privacy-policy');
 // Route::get('/terms-and-conditions', [WebPageController::class, 'termsAndConditions'])->name('terms-and-conditions');

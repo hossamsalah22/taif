@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Enums\BillingCycleEnum;
 use App\Enums\ChildLearningPlanStatusEnum;
 use App\Enums\SubscriptionStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\SubscribeRequest;
+use App\Http\Resources\User\PaymentResource;
 use App\Http\Resources\User\SubscriptionPackageResource;
 use App\Http\Resources\User\SubscriptionResource;
 use App\Models\ChildLearningPlan;
 use App\Models\Subscription;
 use App\Models\SubscriptionPackage;
+use App\Services\SubscriptionCheckout;
 use Illuminate\Http\Request;
+use Throwable;
 
 class SubscriptionController extends Controller
 {
@@ -58,9 +60,9 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    public function subscribe(SubscribeRequest $request)
+    public function subscribe(SubscribeRequest $request, SubscriptionCheckout $checkout)
     {
-        $user = auth('sanctum')->user();
+        $user = $request->user();
 
         $activeSubscription = Subscription::where('parent_id', $user->id)
             ->where('status', SubscriptionStatusEnum::ACTIVE->value)
@@ -71,29 +73,26 @@ class SubscriptionController extends Controller
             return $this->failedResponse(__('You already have an active subscription.'), 400);
         }
 
-        $package = SubscriptionPackage::findOrFail($request->package_id);
+        $package = SubscriptionPackage::where('is_active', true)->findOrFail($request->package_id);
 
-        $startDate = now();
-        $expiryDate = match ($package->billing_cycle) {
-            BillingCycleEnum::Monthly => now()->addMonth(),
-            BillingCycleEnum::Quarterly => now()->addMonths(3),
-            BillingCycleEnum::SemiAnnually => now()->addMonths(6),
-            BillingCycleEnum::Annually => now()->addYear(),
-            default => now()->addMonth(),
-        };
+        if ((float) $package->price <= 0) {
+            $subscription = $checkout->activateFree($user, $package);
 
-        $subscription = Subscription::create([
-            'parent_id' => $user->id,
-            'subscription_package_id' => $package->id,
-            'amount_paid' => $package->price,
-            'status' => SubscriptionStatusEnum::ACTIVE->value,
-            'start_date' => $startDate,
-            'expiry_date' => $expiryDate,
-            'is_free' => $package->price <= 0,
-        ]);
+            return $this->successResponse(__('Subscribed successfully'), [
+                'requires_payment' => false,
+                'subscription' => new SubscriptionResource($subscription),
+            ]);
+        }
 
-        return $this->successResponse(__('Subscribed successfully'), [
-            'subscription' => new SubscriptionResource($subscription),
+        try {
+            $payment = $checkout->startPayment($user, $package);
+        } catch (Throwable) {
+            return $this->failedResponse(__('Payment could not be started, please try again later.'), [], 502);
+        }
+
+        return $this->successResponse(__('Complete the payment to activate your subscription'), [
+            'requires_payment' => true,
+            'payment' => new PaymentResource($payment),
         ]);
     }
 }

@@ -35,6 +35,14 @@ return [
         ],
     ],
 
+    'moyasar' => [
+        'secret_key' => env('MOYASAR_SECRET_KEY'),
+        'publishable_key' => env('MOYASAR_PUBLISHABLE_KEY'),
+        'base_url' => env('MOYASAR_BASE_URL', 'https://api.moyasar.com/v1'),
+        'currency' => env('MOYASAR_CURRENCY', 'SAR'),
+        'invoice_lifetime' => (int) env('MOYASAR_INVOICE_LIFETIME', 60), // minutes the payment link stays payable
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

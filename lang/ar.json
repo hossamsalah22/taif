@@ -1103,5 +1103,18 @@
     "An animated picture shown to the child when they earn the reward. Upload the GIF as the image and a small icon for the rewards list.": "صورة متحركة تظهر للطفل عند حصوله على المكافأة. ارفع ملف الـ GIF في خانة الصورة، وأيقونة صغيرة تظهر في قائمة المكافآت.",
     "A celebration effect played over the screen, like stars or confetti. Upload the effect as an image or an animation (JSON) file, plus a small icon.": "مؤثر احتفالي يظهر على الشاشة مثل النجوم أو قصاصات الورق الملونة. ارفع المؤثر كصورة أو ملف حركة (JSON)، مع أيقونة صغيرة.",
     "A short encouraging sound played to the child, with no picture. Upload the sound file only.": "صوت تشجيعي قصير يسمعه الطفل بدون صورة. ارفع الملف الصوتي فقط.",
-    "Choose a type to see what the child gets and which files are needed.": "اختر النوع لمعرفة ما سيحصل عليه الطفل والملفات المطلوبة."
+    "Choose a type to see what the child gets and which files are needed.": "اختر النوع لمعرفة ما سيحصل عليه الطفل والملفات المطلوبة.",
+    "Paid": "مدفوع",
+    "Failed": "فشل",
+    "Payment": "الدفع",
+    "Subscription": "اشتراك",
+    "Payment Details": "تفاصيل الدفع",
+    "Complete the payment to activate your subscription": "أكمل الدفع لتفعيل اشتراكك",
+    "Payment could not be started, please try again later.": "تعذر بدء عملية الدفع، يرجى المحاولة لاحقاً.",
+    "Payment successful": "تم الدفع بنجاح",
+    "Your subscription is now active. You can return to the app.": "تم تفعيل اشتراكك. يمكنك العودة إلى التطبيق.",
+    "Payment not completed yet": "لم تكتمل عملية الدفع بعد",
+    "Return to the app to check your payment status.": "عد إلى التطبيق للتحقق من حالة الدفع.",
+    "Payment failed": "فشلت عملية الدفع",
+    "The payment was not completed. You can return to the app and try again.": "لم تكتمل عملية الدفع. يمكنك العودة إلى التطبيق والمحاولة مرة أخرى."
 }

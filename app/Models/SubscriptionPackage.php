@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enums\BillingCycleEnum;
 use App\Enums\SubscriptionStatusEnum;
+use Database\Factories\SubscriptionPackageFactory;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\HasTranslations;
@@ -12,7 +14,8 @@ use Spatie\Translatable\HasTranslations;
 #[Guarded(['id'])]
 class SubscriptionPackage extends Model
 {
-    use HasTranslations;
+    /** @use HasFactory<SubscriptionPackageFactory> */
+    use HasFactory, HasTranslations;
 
     protected $translatable = [
         'name',

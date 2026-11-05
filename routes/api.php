@@ -7,6 +7,7 @@ use App\Http\Controllers\Global\GenderController;
 use App\Http\Controllers\Global\PagesController;
 use App\Http\Controllers\Global\SettingController;
 use App\Http\Controllers\Global\SpeechStatusesController;
+use App\Http\Controllers\Payment\MoyasarController;
 use App\Http\Controllers\User\AssessmentController;
 use App\Http\Controllers\User\Auth\AppleLoginController;
 use App\Http\Controllers\User\Auth\GoogleLoginController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\User\LearningPlanController;
 use App\Http\Controllers\User\LogoutController;
 use App\Http\Controllers\User\NotificationController;
 use App\Http\Controllers\User\NotificationTopicController;
+use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\SettingsController;
 use App\Http\Controllers\User\SliderController;
@@ -43,6 +45,7 @@ Route::prefix('user')->group(function () {
         Route::get('sliders', [SliderController::class, 'index']);
         Route::get('subscriptions/gateway', [SubscriptionController::class, 'gateway']);
         Route::post('subscriptions/subscribe', [SubscriptionController::class, 'subscribe']);
+        Route::get('payments/{payment}', [PaymentController::class, 'show']);
         Route::get('profile', [ProfileController::class, 'index']);
         Route::put('profile', [ProfileController::class, 'update']);
         Route::delete('profile', [ProfileController::class, 'destroy']);
@@ -80,6 +83,10 @@ Route::prefix('user')->group(function () {
 
     });
 });
+
+Route::post('payments/moyasar/callback', [MoyasarController::class, 'callback'])
+    ->middleware('throttle:60,1')
+    ->name('payments.moyasar.callback');
 
 Route::prefix('global')->group(function () {
     Route::get('autism-levels', AutismLevelController::class);
