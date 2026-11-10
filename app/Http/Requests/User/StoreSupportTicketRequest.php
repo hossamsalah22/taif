@@ -28,7 +28,7 @@ class StoreSupportTicketRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'min:5', 'max:100'],
-            'description' => ['required', 'string', 'max:1000'],
+            'description' => ['nullable', 'string', 'max:1000'],
             ...SupportTicketAttachment::validationRules(),
         ];
     }

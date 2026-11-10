@@ -31,6 +31,20 @@ class SupportTicketAttachmentTest extends TestCase
         Event::fake([SupportTicketReplyCreated::class]);
     }
 
+    public function test_user_can_create_ticket_without_description(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'user')
+            ->postJson('/api/user/support-tickets', [
+                'title' => 'Payment problem',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.description', null);
+
+        $this->assertNull(SupportTicket::firstOrFail()->description);
+    }
+
     public function test_user_can_create_ticket_with_attachments(): void
     {
         $user = User::factory()->create();
