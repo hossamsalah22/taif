@@ -11,6 +11,8 @@ class ReportPublishedNotification extends Notification
 {
     use Queueable;
 
+    public const MESSAGE = "Your child's screening assessment report is ready. Tap to view the official specialist analysis.";
+
     /**
      * Create a new notification instance.
      */
@@ -49,7 +51,8 @@ class ReportPublishedNotification extends Notification
     {
         return [
             'submission_id' => $this->submission->id,
-            'message' => "Your child's screening assessment report is ready. Tap to view the official specialist analysis.",
+            'message_key' => self::MESSAGE,
+            'message' => __(self::MESSAGE),
         ];
     }
 }

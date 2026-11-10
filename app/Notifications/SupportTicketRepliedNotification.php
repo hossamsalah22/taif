@@ -14,6 +14,8 @@ class SupportTicketRepliedNotification extends Notification implements ShouldQue
 {
     use Queueable;
 
+    public const MESSAGE = 'Your support ticket :ref has been replied to.';
+
     public function __construct(
         protected SupportTicket $ticket
     ) {}
@@ -28,7 +30,9 @@ class SupportTicketRepliedNotification extends Notification implements ShouldQue
         return [
             'ticket_id' => $this->ticket->id,
             'reference_number' => $this->ticket->reference_number,
-            'message' => __('Your support ticket :ref has been replied to.', ['ref' => $this->ticket->reference_number]),
+            'message_key' => self::MESSAGE,
+            'message_params' => ['ref' => $this->ticket->reference_number],
+            'message' => __(self::MESSAGE, ['ref' => $this->ticket->reference_number]),
         ];
     }
 
@@ -36,7 +40,7 @@ class SupportTicketRepliedNotification extends Notification implements ShouldQue
     {
         return (new FcmMessage(notification: new FcmNotification(
             title: __('Support Ticket Update'),
-            body: __('Your support ticket :ref has been replied to.', ['ref' => $this->ticket->reference_number])
+            body: __(self::MESSAGE, ['ref' => $this->ticket->reference_number])
         )))
             ->data(['ticket_id' => (string) $this->ticket->id]);
     }

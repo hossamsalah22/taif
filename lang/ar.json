@@ -1133,5 +1133,16 @@
     "Issuer": "الجهة المصدرة",
     "Gateway Message": "رسالة البوابة",
     "Reference Number": "الرقم المرجعي",
-    "Authorization Code": "رمز التفويض"
+    "Authorization Code": "رمز التفويض",
+    "Profile updated successfully.": "تم تحديث الملف الشخصي بنجاح.",
+    "Profile updated successfully, OTP sent for phone verification.": "تم تحديث الملف الشخصي بنجاح، وتم إرسال رمز التحقق لتأكيد رقم الهاتف.",
+    "Profile deleted successfully.": "تم حذف الملف الشخصي بنجاح.",
+    "Your child's screening assessment report is ready. Tap to view the official specialist analysis.": "تقرير التقييم الأولي لطفلك جاهز. اضغط لعرض تحليل الأخصائي المعتمد.",
+    "Your support ticket :ref has been replied to.": "تم الرد على تذكرة الدعم الخاصة بك :ref.",
+    "Support Ticket Update": "تحديث تذكرة الدعم",
+    "Notifications retrieved successfully.": "تم جلب الإشعارات بنجاح.",
+    "Notification marked as read.": "تم تعليم الإشعار كمقروء.",
+    "All notifications marked as read.": "تم تعليم جميع الإشعارات كمقروءة.",
+    "Notification deleted successfully.": "تم حذف الإشعار بنجاح.",
+    "All notifications deleted successfully.": "تم حذف جميع الإشعارات بنجاح."
 }

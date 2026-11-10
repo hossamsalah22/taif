@@ -25,7 +25,7 @@ class NotificationController extends Controller
             return [
                 'id' => $notification->id,
                 'type' => class_basename($notification->type),
-                'data' => $notification->data,
+                'data' => $this->translateData($notification->data),
                 'is_read' => ! is_null($notification->read_at),
                 'read_at' => $notification->read_at?->toIso8601String(),
                 'created_at' => $notification->created_at->toIso8601String(),
@@ -102,5 +102,24 @@ class NotificationController extends Controller
         $user->notifications()->delete();
 
         return $this->successResponse(__('All notifications deleted successfully.'));
+    }
+
+    /**
+     * Translate the stored notification message into the current locale.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function translateData(array $data): array
+    {
+        if (isset($data['message_key'])) {
+            $data['message'] = __($data['message_key'], $data['message_params'] ?? []);
+        } elseif (isset($data['message']) && is_string($data['message'])) {
+            $data['message'] = __($data['message']);
+        }
+
+        unset($data['message_key'], $data['message_params']);
+
+        return $data;
     }
 }
