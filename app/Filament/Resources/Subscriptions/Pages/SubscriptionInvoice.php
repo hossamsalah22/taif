@@ -59,7 +59,13 @@ class SubscriptionInvoice extends Page
             Action::make('print')
                 ->label(__('Print'))
                 ->icon(Heroicon::OutlinedPrinter)
-                ->alpineClickHandler('window.print()'),
+                ->alpineClickHandler(<<<'JS'
+                    const html = document.documentElement;
+                    const wasDark = html.classList.contains('dark');
+                    html.classList.remove('dark');
+                    window.print();
+                    if (wasDark) html.classList.add('dark');
+                    JS),
             /*
              * Moyasar's hosted invoice only works as a checkout link: once paid it just redirects
              * back to our "payment successful" page, so it is offered only while still unpaid.

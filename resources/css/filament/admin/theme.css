@@ -6,22 +6,33 @@
 
 /* Print only the invoice card on the subscription invoice page. */
 @media print {
-    body:has(.subscription-invoice) .fi-sidebar,
-    body:has(.subscription-invoice) .fi-topbar,
-    body:has(.subscription-invoice) .fi-header,
-    body:has(.subscription-invoice) .fi-breadcrumbs {
-        display: none !important;
+    @page {
+        margin: 12mm;
     }
 
-    body:has(.subscription-invoice) .fi-main-ctn,
-    body:has(.subscription-invoice) .fi-main {
+    body:has(.subscription-invoice) {
+        background: #fff !important;
+    }
+
+    body:has(.subscription-invoice) * {
+        visibility: hidden;
+    }
+
+    body:has(.subscription-invoice) .fi-main-ctn {
+        opacity: 1 !important;
+    }
+
+    body:has(.subscription-invoice) .subscription-invoice,
+    body:has(.subscription-invoice) .subscription-invoice * {
+        visibility: visible;
+    }
+
+    body:has(.subscription-invoice) .subscription-invoice {
+        position: absolute;
+        inset: 0 0 auto 0;
+        width: 100%;
+        max-width: none !important;
         margin: 0 !important;
-        padding: 0 !important;
-        max-width: none !important;
-    }
-
-    .subscription-invoice {
-        max-width: none !important;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
     }
