@@ -8,6 +8,7 @@ use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Resources\AssessmentSubmissions\Pages\ListAssessmentSubmissions;
 use App\Filament\Resources\Children\Pages\ListChildren;
 use App\Filament\Resources\Subscriptions\Pages\ListSubscriptions;
+use App\Filament\Resources\Subscriptions\Pages\SubscriptionInvoice;
 use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\SupportTickets\Pages\ListSupportTickets;
 use App\Models\Admin;
@@ -46,7 +47,7 @@ class SubscriptionsAdminTest extends TestCase
         $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-11-20');
 
         $this->assertFalse(SubscriptionResource::canCreate());
-        $this->assertSame(['index', 'view'], array_keys(SubscriptionResource::getPages()));
+        $this->assertSame(['index', 'view', 'invoice'], array_keys(SubscriptionResource::getPages()));
 
         $this->get(SubscriptionResource::getUrl('index'))->assertOk();
     }
@@ -68,7 +69,7 @@ class SubscriptionsAdminTest extends TestCase
             ->assertCanNotSeeTableRecords([$runningLonger, $expired]);
     }
 
-    public function test_paid_subscriptions_link_to_their_moyasar_invoice(): void
+    public function test_paid_subscriptions_link_to_their_invoice_page(): void
     {
         $paid = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
         $free = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
@@ -119,10 +120,70 @@ class SubscriptionsAdminTest extends TestCase
             ->assertSee($subscription->parent->name)
             ->assertSee('inv_1')
             ->assertSee('pay_1')
-            ->assertSee('https://checkout.moyasar.com/invoices/inv_1', false)
+            ->assertSee(SubscriptionResource::getUrl('invoice', ['record' => $subscription]), false)
             ->assertSee('Card Holder Name')
             ->assertSee('4111-11XX-XXXX-1111')
             ->assertSee('992630968450');
+    }
+
+    public function test_invoice_page_shows_the_paid_subscription_invoice(): void
+    {
+        $subscription = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $payment = Payment::factory()->paid()->create([
+            'parent_id' => $subscription->parent_id,
+            'subscription_id' => $subscription->id,
+            'amount' => 70000,
+            'gateway_invoice_id' => 'inv_1',
+            'gateway_payment_id' => 'pay_1',
+            'payment_url' => 'https://checkout.moyasar.com/invoices/inv_1',
+            'gateway_response' => [
+                'payments' => [[
+                    'id' => 'pay_1',
+                    'status' => 'paid',
+                    'source' => [
+                        'name' => 'Card Holder Name',
+                        'number' => '4111-11XX-XXXX-1111',
+                        'company' => 'visa',
+                    ],
+                ]],
+            ],
+        ]);
+
+        $this->get(SubscriptionResource::getUrl('invoice', ['record' => $subscription]))
+            ->assertOk()
+            ->assertSee(SubscriptionInvoice::invoiceNumber($payment))
+            ->assertSee($subscription->parent->name)
+            ->assertSee($payment->subscriptionPackage->name)
+            ->assertSee('700')
+            ->assertSee('inv_1')
+            ->assertSee('pay_1')
+            ->assertSee('VISA')
+            ->assertSee('4111-11XX-XXXX-1111')
+            ->assertSee('Card Holder Name')
+            ->assertDontSee('https://checkout.moyasar.com/invoices/inv_1', false);
+    }
+
+    public function test_invoice_page_offers_the_payment_link_only_while_unpaid(): void
+    {
+        $subscription = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        Payment::factory()->create([
+            'parent_id' => $subscription->parent_id,
+            'subscription_id' => $subscription->id,
+            'payment_url' => 'https://checkout.moyasar.com/invoices/inv_pending',
+        ]);
+
+        $this->get(SubscriptionResource::getUrl('invoice', ['record' => $subscription]))
+            ->assertOk()
+            ->assertSee('https://checkout.moyasar.com/invoices/inv_pending', false);
+    }
+
+    public function test_invoice_page_is_not_found_for_a_free_subscription(): void
+    {
+        $subscription = $this->createSubscription(SubscriptionStatusEnum::ACTIVE, '2026-12-20');
+        $subscription->update(['is_free' => true, 'amount_paid' => 0]);
+
+        $this->get(SubscriptionResource::getUrl('invoice', ['record' => $subscription]))
+            ->assertNotFound();
     }
 
     public function test_viewing_a_free_subscription_hides_the_payment_sections(): void

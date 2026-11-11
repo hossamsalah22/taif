@@ -1144,5 +1144,14 @@
     "Notification marked as read.": "تم تعليم الإشعار كمقروء.",
     "All notifications marked as read.": "تم تعليم جميع الإشعارات كمقروءة.",
     "Notification deleted successfully.": "تم حذف الإشعار بنجاح.",
-    "All notifications deleted successfully.": "تم حذف جميع الإشعارات بنجاح."
+    "All notifications deleted successfully.": "تم حذف جميع الإشعارات بنجاح.",
+    "Print": "طباعة",
+    "Open payment link": "فتح رابط الدفع",
+    "View subscription": "عرض الاشتراك",
+    "Billed to": "فاتورة إلى",
+    "Issue Date": "تاريخ الإصدار",
+    "Subscription Period": "مدة الاشتراك",
+    "Subtotal": "المجموع الفرعي",
+    "Total": "الإجمالي",
+    "Thank you for subscribing to :app.": "شكراً لاشتراكك في :app."
 }

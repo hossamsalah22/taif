@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Subscriptions\Schemas;
 
 use App\Enums\PaymentStatusEnum;
 use App\Enums\SubscriptionStatusEnum;
+use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Models\Subscription;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -102,9 +103,8 @@ class SubscriptionInfolist
                         TextEntry::make('payment.payment_url')
                             ->label(__('Invoice'))
                             ->formatStateUsing(fn (): string => __('View invoice'))
-                            ->url(fn (Subscription $record): ?string => $record->payment?->payment_url)
-                            ->openUrlInNewTab()
-                            ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                            ->url(fn (Subscription $record): ?string => $record->payment ? SubscriptionResource::getUrl('invoice', ['record' => $record]) : null)
+                            ->icon(Heroicon::OutlinedDocumentText)
                             ->color('primary')
                             ->placeholder('—'),
                     ])

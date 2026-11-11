@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Subscriptions;
 use App\Enums\NavigationGroupEnum;
 use App\Filament\Resources\MainResource;
 use App\Filament\Resources\Subscriptions\Pages\ListSubscriptions;
+use App\Filament\Resources\Subscriptions\Pages\SubscriptionInvoice;
 use App\Filament\Resources\Subscriptions\Pages\ViewSubscription;
 use App\Filament\Resources\Subscriptions\Schemas\SubscriptionInfolist;
 use App\Filament\Resources\Subscriptions\Tables\SubscriptionsTable;
@@ -57,6 +58,7 @@ class SubscriptionResource extends MainResource
         return [
             'index' => ListSubscriptions::route('/'),
             'view' => ViewSubscription::route('/{record}'),
+            'invoice' => SubscriptionInvoice::route('/{record}/invoice'),
         ];
     }
 }

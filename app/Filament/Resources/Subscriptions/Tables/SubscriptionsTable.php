@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Subscriptions\Tables;
 
 use App\Enums\SubscriptionStatusEnum;
+use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Models\Subscription;
 use App\Models\SubscriptionPackage;
 use Carbon\Carbon;
@@ -55,9 +56,8 @@ class SubscriptionsTable
                 TextColumn::make('payment.payment_url')
                     ->label(__('Invoice'))
                     ->formatStateUsing(fn (): string => __('View invoice'))
-                    ->url(fn (Subscription $record): ?string => $record->payment?->payment_url)
-                    ->openUrlInNewTab()
-                    ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                    ->url(fn (Subscription $record): ?string => $record->payment ? SubscriptionResource::getUrl('invoice', ['record' => $record]) : null)
+                    ->icon(Heroicon::OutlinedDocumentText)
                     ->color('primary')
                     ->placeholder('—'),
                 TextColumn::make('created_at')

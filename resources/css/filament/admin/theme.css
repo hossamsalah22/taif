@@ -3,3 +3,26 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../vendor/bezhansalleh/filament-language-switch/**';
+
+/* Print only the invoice card on the subscription invoice page. */
+@media print {
+    body:has(.subscription-invoice) .fi-sidebar,
+    body:has(.subscription-invoice) .fi-topbar,
+    body:has(.subscription-invoice) .fi-header,
+    body:has(.subscription-invoice) .fi-breadcrumbs {
+        display: none !important;
+    }
+
+    body:has(.subscription-invoice) .fi-main-ctn,
+    body:has(.subscription-invoice) .fi-main {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+    }
+
+    .subscription-invoice {
+        max-width: none !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
