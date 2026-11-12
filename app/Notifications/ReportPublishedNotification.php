@@ -4,22 +4,19 @@ namespace App\Notifications;
 
 use App\Models\AssessmentSubmission;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class ReportPublishedNotification extends Notification
+class ReportPublishedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public const MESSAGE = "Your child's screening assessment report is ready. Tap to view the official specialist analysis.";
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct(public AssessmentSubmission $submission)
-    {
-        //
-    }
+    public function __construct(public AssessmentSubmission $submission) {}
 
     /**
      * Get the notification's delivery channels.
@@ -28,18 +25,7 @@ class ReportPublishedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database']; // You can add FCM or other channels here if integrated
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+        return ['database', FcmChannel::class];
     }
 
     /**
@@ -54,5 +40,17 @@ class ReportPublishedNotification extends Notification
             'message_key' => self::MESSAGE,
             'message' => __(self::MESSAGE),
         ];
+    }
+
+    public function toFcm(object $notifiable): FcmMessage
+    {
+        return (new FcmMessage(notification: new FcmNotification(
+            title: __('Assessment Report'),
+            body: __(self::MESSAGE),
+        )))
+            ->data([
+                'submission_id' => (string) $this->submission->id,
+                'child_id' => (string) $this->submission->child_id,
+            ]);
     }
 }

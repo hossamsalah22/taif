@@ -26,6 +26,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
+use NotificationChannels\Fcm\FcmChannel;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -89,6 +90,32 @@ class AdminWorkflowTest extends TestCase
         $this->assertSame(AssessmentSubmissionStatusEnum::PUBLISHED, $submission->status);
         $this->assertNotNull($submission->report_published_at);
         Notification::assertSentTo($submission->child->parent, ReportPublishedNotification::class);
+    }
+
+    public function test_report_published_notification_is_sent_as_a_push_notification(): void
+    {
+        Notification::fake();
+        $submission = $this->createSubmission('reviewed_with_report');
+        $parent = $submission->child->parent;
+
+        $submission->publish();
+
+        Notification::assertSentTo(
+            $parent,
+            ReportPublishedNotification::class,
+            function (ReportPublishedNotification $notification, array $channels) use ($parent, $submission): bool {
+                $push = $notification->toFcm($parent)->toArray();
+
+                return in_array('database', $channels, true)
+                    && in_array(FcmChannel::class, $channels, true)
+                    && $push['notification']['title'] === __('Assessment Report')
+                    && $push['notification']['body'] === __(ReportPublishedNotification::MESSAGE)
+                    && $push['data'] === [
+                        'submission_id' => (string) $submission->id,
+                        'child_id' => (string) $submission->child_id,
+                    ];
+            }
+        );
     }
 
     public function test_publishing_from_the_view_page_notifies_the_parent(): void
