@@ -21,7 +21,26 @@ class SubscriptionPackageResource extends JsonResource
             'billing_cycle' => $this->billing_cycle,
             'billing_cycle_label' => BillingCycleEnum::label($this->billing_cycle),
             'price' => $this->price,
-            'features' => $this->features,
+            'features' => collect($this->features ?? [])
+                ->map(fn (mixed $item): array => ['feature' => $this->translateFeature($item['feature'] ?? $item)])
+                ->values(),
         ];
+    }
+
+    /**
+     * Pick the feature text in the current locale, falling back to any language that has it.
+     *
+     * @param  array<string, string|null>|string|null  $feature
+     */
+    private function translateFeature(array|string|null $feature): ?string
+    {
+        if (! is_array($feature)) {
+            return $feature;
+        }
+
+        return collect([app()->getLocale(), config('app.fallback_locale')])
+            ->map(fn (string $locale): ?string => $feature[$locale] ?? null)
+            ->merge($feature)
+            ->first(fn (mixed $text): bool => filled($text));
     }
 }
