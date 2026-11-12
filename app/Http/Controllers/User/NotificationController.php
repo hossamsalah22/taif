@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssessmentSubmission;
+use App\Notifications\ReportPublishedNotification;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 
@@ -25,7 +27,7 @@ class NotificationController extends Controller
             return [
                 'id' => $notification->id,
                 'type' => class_basename($notification->type),
-                'data' => $this->translateData($notification->data),
+                'data' => $this->withReportLink($notification->type, $this->translateData($notification->data)),
                 'is_read' => ! is_null($notification->read_at),
                 'read_at' => $notification->read_at?->toIso8601String(),
                 'created_at' => $notification->created_at->toIso8601String(),
@@ -119,6 +121,30 @@ class NotificationController extends Controller
         }
 
         unset($data['message_key'], $data['message_params']);
+
+        return $data;
+    }
+
+    /**
+     * Give report notifications stored before the link existed the child and report link the app needs to open them.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withReportLink(string $type, array $data): array
+    {
+        if ($type !== ReportPublishedNotification::class || isset($data['report_url']) || ! isset($data['submission_id'])) {
+            return $data;
+        }
+
+        $childId = $data['child_id'] ?? AssessmentSubmission::query()->whereKey($data['submission_id'])->value('child_id');
+
+        if ($childId === null) {
+            return $data;
+        }
+
+        $data['child_id'] = $childId;
+        $data['report_url'] = ReportPublishedNotification::reportUrl($childId, $data['submission_id']);
 
         return $data;
     }

@@ -37,6 +37,8 @@ class ReportPublishedNotification extends Notification implements ShouldQueue
     {
         return [
             'submission_id' => $this->submission->id,
+            'child_id' => $this->submission->child_id,
+            'report_url' => self::reportUrl($this->submission->child_id, $this->submission->id),
             'message_key' => self::MESSAGE,
             'message' => __(self::MESSAGE),
         ];
@@ -51,6 +53,15 @@ class ReportPublishedNotification extends Notification implements ShouldQueue
             ->data([
                 'submission_id' => (string) $this->submission->id,
                 'child_id' => (string) $this->submission->child_id,
+                'report_url' => self::reportUrl($this->submission->child_id, $this->submission->id),
             ]);
+    }
+
+    /**
+     * The API endpoint the app calls to show the published report.
+     */
+    public static function reportUrl(int $childId, int $submissionId): string
+    {
+        return route('api.reports.show', ['child' => $childId, 'submission' => $submissionId]);
     }
 }

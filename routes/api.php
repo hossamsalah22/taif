@@ -77,7 +77,7 @@ Route::prefix('user')->group(function () {
         Route::prefix('children/{child}/assessments')->group(function () {
             Route::get('registration', [AssessmentController::class, 'registrationTest']);
             Route::post('submit', [AssessmentController::class, 'submitTest']);
-            Route::get('{submission}/report', [AssessmentReportController::class, 'show']);
+            Route::get('{submission}/report', [AssessmentReportController::class, 'show'])->name('api.reports.show');
             Route::get('{submission}/report/download', [AssessmentReportController::class, 'download'])->name('api.reports.download');
         });
 

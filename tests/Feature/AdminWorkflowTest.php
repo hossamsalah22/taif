@@ -113,6 +113,7 @@ class AdminWorkflowTest extends TestCase
                     && $push['data'] === [
                         'submission_id' => (string) $submission->id,
                         'child_id' => (string) $submission->child_id,
+                        'report_url' => route('api.reports.show', ['child' => $submission->child_id, 'submission' => $submission->id]),
                     ];
             }
         );
