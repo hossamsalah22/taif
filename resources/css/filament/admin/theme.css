@@ -5,7 +5,8 @@
 @source '../../../../vendor/bezhansalleh/filament-language-switch/**';
 
 /*
- * Tayf look: navy sidebar with teal highlights, a soft light canvas and rounded cards.
+ * Tayf look: teal highlights, a soft light canvas and rounded cards.
+ * The sidebar is white in light mode and navy in dark mode.
  */
 :root {
     --tayf-navy: #16324a;
@@ -21,30 +22,26 @@
     background-color: var(--color-gray-950);
 }
 
-/* Sidebar */
+/* Sidebar: light mode */
 .fi-sidebar,
 .fi-sidebar.fi-sidebar-open {
-    background-color: var(--tayf-navy) !important;
-}
-
-.dark .fi-sidebar,
-.dark .fi-sidebar.fi-sidebar-open {
-    background-color: var(--tayf-navy-deep) !important;
+    background-color: #fff !important;
+    border-inline-end: 1px solid var(--color-gray-200);
 }
 
 .fi-sidebar-nav {
-    scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gray-300) transparent;
 }
 
 .fi-sidebar .fi-sidebar-group-label {
-    @apply text-xs font-semibold tracking-wide;
-    color: rgb(255 255 255 / 0.55);
+    @apply text-xs font-semibold tracking-wide text-gray-500;
 }
 
 .fi-sidebar .fi-sidebar-group-btn .fi-icon,
 .fi-sidebar .fi-sidebar-group-collapse-btn .fi-icon,
 .fi-sidebar .fi-sidebar-group-collapse-btn {
-    color: rgb(255 255 255 / 0.5);
+    @apply text-gray-400;
 }
 
 .fi-sidebar .fi-sidebar-item-btn {
@@ -52,19 +49,55 @@
 }
 
 .fi-sidebar .fi-sidebar-item-btn > .fi-icon {
-    color: rgb(255 255 255 / 0.6);
+    @apply text-gray-400;
 }
 
 .fi-sidebar .fi-sidebar-item-label {
-    color: rgb(255 255 255 / 0.85);
+    color: var(--tayf-navy);
 }
 
 .fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover,
 .fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:focus-visible,
 .fi-sidebar .fi-sidebar-group-dropdown-trigger-btn:hover {
+    @apply bg-primary-50;
+}
+
+/* Sidebar: dark mode */
+.dark .fi-sidebar,
+.dark .fi-sidebar.fi-sidebar-open {
+    background-color: var(--tayf-navy-deep) !important;
+    border-inline-end-color: rgb(255 255 255 / 0.06);
+}
+
+.dark .fi-sidebar-nav {
+    scrollbar-color: rgb(255 255 255 / 0.15) transparent;
+}
+
+.dark .fi-sidebar .fi-sidebar-group-label {
+    color: rgb(255 255 255 / 0.55);
+}
+
+.dark .fi-sidebar .fi-sidebar-group-btn .fi-icon,
+.dark .fi-sidebar .fi-sidebar-group-collapse-btn .fi-icon,
+.dark .fi-sidebar .fi-sidebar-group-collapse-btn {
+    color: rgb(255 255 255 / 0.5);
+}
+
+.dark .fi-sidebar .fi-sidebar-item-btn > .fi-icon {
+    color: rgb(255 255 255 / 0.6);
+}
+
+.dark .fi-sidebar .fi-sidebar-item-label {
+    color: rgb(255 255 255 / 0.85);
+}
+
+.dark .fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover,
+.dark .fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:focus-visible,
+.dark .fi-sidebar .fi-sidebar-group-dropdown-trigger-btn:hover {
     background-color: rgb(255 255 255 / 0.08);
 }
 
+/* Active item: solid teal in both modes. */
 .fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     @apply bg-primary-600 shadow-sm;
 }
