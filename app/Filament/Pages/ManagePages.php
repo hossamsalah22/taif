@@ -28,9 +28,9 @@ class ManagePages extends SettingsPage
 
     protected static string $settings = PagesSettings::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::APP_CONTENT;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SETTINGS;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     public static function getNavigationLabel(): string
     {

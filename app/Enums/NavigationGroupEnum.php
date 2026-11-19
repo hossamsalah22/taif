@@ -6,37 +6,34 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Support\Contracts\HasLabel;
 
 /**
- * Admin sidebar groups, in the order they are shown: daily work first, rarely changed setup last.
+ * Admin sidebar sections, in the order they are shown. Each section is one area of work,
+ * so an entry lives in exactly one place: content, students, finance, settings and reports.
  */
 enum NavigationGroupEnum: string implements HasLabel
 {
-    case OPERATIONS = 'operations';
-    case FAMILIES = 'families';
-    case LEARNING_CONTENT = 'learning_content';
-    case SUBSCRIPTIONS = 'subscriptions';
-    case APP_CONTENT = 'app_content';
-    case LOCATIONS = 'locations';
+    case CONTENT = 'content';
+    case STUDENTS = 'students';
+    case FINANCE = 'finance';
     case SETTINGS = 'settings';
+    case REPORTS = 'reports';
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::OPERATIONS => __('Daily operations'),
-            self::FAMILIES => __('Children & families'),
-            self::LEARNING_CONTENT => __('Learning content'),
-            self::SUBSCRIPTIONS => __('Subscriptions'),
-            self::APP_CONTENT => __('App content'),
-            self::LOCATIONS => __('Locations'),
-            self::SETTINGS => __('Settings & access'),
+            self::CONTENT => __('Content'),
+            self::STUDENTS => __('Students'),
+            self::FINANCE => __('Finance & subscriptions'),
+            self::SETTINGS => __('Settings'),
+            self::REPORTS => __('Reports'),
         };
     }
 
     /**
-     * Setup groups that are rarely touched start collapsed so the daily work stays on screen.
+     * Settings are rarely changed, so that section starts collapsed and the daily work stays on screen.
      */
     public function isCollapsedByDefault(): bool
     {
-        return in_array($this, [self::APP_CONTENT, self::LOCATIONS, self::SETTINGS], true);
+        return $this === self::SETTINGS;
     }
 
     /**

@@ -20,9 +20,9 @@ class FaqResource extends MainResource
 {
     protected static ?string $model = Faq::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::APP_CONTENT;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::CONTENT;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 7;
 
     /**
      * Hidden from the sidebar for now; the pages still work by URL.

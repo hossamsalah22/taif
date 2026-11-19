@@ -504,12 +504,7 @@
     "A plan is what a child follows. Add goals to a plan, then use \"Assign to Children\" to give it to children with the same severity level.": "A plan is what a child follows. Add goals to a plan, then use \"Assign to Children\" to give it to children with the same severity level.",
     "A goal is a skill the child learns. Its lessons and exercises are added inside the goal form, and one goal can be shared by several plans.": "A goal is a skill the child learns. Its lessons and exercises are added inside the goal form, and one goal can be shared by several plans.",
     "A lesson is one step of a goal. To add or edit its exercises, open the goal it belongs to.": "A lesson is one step of a goal. To add or edit its exercises, open the goal it belongs to.",
-    "Daily operations": "Daily operations",
-    "Children & families": "Children & families",
-    "Learning content": "Learning content",
-    "App content": "App content",
     "Locations": "Locations",
-    "Settings & access": "Settings & access",
     "Open tickets waiting for a reply": "Open tickets waiting for a reply",
     "Submissions waiting for review": "Submissions waiting for review",
     "Ticket Number": "Ticket Number",
@@ -633,5 +628,13 @@
     "Notification marked as read.": "Notification marked as read.",
     "All notifications marked as read.": "All notifications marked as read.",
     "Notification deleted successfully.": "Notification deleted successfully.",
-    "All notifications deleted successfully.": "All notifications deleted successfully."
+    "All notifications deleted successfully.": "All notifications deleted successfully.",
+    "Content": "Content",
+    "Students": "Students",
+    "Finance & subscriptions": "Finance & subscriptions",
+    "Settings": "Settings",
+    "Reports": "Reports",
+    "Name, severity level and pace": "Name, severity level and pace",
+    "Optional": "Optional",
+    "Learning content": "Learning content"
 }

@@ -21,7 +21,7 @@ class AssessmentResource extends MainResource
 {
     protected static ?string $model = Assessment::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::CONTENT;
 
     protected static ?int $navigationSort = 5;
 

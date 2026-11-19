@@ -22,11 +22,30 @@ class LearningPlanResource extends MainResource
 {
     protected static ?string $model = LearningPlan::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::CONTENT;
 
     protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
+
+    /**
+     * One sidebar entry for the whole learning content workspace; goals, lessons and rewards are tabs inside it.
+     */
+    public static function getNavigationLabel(): string
+    {
+        return __('Learning content');
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getNavigationItemActiveRoutePattern(): array
+    {
+        return array_map(
+            fn (string $resource): string => $resource::getRouteBaseName().'.*',
+            ListLearningPlans::learningContentResources(),
+        );
+    }
 
     public static function form(Schema $schema): Schema
     {

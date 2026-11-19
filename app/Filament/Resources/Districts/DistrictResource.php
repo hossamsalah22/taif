@@ -20,9 +20,9 @@ class DistrictResource extends MainResource
 {
     protected static ?string $model = District::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SETTINGS;
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 13;
 
     /**
      * Hidden from the sidebar for now; the pages still work by URL.

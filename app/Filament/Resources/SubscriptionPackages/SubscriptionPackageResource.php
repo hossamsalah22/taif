@@ -22,9 +22,9 @@ class SubscriptionPackageResource extends MainResource
 {
     protected static ?string $model = SubscriptionPackage::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SUBSCRIPTIONS;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::FINANCE;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 

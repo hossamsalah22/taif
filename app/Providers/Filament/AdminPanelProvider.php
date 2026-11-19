@@ -59,7 +59,9 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile(EditProfile::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#14a094'),
+                'info' => Color::hex('#6d55d9'),
+                'gray' => Color::Slate,
             ])
             ->favicon(Storage::url('tayf.png'))
             ->brandLogo(Storage::url('tayf.png'))

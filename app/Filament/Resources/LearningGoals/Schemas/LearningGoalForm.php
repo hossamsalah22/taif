@@ -12,7 +12,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Schema;
 
 class LearningGoalForm
@@ -23,11 +25,22 @@ class LearningGoalForm
             ->columns(1)
             ->components([
                 LearningStructureHint::make('goal'),
+                self::tabs(),
+            ]);
+    }
 
-                Section::make(__('Goal Details'))
+    /**
+     * The goal form split into tabs, used on the goal page and in the "add a new goal" popup of the plan form.
+     * Inside the plan form the goal is added to that plan automatically, so the plans field is left out there.
+     */
+    public static function tabs(bool $withPlans = true): Tabs
+    {
+        return Tabs::make('goal')
+            ->columnSpanFull()
+            ->tabs([
+                Tab::make(__('Goal Details'))
                     ->icon('heroicon-o-academic-cap')
                     ->columns(2)
-                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->label(__('Goal Name'))
@@ -50,6 +63,7 @@ class LearningGoalForm
                             ->multiple()
                             ->searchable()
                             ->preload()
+                            ->visible($withPlans)
                             ->helperText(__('Optional. A goal can be created without a plan and shared between several plans.')),
                         Select::make('display_priority')
                             ->label(__('Display priority'))
@@ -58,19 +72,17 @@ class LearningGoalForm
                             ->helperText(__('Order inside the plan: 1 comes first.')),
                     ]),
 
-                Section::make(__('Lessons'))
-                    ->description(__('Add the lessons of this goal and drag them into the order the child follows. Exercises are added inside each lesson: save the goal, then use "Manage exercises" on a lesson.'))
+                Tab::make(__('Lessons'))
                     ->icon('heroicon-o-play-circle')
-                    ->columnSpanFull()
                     ->schema([
+                        Text::make(__('Add the lessons of this goal and drag them into the order the child follows. Exercises are added inside each lesson: save the goal, then use "Manage exercises" on a lesson.')),
                         LessonsRepeater::make(),
                     ]),
 
-                Section::make(__('Assessment Questions'))
+                Tab::make(__('Assessment Questions'))
                     ->icon('heroicon-o-question-mark-circle')
-                    ->collapsible()
-                    ->collapsed()
-                    ->columnSpanFull()
+                    ->badge(__('Optional'))
+                    ->badgeColor('gray')
                     ->schema([
                         Select::make('questions')
                             ->label(__('Questions'))
@@ -82,10 +94,9 @@ class LearningGoalForm
                             ->helperText(__('Optional. Assessment questions linked to this goal.')),
                     ]),
 
-                Section::make(__('Access & Reward'))
+                Tab::make(__('Access & Reward'))
                     ->icon('heroicon-o-gift')
                     ->columns(2)
-                    ->columnSpanFull()
                     ->schema([
                         Select::make('reward_id')
                             ->label(__('Goal Completion Reward'))

@@ -21,9 +21,9 @@ class CityResource extends MainResource
 {
     protected static ?string $model = City::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SETTINGS;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 12;
 
     /**
      * Hidden from the sidebar for now; the pages still work by URL.

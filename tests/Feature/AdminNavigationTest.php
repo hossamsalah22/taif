@@ -6,18 +6,25 @@ use App\Enums\AutismLevelEnum;
 use App\Enums\NavigationGroupEnum;
 use App\Enums\SupportTicketStatusEnum;
 use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\ManagePages;
+use App\Filament\Resources\Admins\AdminResource;
+use App\Filament\Resources\Assessments\AssessmentResource;
 use App\Filament\Resources\AssessmentSubmissions\AssessmentSubmissionResource;
 use App\Filament\Resources\ChildLearningPlans\ChildLearningPlanResource;
 use App\Filament\Resources\Children\ChildResource;
 use App\Filament\Resources\Cities\CityResource;
+use App\Filament\Resources\ClinicalProgressReports\ClinicalProgressReportResource;
 use App\Filament\Resources\Countries\CountryResource;
 use App\Filament\Resources\Districts\DistrictResource;
 use App\Filament\Resources\Faqs\FaqResource;
+use App\Filament\Resources\LearningPlans\LearningPlanResource;
 use App\Filament\Resources\Permissions\PermissionResource;
 use App\Filament\Resources\Regions\RegionResource;
 use App\Filament\Resources\Sliders\SliderResource;
 use App\Filament\Resources\SubscriptionPackages\SubscriptionPackageResource;
+use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\SupportTickets\SupportTicketResource;
+use App\Filament\Resources\Users\UserResource;
 use App\Models\Admin;
 use App\Models\Assessment;
 use App\Models\AssessmentSubmission;
@@ -32,18 +39,15 @@ class AdminNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_sidebar_lists_groups_with_daily_work_first(): void
+    public function test_sidebar_lists_the_sections_in_order(): void
     {
         $this->actingAs($this->createSuperAdmin(), 'web');
-
-        // Locations has no entries while its resources are hidden, so the group does not show.
-        $shownGroups = array_filter(NavigationGroupEnum::cases(), fn (NavigationGroupEnum $group): bool => $group !== NavigationGroupEnum::LOCATIONS);
 
         $this->get(Dashboard::getUrl())
             ->assertOk()
             ->assertSeeInOrder(array_map(
                 fn (NavigationGroupEnum $group): string => $group->getLabel(),
-                array_values($shownGroups),
+                NavigationGroupEnum::cases(),
             ));
     }
 
@@ -67,10 +71,19 @@ class AdminNavigationTest extends TestCase
 
     public function test_resources_are_grouped_by_the_work_they_belong_to(): void
     {
-        $this->assertSame(NavigationGroupEnum::FAMILIES, ChildResource::getNavigationGroup());
-        $this->assertSame(NavigationGroupEnum::FAMILIES, ChildLearningPlanResource::getNavigationGroup());
-        $this->assertSame(NavigationGroupEnum::OPERATIONS, SupportTicketResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::CONTENT, LearningPlanResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::CONTENT, AssessmentResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::STUDENTS, ChildResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::STUDENTS, UserResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::STUDENTS, AssessmentSubmissionResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::STUDENTS, ChildLearningPlanResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::STUDENTS, SupportTicketResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::FINANCE, SubscriptionResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::FINANCE, SubscriptionPackageResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::SETTINGS, AdminResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::SETTINGS, ManagePages::getNavigationGroup());
         $this->assertSame(NavigationGroupEnum::SETTINGS->getLabel(), PermissionResource::getNavigationGroup());
+        $this->assertSame(NavigationGroupEnum::REPORTS, ClinicalProgressReportResource::getNavigationGroup());
     }
 
     public function test_sliders_and_faqs_are_hidden_from_the_sidebar(): void
@@ -100,18 +113,16 @@ class AdminNavigationTest extends TestCase
             $dashboard->assertDontSee($resource::getUrl('index'));
             $this->get($resource::getUrl('index'))->assertOk();
         }
-
-        $dashboard->assertDontSee(NavigationGroupEnum::LOCATIONS->getLabel());
     }
 
-    public function test_only_setup_groups_start_collapsed(): void
+    public function test_only_settings_start_collapsed(): void
     {
         $collapsed = collect(NavigationGroupEnum::navigationGroups())
             ->filter(fn ($group): bool => $group->isCollapsed())
             ->keys()
             ->all();
 
-        $this->assertSame(['APP_CONTENT', 'LOCATIONS', 'SETTINGS'], $collapsed);
+        $this->assertSame(['SETTINGS'], $collapsed);
     }
 
     public function test_ticket_badge_counts_only_open_tickets(): void

@@ -20,9 +20,9 @@ class SliderResource extends MainResource
 {
     protected static ?string $model = Slider::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::APP_CONTENT;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::CONTENT;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 6;
 
     /**
      * Hidden from the sidebar for now; the pages still work by URL.

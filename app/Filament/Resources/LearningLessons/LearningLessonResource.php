@@ -22,7 +22,12 @@ class LearningLessonResource extends MainResource
 {
     protected static ?string $model = LearningLesson::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LEARNING_CONTENT;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::CONTENT;
+
+    /**
+     * Shown as a tab of the learning content workspace instead of its own sidebar entry.
+     */
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?int $navigationSort = 3;
 

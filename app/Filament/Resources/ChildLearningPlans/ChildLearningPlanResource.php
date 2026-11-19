@@ -25,9 +25,9 @@ class ChildLearningPlanResource extends MainResource
 {
     protected static ?string $model = ChildLearningPlan::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::FAMILIES;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::STUDENTS;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 

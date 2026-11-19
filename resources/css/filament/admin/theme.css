@@ -4,6 +4,104 @@
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../vendor/bezhansalleh/filament-language-switch/**';
 
+/*
+ * Tayf look: navy sidebar with teal highlights, a soft light canvas and rounded cards.
+ */
+:root {
+    --tayf-navy: #16324a;
+    --tayf-navy-deep: #0f2436;
+    --tayf-canvas: #f5f8fa;
+}
+
+.fi-body {
+    background-color: var(--tayf-canvas);
+}
+
+.dark .fi-body {
+    background-color: var(--color-gray-950);
+}
+
+/* Sidebar */
+.fi-sidebar,
+.fi-sidebar.fi-sidebar-open {
+    background-color: var(--tayf-navy) !important;
+}
+
+.dark .fi-sidebar,
+.dark .fi-sidebar.fi-sidebar-open {
+    background-color: var(--tayf-navy-deep) !important;
+}
+
+.fi-sidebar-nav {
+    scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+}
+
+.fi-sidebar .fi-sidebar-group-label {
+    @apply text-xs font-semibold tracking-wide;
+    color: rgb(255 255 255 / 0.55);
+}
+
+.fi-sidebar .fi-sidebar-group-btn .fi-icon,
+.fi-sidebar .fi-sidebar-group-collapse-btn .fi-icon,
+.fi-sidebar .fi-sidebar-group-collapse-btn {
+    color: rgb(255 255 255 / 0.5);
+}
+
+.fi-sidebar .fi-sidebar-item-btn {
+    @apply rounded-xl;
+}
+
+.fi-sidebar .fi-sidebar-item-btn > .fi-icon {
+    color: rgb(255 255 255 / 0.6);
+}
+
+.fi-sidebar .fi-sidebar-item-label {
+    color: rgb(255 255 255 / 0.85);
+}
+
+.fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:hover,
+.fi-sidebar .fi-sidebar-item.fi-sidebar-item-has-url > .fi-sidebar-item-btn:focus-visible,
+.fi-sidebar .fi-sidebar-group-dropdown-trigger-btn:hover {
+    background-color: rgb(255 255 255 / 0.08);
+}
+
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    @apply bg-primary-600 shadow-sm;
+}
+
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label {
+    @apply text-white;
+}
+
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-grouped-border-part {
+    @apply bg-white;
+}
+
+/* Mobile drawer header keeps the white logo strip. */
+.fi-sidebar .fi-sidebar-header {
+    @apply bg-white dark:bg-gray-900;
+}
+
+/* Cards: sections, stats, charts and tables share the same rounded, softly bordered look. */
+.fi-section,
+.fi-wi-stats-overview-stat,
+.fi-ta-ctn {
+    @apply rounded-2xl shadow-none ring-1 ring-gray-200/80 dark:ring-white/10;
+}
+
+.fi-wi-stats-overview-stat {
+    @apply transition-shadow hover:shadow-md;
+}
+
+.fi-header-heading {
+    @apply font-extrabold tracking-tight text-[color:var(--tayf-navy)] dark:text-white;
+}
+
+.fi-btn {
+    @apply rounded-xl;
+}
+
 /* Print only the invoice card on the subscription invoice page. */
 @media print {
     @page {

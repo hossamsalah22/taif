@@ -21,9 +21,9 @@ class CountryResource extends MainResource
 {
     protected static ?string $model = Country::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::LOCATIONS;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::SETTINGS;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 10;
 
     /**
      * Hidden from the sidebar for now; the pages still work by URL.

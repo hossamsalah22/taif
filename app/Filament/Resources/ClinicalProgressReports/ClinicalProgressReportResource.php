@@ -20,9 +20,9 @@ class ClinicalProgressReportResource extends MainResource
 {
     protected static ?string $model = ClinicalProgressReport::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::OPERATIONS;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::REPORTS;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentChartBar;
 

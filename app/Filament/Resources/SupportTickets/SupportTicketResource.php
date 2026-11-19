@@ -21,9 +21,9 @@ class SupportTicketResource extends MainResource
 {
     protected static ?string $model = SupportTicket::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::OPERATIONS;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::STUDENTS;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 5;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 

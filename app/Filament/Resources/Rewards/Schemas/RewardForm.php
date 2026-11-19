@@ -8,7 +8,8 @@ use App\Models\Reward;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
@@ -18,11 +19,22 @@ class RewardForm
     {
         return $schema
             ->columns(1)
-            ->components([
-                Section::make(__('Reward Details'))
+            ->components([self::tabs()]);
+    }
+
+    /**
+     * The reward form split into tabs, used on the reward page and in the plan form's "add a new reward" popup.
+     * When the reward is created from a place that only takes one target (e.g. a plan's completion reward),
+     * that target is fixed and shown read-only.
+     */
+    public static function tabs(?RewardTargetEnum $fixedTarget = null): Tabs
+    {
+        return Tabs::make('reward')
+            ->columnSpanFull()
+            ->tabs([
+                Tab::make(__('Reward Details'))
                     ->icon('heroicon-o-gift')
                     ->columns(2)
-                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->label(__('name'))
@@ -55,7 +67,9 @@ class RewardForm
                         Select::make('target_type')
                             ->label(__('Reward Target'))
                             ->options(RewardTargetEnum::options())
-                            ->default(RewardTargetEnum::LESSON->value)
+                            ->default($fixedTarget?->value ?? RewardTargetEnum::LESSON->value)
+                            ->disabled($fixedTarget !== null)
+                            ->dehydrated()
                             ->required()
                             ->helperText(__('Where this reward can be attached: question, lesson, goal or learning plan.')),
                         Select::make('type')
@@ -71,10 +85,9 @@ class RewardForm
                             }),
                     ]),
 
-                Section::make(__('Media Assets'))
+                Tab::make(__('Media Assets'))
                     ->icon('heroicon-o-photo')
                     ->columns(2)
-                    ->columnSpanFull()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('sound')
                             ->label(__('Sound File'))

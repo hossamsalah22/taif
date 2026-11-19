@@ -23,9 +23,9 @@ class ChildResource extends MainResource
 {
     protected static ?string $model = Child::class;
 
-    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::FAMILIES;
+    protected static string|UnitEnum|null $navigationGroup = NavigationGroupEnum::STUDENTS;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFaceSmile;
 
